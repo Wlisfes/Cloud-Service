@@ -1,28 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, BeforeInsert } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm'
+import { DateEntity } from '@/entity/common.entity'
 
 @Entity('user')
-export class UserEntity {
+export class UserEntity extends DateEntity {
+	@BeforeInsert()
+	async BeforeCreate() {
+		this.uid = Date.now()
+	}
+
 	@PrimaryGeneratedColumn({ comment: '自增长主键' })
 	id: number
 
-	@Column({
-		type: 'double',
-		comment: 'uid',
-		readonly: true
-	})
+	@Column({ type: 'double', comment: 'uid', readonly: true })
 	uid: number
 
-	@Column({
-		comment: '昵称',
-		nullable: false
-	})
+	@Column({ comment: '昵称', nullable: false })
 	nickname: string
 
-	@Column({
-		comment: '邮箱',
-		nullable: true
-	})
+	@Column({ comment: '邮箱', nullable: true })
 	email: string | null
+
+	@Column({ comment: '头像', nullable: true })
+	avatar: string | null
 
 	@Column({
 		comment: '手机号',
@@ -33,11 +32,5 @@ export class UserEntity {
 			to: value => String(value)
 		}
 	})
-	mobile: string
-
-	@Column({
-		comment: '头像',
-		nullable: true
-	})
-	avatar: string | null
+	mobile: string | null
 }

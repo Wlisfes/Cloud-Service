@@ -7,8 +7,16 @@ import { AppService } from '@/app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { WebInitModule } from '@/web-module/init/init.module'
 
+//表注入
+import { UserEntity } from '@/entity/user.entity'
+
 @Module({
-	imports: [ConfigModule.forRoot({ isGlobal: true }), TypeOrmModule.forFeature([]), WebInitModule],
+	imports: [
+		ConfigModule.forRoot({ isGlobal: true }),
+		TypeOrmModule.forRoot(),
+		TypeOrmModule.forFeature([UserEntity]),
+		WebInitModule
+	],
 	controllers: [AppController],
 	providers: [AppService]
 })
