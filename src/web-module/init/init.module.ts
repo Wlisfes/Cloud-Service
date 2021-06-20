@@ -2,6 +2,7 @@ import { Module, Global } from '@nestjs/common'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 
 //依赖模块挂载
+import { AliyunModule } from '@/common/aliyun/aliyun.module'
 import { BannerModule } from '@/web-module/banner/banner.module'
 import { UserModule } from '@/web-module/user/user.module'
 
@@ -19,7 +20,7 @@ export async function webSwagger(app) {
 		.setVersion('1.0')
 		.build()
 	const document = SwaggerModule.createDocument(app, options, {
-		include: imports
+		include: [AliyunModule, ...imports]
 	})
 	SwaggerModule.setup('api-web', app, document)
 	return this

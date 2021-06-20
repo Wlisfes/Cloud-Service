@@ -29,7 +29,7 @@ export class UserEntity extends DateEntity {
 		nullable: true,
 		transformer: {
 			from: value => (value ? Number(value) : null),
-			to: value => String(value)
+			to: value => (value ? String(value) : null)
 		}
 	})
 	mobile: string | null
