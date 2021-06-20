@@ -9,10 +9,10 @@ import { AliyunModule } from '@/common/aliyun/aliyun.module'
 		ConfigModule.forRoot({ isGlobal: true }),
 		TypeOrmModule.forRoot(),
 		AliyunModule.forRoot({
-			accessKeyId: 'LTAI4GCnkFG1dVosYiJAyHaM',
-			accessKeySecret: '9BAntvWrWdDMg8fRXBTPhBryj7l5aT',
-			endpoint: 'http://vod.cn-shanghai.aliyuncs.com',
-			apiVersion: '2017-03-21'
+			accessKeyId: process.env.ALIYUN_ACCESSKEYID,
+			accessKeySecret: process.env.ALIYUN_ACCESSKEYSECRET,
+			endpoint: process.env.ALIYUN_ENDPOINT,
+			apiVersion: process.env.ALIYUN_APIVERSION
 		})
 	]
 })
