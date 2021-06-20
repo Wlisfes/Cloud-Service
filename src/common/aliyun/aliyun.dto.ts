@@ -15,7 +15,7 @@ export class CreateUpload {
 }
 
 export class RefreshUpload {
-	@ApiProperty({ description: '视频id', example: 'VideoId' })
+	@ApiProperty({ description: '视频id', example: 'e182ea7c477d488faedcca60dfe0bfea' })
 	@IsNotEmpty({ message: '视频id 必填' })
 	@Type(() => String)
 	VideoId: string
