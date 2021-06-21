@@ -1,6 +1,6 @@
 import { Module, HttpModule } from '@nestjs/common'
-import { BannerService } from '@/web-module/banner/banner.service'
-import { BannerController } from '@/web-module/banner/banner.controller'
+import { BannerService } from './banner.service'
+import { BannerController } from './banner.controller'
 
 @Module({
 	imports: [HttpModule],

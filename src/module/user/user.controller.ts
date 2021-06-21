@@ -1,6 +1,6 @@
 import { Controller, Post, Put, Get, Body, Query } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiQuery, ApiHeader } from '@nestjs/swagger'
-import { UserService } from '@/web-module/user/user.service'
+import { UserService } from './user.service'
 
 @ApiTags('用户模块')
 @Controller('user')

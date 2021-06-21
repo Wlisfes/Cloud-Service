@@ -4,7 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express'
 import { HttpExceptionFilter } from '@/filters/http-exception.filter'
 import { TransformInterceptor } from '@/interceptor/transform.interceptor'
 import { AppModule } from '@/app.module'
-import { webSwagger } from '@/web-module/init/init.module'
+import { webSwagger } from '@/module/init/init.module'
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -34,6 +34,6 @@ async function bootstrap() {
 	const port = process.env.PORT || 3005
 	await app.listen(port)
 	console.log(`http://localhost:${port}`)
-	console.log(`http://localhost:${port}/api-web`)
+	console.log(`http://localhost:${port}/api-desc`)
 }
 bootstrap()

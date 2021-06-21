@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiHeader } from '@nestjs/swagger'
-import { BannerService } from '@/web-module/banner/banner.service'
+import { BannerService } from './banner.service'
 
 @ApiTags('Banner模块')
 @Controller('banner')
