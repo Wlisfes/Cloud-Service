@@ -17,22 +17,20 @@ export class AliyunService extends AliyunBase {
 	}
 
 	//创建上传凭证
-	createUpload(prosp: DTO.CreateUpload) {
-		return new Promise((resolve, reject) => {
-			this.client
-				.request('CreateUploadVideo', { ...prosp }, {})
-				.then(response => resolve(response))
-				.catch(e => reject(new HttpException(e.data.Message, HttpStatus.BAD_REQUEST)))
-		})
+	async createUpload(prosp: DTO.CreateUpload) {
+		try {
+			return await this.client.request('CreateUploadVideo', { ...prosp }, {})
+		} catch (e) {
+			throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	//刷新上传凭证
-	refreshUpload(prosp: DTO.RefreshUpload) {
-		return new Promise((resolve, reject) => {
-			this.client
-				.request('RefreshUploadVideo', { VideoId: prosp.VideoId }, {})
-				.then(response => resolve(response))
-				.catch(e => reject(new HttpException(e.data.Message, HttpStatus.BAD_REQUEST)))
-		})
+	async refreshUpload(prosp: DTO.RefreshUpload) {
+		try {
+			return await this.client.request('RefreshUploadVideo', { VideoId: prosp.VideoId }, {})
+		} catch (e) {
+			throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
 	}
 }

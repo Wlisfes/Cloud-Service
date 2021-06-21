@@ -30,9 +30,7 @@ export async function webSwagger(app) {
 		.setDescription('Cloud-Service Api Documentation')
 		.setVersion('1.0')
 		.build()
-	const document = SwaggerModule.createDocument(app, options, {
-		include: [AliyunModule, BannerModule, UserModule]
-	})
+	const document = SwaggerModule.createDocument(app, options)
 	SwaggerModule.setup('api-desc', app, document)
 	return this
 }

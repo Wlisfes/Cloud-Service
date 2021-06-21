@@ -1,5 +1,5 @@
-import { Controller, Get, Query } from '@nestjs/common'
-import { ApiTags, ApiOperation } from '@nestjs/swagger'
+import { Controller, Post, Body } from '@nestjs/common'
+import { ApiTags, ApiOperation, ApiHeader } from '@nestjs/swagger'
 import { AliyunService } from './aliyun.service'
 import * as DTO from './aliyun.dto'
 
@@ -9,14 +9,14 @@ export class AliyunController {
 	constructor(private readonly aliyunService: AliyunService) {}
 
 	@ApiOperation({ summary: '创建上传凭证' })
-	@Get('create/upload')
-	async createUpload(@Query() query: DTO.CreateUpload) {
-		return await this.aliyunService.createUpload(query)
+	@Post('create/upload')
+	async createUpload(@Body() props: DTO.CreateUpload) {
+		return await this.aliyunService.createUpload(props)
 	}
 
 	@ApiOperation({ summary: '刷新上传凭证' })
-	@Get('refresh/upload')
-	async refreshUpload(@Query() query: DTO.RefreshUpload) {
-		return await this.aliyunService.refreshUpload(query)
+	@Post('refresh/upload')
+	async refreshUpload(@Body() props: DTO.RefreshUpload) {
+		return await this.aliyunService.refreshUpload(props)
 	}
 }
