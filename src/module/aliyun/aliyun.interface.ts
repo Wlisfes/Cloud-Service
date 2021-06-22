@@ -26,11 +26,6 @@ class AliyunParameter {
 	@Type(() => String)
 	FileName: string
 
-	@ApiProperty({ description: '视频id', example: 'e182ea7c477d488faedcca60dfe0bfea' })
-	@IsNotEmpty({ message: '视频id 必填' })
-	@Type(() => String)
-	VideoId: string
-
 	@ApiProperty({ required: false, description: '视频封面', example: 'https://oss.lisfes.cn/xxx.png' })
 	CoverURL?: string
 
@@ -54,14 +49,36 @@ class AliyunParameter {
 		description: '工作流ID,如果同时传递了WorkflowId和TemplateGroupId,以WorkflowId为准'
 	})
 	WorkflowId?: string
-}
 
-export class AliyunResponse extends PickType(AliyunInterface, [
-	'RequestId',
-	'UploadAddress',
-	'UploadAuth',
-	'VideoId'
-]) {}
+	/**---华丽的分割线-------------------------------------------------------------------------**/
+
+	@ApiProperty({ description: '视频id', example: 'c701f4f45fdb411db614037f69bba11c' })
+	@IsNotEmpty({ message: '视频id 必填' })
+	@Type(() => String)
+	VideoId: string
+
+	/**---华丽的分割线-------------------------------------------------------------------------**/
+	@ApiProperty({
+		required: false,
+		description: '播放凭证过期时间, 默认为100秒, 取值范围100~3000',
+		example: 100,
+		default: 100
+	})
+	@IsNotEmpty({ message: '播放凭证过期时间 必填' })
+	@Type(() => Number)
+	AuthInfoTimeout: number
+
+	/**---华丽的分割线-------------------------------------------------------------------------**/
+	@ApiProperty({
+		required: false,
+		description: '播放地址过期时间。单位：秒, 最大值: 2592000 (即30天)',
+		example: 1800,
+		default: 1800
+	})
+	@IsNotEmpty({ message: '播放凭证过期时间 必填' })
+	@Type(() => Number)
+	AuthTimeout: number
+}
 
 export class CreateUpload extends PickType(AliyunParameter, [
 	'Title',
@@ -73,5 +90,18 @@ export class CreateUpload extends PickType(AliyunParameter, [
 	'TemplateGroupId',
 	'WorkflowId'
 ]) {}
+export class AliyunCreateUploadResponse extends PickType(AliyunInterface, [
+	'RequestId',
+	'UploadAddress',
+	'UploadAuth',
+	'VideoId'
+]) {}
 
 export class RefreshUpload extends PickType(AliyunParameter, ['VideoId']) {}
+export class AliyunRefreshUploadResponse extends AliyunCreateUploadResponse {}
+
+export class CreatePlayAuth extends PickType(AliyunParameter, ['VideoId', 'AuthInfoTimeout']) {}
+export class AliyunCreatePlayAuthResponse extends PickType(AliyunInterface, []) {}
+
+export class CreatePlayInfo extends PickType(AliyunParameter, ['VideoId', 'AuthTimeout']) {}
+export class AliyunCreatePlayInfoResponse extends PickType(AliyunInterface, []) {}
