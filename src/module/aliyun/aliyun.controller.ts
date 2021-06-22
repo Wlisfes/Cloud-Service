@@ -11,18 +11,18 @@ export class AliyunController {
 	@ApiOperation({ summary: '创建上传凭证' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.AliyunInterface })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.AliyunResponse })
 	@Post('create/upload')
-	async createUpload(@Body() props: DTO.CreateUpload) {
+	async createUpload(@Body() props: DTO.CreateUpload): Promise<DTO.AliyunResponse> {
 		return await this.aliyunService.createUpload(props)
 	}
 
 	@ApiOperation({ summary: '刷新上传凭证' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.AliyunInterface })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.AliyunResponse })
 	@Post('refresh/upload')
-	async refreshUpload(@Body() props: DTO.RefreshUpload) {
+	async refreshUpload(@Body() props: DTO.RefreshUpload): Promise<DTO.AliyunResponse> {
 		return await this.aliyunService.refreshUpload(props)
 	}
 }

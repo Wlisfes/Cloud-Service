@@ -17,7 +17,7 @@ export class AliyunService extends AliyunBase {
 	}
 
 	//创建上传凭证
-	async createUpload(prosp: DTO.CreateUpload): Promise<DTO.AliyunInterface> {
+	async createUpload(prosp: DTO.CreateUpload): Promise<DTO.AliyunResponse> {
 		try {
 			return await this.client.request('CreateUploadVideo', { ...prosp }, {})
 		} catch (e) {
@@ -26,7 +26,7 @@ export class AliyunService extends AliyunBase {
 	}
 
 	//刷新上传凭证
-	async refreshUpload(prosp: DTO.RefreshUpload): Promise<DTO.AliyunInterface> {
+	async refreshUpload(prosp: DTO.RefreshUpload): Promise<DTO.AliyunResponse> {
 		try {
 			return await this.client.request('RefreshUploadVideo', { VideoId: prosp.VideoId }, {})
 		} catch (e) {
