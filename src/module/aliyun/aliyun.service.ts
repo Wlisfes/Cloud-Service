@@ -1,6 +1,6 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common'
 import { RPCClient, CLIENT, CLIENT_CONFIG, Config } from './aliyun.provider'
-import * as DTO from './aliyun.dto'
+import * as DTO from './aliyun.interface'
 
 export class AliyunBase {
 	protected client: RPCClient
@@ -17,7 +17,7 @@ export class AliyunService extends AliyunBase {
 	}
 
 	//创建上传凭证
-	async createUpload(prosp: DTO.CreateUpload) {
+	async createUpload(prosp: DTO.CreateUpload): Promise<DTO.AliyunInterface> {
 		try {
 			return await this.client.request('CreateUploadVideo', { ...prosp }, {})
 		} catch (e) {
@@ -26,7 +26,7 @@ export class AliyunService extends AliyunBase {
 	}
 
 	//刷新上传凭证
-	async refreshUpload(prosp: DTO.RefreshUpload) {
+	async refreshUpload(prosp: DTO.RefreshUpload): Promise<DTO.AliyunInterface> {
 		try {
 			return await this.client.request('RefreshUploadVideo', { VideoId: prosp.VideoId }, {})
 		} catch (e) {
