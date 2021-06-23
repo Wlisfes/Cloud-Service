@@ -59,10 +59,8 @@ class AliyunParameter {
 
 	/**---华丽的分割线-------------------------------------------------------------------------**/
 	@ApiProperty({
-		required: false,
-		description: '播放凭证过期时间, 默认为100秒, 取值范围100~3000',
-		example: 100,
-		default: 100
+		description: '播放凭证过期时间, 取值范围100~3000',
+		example: 100
 	})
 	@IsNotEmpty({ message: '播放凭证过期时间 必填' })
 	@Type(() => Number)
@@ -70,10 +68,8 @@ class AliyunParameter {
 
 	/**---华丽的分割线-------------------------------------------------------------------------**/
 	@ApiProperty({
-		required: false,
 		description: '播放地址过期时间。单位：秒, 最大值: 2592000 (即30天)',
-		example: 1800,
-		default: 1800
+		example: 1800
 	})
 	@IsNotEmpty({ message: '播放凭证过期时间 必填' })
 	@Type(() => Number)

@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm'
 import { DateEntity } from '@/entity/common.entity'
+import { hashSync } from 'bcryptjs'
 
 @Entity('user')
 export class UserEntity extends DateEntity {
@@ -22,6 +23,16 @@ export class UserEntity extends DateEntity {
 
 	@Column({ comment: '头像', nullable: true })
 	avatar: string | null
+
+	@Column({
+		comment: '密码',
+		nullable: false,
+		transformer: {
+			from: value => value,
+			to: value => hashSync(value)
+		}
+	})
+	password: string
 
 	@Column({
 		comment: '手机号',
