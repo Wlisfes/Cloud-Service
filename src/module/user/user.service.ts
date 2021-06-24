@@ -2,22 +2,52 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UserEntity } from '@/entity/user.entity'
+import { compareSync } from 'bcryptjs'
+import * as DTO from './user.interface'
 
 @Injectable()
 export class UserService {
 	constructor(@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>) {}
 
 	//创建用户
-	async createUser(props) {
+	async createUser(props: DTO.CreateUser): Promise<UserEntity> {
 		try {
+			if (await this.userModel.findOne({ username: props.username })) {
+				throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST)
+			}
 			const newUser = await this.userModel.create({
-				nickname: '妖雨纯',
+				...props,
 				email: '876451336@qq.com',
-				mobile: null,
-				avatar: null
+				mobile: 18676361342
 			})
+			const { uid } = await this.userModel.save(newUser)
+			return await this.findUidUser(uid)
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
 
-			return await this.userModel.save(newUser)
+	//用户登录
+	async loginUser(props: DTO.LoginUser) {
+		try {
+			const user = await this.userModel
+				.createQueryBuilder('user')
+				.orWhere('user.username = :username', { username: props.username })
+				.orWhere('user.email = :email', { email: props.username })
+				.orWhere('user.mobile = :mobile', { mobile: props.username })
+				.getOne()
+
+			if (!user) {
+				throw new HttpException('用户名错误', HttpStatus.BAD_REQUEST)
+			}
+			if (user.status !== 1) {
+				throw new HttpException('账户已被禁用', HttpStatus.BAD_REQUEST)
+			}
+			if (!compareSync(props.password, user.password)) {
+				throw new HttpException('密码错误', HttpStatus.BAD_REQUEST)
+			}
+
+			return user
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -31,9 +61,22 @@ export class UserService {
 					uid: 1624099363625
 				},
 				{
-					mobile: '18676361342'
+					mobile: 18676361342
 				}
 			)
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	//uid获取用户信息
+	async findUidUser(uid: number) {
+		try {
+			const user = await this.userModel.findOne({ uid })
+			if (user) {
+				return user
+			}
+			throw new HttpException('uid 错误', HttpStatus.BAD_REQUEST)
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

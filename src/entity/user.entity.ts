@@ -15,6 +15,9 @@ export class UserEntity extends DateEntity {
 	@Column({ type: 'double', comment: 'uid', readonly: true })
 	uid: number
 
+	@Column({ comment: '用户名', nullable: false })
+	username: string
+
 	@Column({ comment: '昵称', nullable: false })
 	nickname: string
 
@@ -23,6 +26,13 @@ export class UserEntity extends DateEntity {
 
 	@Column({ comment: '头像', nullable: true })
 	avatar: string | null
+
+	@Column({
+		comment: '手机号',
+		type: 'double',
+		nullable: true
+	})
+	mobile: number | null
 
 	@Column({
 		comment: '密码',
@@ -35,13 +45,11 @@ export class UserEntity extends DateEntity {
 	password: string
 
 	@Column({
-		comment: '手机号',
-		length: 11,
-		nullable: true,
-		transformer: {
-			from: value => (value ? Number(value) : null),
-			to: value => (value ? String(value) : null)
-		}
+		comment: '状态',
+		type: 'enum',
+		enum: [0, 1],
+		default: 1,
+		nullable: false
 	})
-	mobile: string | null
+	status: 0 | 1
 }
