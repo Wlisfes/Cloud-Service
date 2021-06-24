@@ -5,7 +5,7 @@ import { hashSync } from 'bcryptjs'
 @Entity('user')
 export class UserEntity extends DateEntity {
 	@BeforeInsert()
-	async BeforeCreate() {
+	BeforeCreate() {
 		this.uid = Date.now()
 	}
 
