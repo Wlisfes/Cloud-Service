@@ -9,7 +9,6 @@ interface Auth {
 }
 export interface Config {
 	host: string
-	port: number
 	secure: boolean
 	auth: Auth
 }
@@ -17,7 +16,7 @@ export interface SendMailOption {
 	from: string
 	to: string
 	subject: string
-	text: string
+	text?: string
 	html?: string
 }
 
@@ -32,7 +31,6 @@ export const nodemailerProvider = () => ({
 	useFactory: (options: Config): Nodemailer => {
 		return new nodemailer.createTransport({
 			host: options.host,
-			port: options.port,
 			secure: options.secure,
 			auth: {
 				user: options.auth.user,

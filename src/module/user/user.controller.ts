@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Get, Body, Query } from '@nestjs/common'
+import { Controller, Session, Post, Put, Get, Body, Query } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse } from '@nestjs/swagger'
 import { UserService } from './user.service'
 import * as DTO from './user.interface'
@@ -13,8 +13,8 @@ export class UserController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.UserCreateUserResponse })
 	@Post('create')
-	async createUser(@Body() body: DTO.CreateUser) {
-		return await this.userService.createUser(body)
+	async createUser(@Body() body: DTO.CreateUser, @Session() session: { code: number }) {
+		return await this.userService.createUser(body, session.code)
 	}
 
 	@ApiOperation({ summary: '用户登录' })

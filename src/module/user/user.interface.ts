@@ -30,6 +30,12 @@ class UserParameter {
 	@Type(type => Number)
 	uid: number
 
+	@ApiProperty({ description: '验证码', example: 599348 })
+	@IsNotEmpty({ message: '验证码 必填' })
+	@Length(6, 6, { message: '验证码长度必须6位' })
+	@Type(type => Number)
+	code: number
+
 	@ApiProperty({ description: '用户名', example: 'lisfes' })
 	@IsNotEmpty({ message: '用户名 必填' })
 	@Length(4, 20, { message: '用户名长度必须4~20位' })
@@ -54,7 +60,7 @@ class UserParameter {
 	avatar: string
 }
 
-export class CreateUser extends PickType(UserParameter, ['username', 'nickname', 'password', 'email']) {}
+export class CreateUser extends PickType(UserParameter, ['username', 'nickname', 'password', 'email', 'code']) {}
 export class UserCreateUserResponse extends UserInterface {}
 
 export class LoginUser extends PickType(UserParameter, ['username', 'password']) {}

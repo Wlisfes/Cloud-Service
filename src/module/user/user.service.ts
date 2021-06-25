@@ -10,11 +10,16 @@ export class UserService {
 	constructor(@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>) {}
 
 	//创建用户
-	async createUser(props: DTO.CreateUser): Promise<UserEntity> {
+	async createUser(props: DTO.CreateUser, code: number): Promise<UserEntity> {
 		try {
+			if (code !== props.code) {
+				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
+			}
+
 			if (await this.userModel.findOne({ username: props.username })) {
 				throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST)
 			}
+
 			const newUser = await this.userModel.create({
 				...props,
 				email: '876451336@qq.com',

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { SessionModule } from 'nestjs-session'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 
 //依赖模块挂载
@@ -13,6 +14,17 @@ import { UserModule } from '@/module/user/user.module'
 	imports: [
 		ConfigModule.forRoot({ isGlobal: true }),
 		TypeOrmModule.forRoot(),
+		SessionModule.forRootAsync({
+			useFactory: () => ({
+				session: {
+					secret: process.env.SESSION_SECRET,
+					cookie: {
+						httpOnly: true,
+						maxAge: Number(process.env.SESSION_MAXAGE || 60 * 1000)
+					}
+				}
+			})
+		}),
 		AliyunModule.forRoot({
 			accessKeyId: process.env.ALIYUN_ACCESSKEYID,
 			accessKeySecret: process.env.ALIYUN_ACCESSKEYSECRET,
@@ -21,8 +33,7 @@ import { UserModule } from '@/module/user/user.module'
 		}),
 		NodemailerModule.forRoot({
 			host: process.env.NODEMAILER_HOST,
-			port: Number(process.env.NODEMAILER_PORT),
-			secure: Boolean(Number(process.env.NODEMAILER_SECURE)),
+			secure: true,
 			auth: {
 				user: process.env.NODEMAILER_AUTH_USER,
 				pass: process.env.NODEMAILER_AUTH_PASS
