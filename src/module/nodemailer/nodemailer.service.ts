@@ -10,9 +10,9 @@ export class NodemailerService {
 	) {}
 
 	//创建数字验证码
-	public async createNumberCode(): Promise<number> {
-		const captcha = '123456'
-			.split('')
+	public async createNumberCode(num: number): Promise<number> {
+		const captcha = Array(num)
+			.fill(num)
 			.map(() => Math.floor(Math.random() * 10))
 			.join('')
 		return Number(captcha)
@@ -34,7 +34,7 @@ export class NodemailerService {
 	//发送注册验证码
 	async registerCode(props: DTO.RegisterCode, session): Promise<DTO.NodemailerResponse> {
 		try {
-			const code = await this.createNumberCode()
+			const code = await this.createNumberCode(6)
 			session.code = code
 			return await this.sendEmailCode({
 				from: '"妖雨纯" <876451336@qq.com>',
