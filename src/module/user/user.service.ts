@@ -29,6 +29,15 @@ export class UserService {
 			})
 			const { uid } = await this.userModel.save(newUser)
 			return await this.findUidUser(uid)
+
+			// Object.keys([...Array(35)]).forEach(async k => {
+			// 	const newUser = await this.userModel.create({
+			// 		...props,
+			// 		email: '876451336@qq.com',
+			// 		mobile: 18676361342
+			// 	})
+			// 	await this.userModel.save(newUser)
+			// })
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -63,16 +72,24 @@ export class UserService {
 	}
 
 	//修改用户
-	async updateUser(props) {
+	async updateUser(props: DTO.UpdateUser, uid: number): Promise<UserEntity> {
 		try {
-			await this.userModel.update(
-				{
-					uid: 1624099363625
-				},
-				{
-					mobile: 18676361342
-				}
-			)
+			await this.userModel.update({ uid }, { ...props })
+			return await this.findUidUser(uid)
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	//修改用户邮箱
+	async updateUserEmail(props: DTO.UpdateUserEmail, uid: number, code: number): Promise<UserEntity> {
+		try {
+			if (code !== props.code) {
+				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
+			}
+
+			await this.userModel.update({ uid }, { email: props.email })
+			return await this.findUidUser(uid)
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -92,9 +109,15 @@ export class UserService {
 	}
 
 	//用户列表
-	async findUsers(props) {
+	async findUsers(props: DTO.FindUsers) {
 		try {
-			return await this.userModel.find()
+			const [list = [], total] = await this.userModel.findAndCount({
+				order: { uid: 'DESC' },
+				skip: (props.page - 1) * props.size,
+				take: props.size
+			})
+
+			return { total, size: props.size, page: props.page, list }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

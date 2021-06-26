@@ -1,27 +1,39 @@
-import { ApiProperty, PickType } from '@nestjs/swagger'
-import { IsNotEmpty, IsEmail, Length } from 'class-validator'
+import { ApiProperty, PickType, OmitType, IntersectionType } from '@nestjs/swagger'
+import { IsNotEmpty, IsEmail, Length, IsOptional, IsNumber, Min } from 'class-validator'
 import { Type } from 'class-transformer'
 import { JwtInterface } from '@/module/jwt/jwt.interface'
 
 class UserInterface {
-	@ApiProperty({ description: '主键id', example: 1 })
+	@ApiProperty({ required: false, description: '主键id', example: 1 })
 	id: number
-	@ApiProperty({ description: 'uid', example: 1624521523438 })
+
+	@ApiProperty({ required: false, description: 'uid', example: 1624521523438 })
 	uid: number
-	@ApiProperty({ description: '用户名', example: 'lisfes' })
+
+	@ApiProperty({ required: false, description: '用户名', example: 'lisfes' })
 	username: string
-	@ApiProperty({ description: '昵称', example: '妖雨纯' })
+
+	@ApiProperty({ required: false, description: '昵称', example: '妖雨纯' })
 	nickname: string
-	@ApiProperty({ description: '邮箱', example: '876451336@qq.com' })
+
+	@ApiProperty({ required: false, description: '邮箱', example: '876451336@qq.com' })
 	email: string
-	@ApiProperty({ description: '密码', example: '****************' })
+
+	@ApiProperty({ required: false, description: '密码', example: '****************' })
 	password: string | null
-	@ApiProperty({ description: '头像', example: 'https://oss.lisfes.cn/xxx/xxx.png' })
+
+	@ApiProperty({ required: false, description: '头像', example: 'https://oss.lisfes.cn/xxx/xxx.png' })
+	@IsOptional()
 	avatar: string | null
-	@ApiProperty({ description: '手机号', example: 18888888888 })
+
+	@ApiProperty({ required: false, description: '手机号', example: 18888888888 })
 	mobile: number | null
-	@ApiProperty({ description: '状态', example: 0 | 1 })
-	status: number
+
+	@ApiProperty({ description: '状态', enum: [0, 1], example: 0 | 1 })
+	status: 1 | 0
+
+	@ApiProperty({ description: '总数', example: 0 })
+	total: number
 }
 
 class UserParameter {
@@ -58,12 +70,46 @@ class UserParameter {
 	@ApiProperty({ description: '头像', example: 'https://oss.lisfes.cn/xxx/xxx.png' })
 	@IsNotEmpty({ message: '头像 必填' })
 	avatar: string
+
+	@ApiProperty({ description: '状态', enum: [0, 1], example: 0 | 1 })
+	@IsNotEmpty({ message: '状态 必填' })
+	@Type(type => Number)
+	status: 1 | 0
+
+	@ApiProperty({ description: '分页', example: 1 })
+	@IsNotEmpty({ message: 'page 必填' })
+	@IsNumber({}, { message: 'page必须是数字' })
+	@Min(1, { message: 'page不能小于1' })
+	@Type(type => Number)
+	page: number
+
+	@ApiProperty({ description: '分页数量', example: 10 })
+	@IsNotEmpty({ message: 'size 必填' })
+	@IsNumber({}, { message: 'size必须是数字' })
+	@Min(1, { message: 'size不能小于1' })
+	@Type(type => Number)
+	size: number
 }
 
 export class CreateUser extends PickType(UserParameter, ['username', 'nickname', 'password', 'email', 'code']) {}
-export class CreateUserResponse extends UserInterface {}
+export class CreateUserResponse extends OmitType(UserInterface, ['total']) {}
 
 export class LoginUser extends PickType(UserParameter, ['username', 'password']) {}
 export class LoginUserResponse extends PickType(JwtInterface, ['token']) {}
 
-export class FindUserResponse extends UserInterface {}
+export class FindUserResponse extends OmitType(UserInterface, ['total']) {}
+
+export class FindUsers extends PickType(UserParameter, ['page', 'size']) {}
+export class FindUsersResponse extends PickType(UserInterface, ['total']) {
+	@ApiProperty({ description: '用户列表', type: [OmitType(UserInterface, ['total'])], example: [] })
+	list: UserInterface[]
+}
+
+export class UpdateUser extends IntersectionType(
+	PickType(UserParameter, ['nickname', 'status']),
+	PickType(UserInterface, ['avatar'])
+) {}
+export class UpdateUserResponse extends OmitType(UserInterface, ['total']) {}
+
+export class UpdateUserEmail extends PickType(UserParameter, ['email', 'code']) {}
+export class UpdateUserEmailResponse extends OmitType(UserInterface, ['total']) {}
