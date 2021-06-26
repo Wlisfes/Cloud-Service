@@ -1,5 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger'
-import { IsNotEmpty } from 'class-validator'
+import { IsNotEmpty, IsNumber, Min } from 'class-validator'
 import { Type } from 'class-transformer'
 
 class AliyunInterface {
@@ -58,20 +58,18 @@ class AliyunParameter {
 	VideoId: string
 
 	/**---华丽的分割线-------------------------------------------------------------------------**/
-	@ApiProperty({
-		description: '播放凭证过期时间, 取值范围100~3000',
-		example: 100
-	})
+	@ApiProperty({ description: '播放凭证过期时间, 取值范围100~3000', example: 100 })
 	@IsNotEmpty({ message: '播放凭证过期时间 必填' })
+	@IsNumber({}, { message: 'AuthInfoTimeout必须是数字' })
+	@Min(100, { message: 'AuthInfoTimeout不能小于100' })
 	@Type(() => Number)
 	AuthInfoTimeout: number
 
 	/**---华丽的分割线-------------------------------------------------------------------------**/
-	@ApiProperty({
-		description: '播放地址过期时间。单位：秒, 最大值: 2592000 (即30天)',
-		example: 1800
-	})
+	@ApiProperty({ description: '播放地址过期时间。单位：秒, 最大值: 2592000 (即30天)', example: 1800 })
 	@IsNotEmpty({ message: '播放凭证过期时间 必填' })
+	@IsNumber({}, { message: 'AuthTimeout必须是数字' })
+	@Min(100, { message: 'AuthTimeout不能小于100' })
 	@Type(() => Number)
 	AuthTimeout: number
 }
