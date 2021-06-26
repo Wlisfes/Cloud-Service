@@ -2,12 +2,16 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UserEntity } from '@/entity/user.entity'
+import { JwtAuthService } from '@/module/jwt/jwt.service'
 import { compareSync } from 'bcryptjs'
 import * as DTO from './user.interface'
 
 @Injectable()
 export class UserService {
-	constructor(@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>) {}
+	constructor(
+		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
+		private readonly jwtAuthService: JwtAuthService
+	) {}
 
 	//创建用户
 	async createUser(props: DTO.CreateUser, code: number): Promise<UserEntity> {
@@ -15,11 +19,9 @@ export class UserService {
 			if (code !== props.code) {
 				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
 			}
-
 			if (await this.userModel.findOne({ username: props.username })) {
 				throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST)
 			}
-
 			const newUser = await this.userModel.create({
 				...props,
 				email: '876451336@qq.com',
@@ -51,8 +53,10 @@ export class UserService {
 			if (!compareSync(props.password, user.password)) {
 				throw new HttpException('密码错误', HttpStatus.BAD_REQUEST)
 			}
-
-			return user
+			return await this.jwtAuthService.signature({
+				uid: user.uid,
+				password: user.password
+			})
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

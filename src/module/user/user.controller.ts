@@ -26,6 +26,10 @@ export class UserController {
 		return await this.userService.loginUser(body)
 	}
 
+	@ApiOperation({ summary: '用户信息' })
+	@Get('info')
+	async findUser(@Query() query) {}
+
 	@ApiOperation({ summary: '更新用户' })
 	@Put('update')
 	async updateUser(@Body() body) {

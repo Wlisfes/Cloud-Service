@@ -32,7 +32,6 @@ class UserParameter {
 
 	@ApiProperty({ description: '验证码', example: 599348 })
 	@IsNotEmpty({ message: '验证码 必填' })
-	@Length(6, 6, { message: '验证码长度必须6位' })
 	@Type(type => Number)
 	code: number
 

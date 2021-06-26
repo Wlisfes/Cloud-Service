@@ -5,6 +5,7 @@ import { SessionModule } from 'nestjs-session'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 
 //依赖模块挂载
+import { JwtAuthModule } from '@/module/jwt/jwt.module'
 import { AliyunModule } from '@/module/aliyun/aliyun.module'
 import { NodemailerModule } from '@/module/nodemailer/nodemailer.module'
 import { BannerModule } from '@/module/banner/banner.module'
@@ -20,7 +21,7 @@ import { UserModule } from '@/module/user/user.module'
 					secret: process.env.SESSION_SECRET,
 					cookie: {
 						httpOnly: true,
-						maxAge: Number(process.env.SESSION_MAXAGE || 60 * 1000)
+						maxAge: Number(process.env.SESSION_MAXAGE || 30 * 60 * 1000)
 					}
 				}
 			})
@@ -39,6 +40,7 @@ import { UserModule } from '@/module/user/user.module'
 				pass: process.env.NODEMAILER_AUTH_PASS
 			}
 		}),
+		JwtAuthModule,
 		BannerModule,
 		UserModule
 	]
