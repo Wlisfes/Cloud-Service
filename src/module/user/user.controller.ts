@@ -1,6 +1,7 @@
-import { Controller, Session, Post, Put, Get, Body, Query } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse } from '@nestjs/swagger'
+import { Controller, Session, Post, Put, Get, Body, Query, Req } from '@nestjs/common'
+import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse, ApiHeader } from '@nestjs/swagger'
 import { UserService } from './user.service'
+import { AuthToken, APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as DTO from './user.interface'
 
 @ApiTags('用户模块')
@@ -27,8 +28,12 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: '用户信息' })
+	@ApiHeader({ name: APP_AUTH_TOKEN, required: true })
+	@AuthToken({ login: true })
 	@Get('info')
-	async findUser(@Query() query) {}
+	async findUser(@Query() query, @Req() req) {
+		console.log(req.user)
+	}
 
 	@ApiOperation({ summary: '更新用户' })
 	@Put('update')
