@@ -1,6 +1,7 @@
 import { ApiProperty, PickType } from '@nestjs/swagger'
 import { IsNotEmpty, IsEmail, Length } from 'class-validator'
 import { Type } from 'class-transformer'
+import { JwtInterface } from '@/module/jwt/jwt.interface'
 
 class UserInterface {
 	@ApiProperty({ description: '主键id', example: 1 })
@@ -60,6 +61,9 @@ class UserParameter {
 }
 
 export class CreateUser extends PickType(UserParameter, ['username', 'nickname', 'password', 'email', 'code']) {}
-export class UserCreateUserResponse extends UserInterface {}
+export class CreateUserResponse extends UserInterface {}
 
 export class LoginUser extends PickType(UserParameter, ['username', 'password']) {}
+export class LoginUserResponse extends PickType(JwtInterface, ['token']) {}
+
+export class FindUserResponse extends UserInterface {}

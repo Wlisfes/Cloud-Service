@@ -79,7 +79,7 @@ export class UserService {
 	}
 
 	//uid获取用户信息
-	async findUidUser(uid: number) {
+	async findUidUser(uid: number): Promise<UserEntity> {
 		try {
 			const user = await this.userModel.findOne({ uid })
 			if (user) {

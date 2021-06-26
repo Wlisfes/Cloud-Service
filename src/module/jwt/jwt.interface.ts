@@ -1,6 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger'
 
-class JwtInterface {
+export class JwtInterface {
 	@ApiProperty({ description: 'uid', example: 1624636180841 })
 	uid: number
 	@ApiProperty({ description: '密码', example: '****************' })

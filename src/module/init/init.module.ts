@@ -5,6 +5,7 @@ import { SessionModule } from 'nestjs-session'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 
 //依赖模块挂载
+import { RedisModule } from '@/module/redis/redis.module'
 import { JwtAuthModule } from '@/module/jwt/jwt.module'
 import { AliyunModule } from '@/module/aliyun/aliyun.module'
 import { NodemailerModule } from '@/module/nodemailer/nodemailer.module'
@@ -15,6 +16,13 @@ import { UserModule } from '@/module/user/user.module'
 	imports: [
 		ConfigModule.forRoot({ isGlobal: true }),
 		TypeOrmModule.forRoot(),
+		RedisModule.forRoot({
+			host: process.env.REDIS_HOST,
+			port: Number(process.env.REDIS_PORT),
+			db: Number(process.env.REDIS_DB),
+			password: process.env.REDIS_PASSWORD,
+			keyPrefix: process.env.REDIS_KEYPREFIX
+		}),
 		SessionModule.forRootAsync({
 			useFactory: () => ({
 				session: {

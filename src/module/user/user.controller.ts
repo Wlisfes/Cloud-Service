@@ -12,7 +12,7 @@ export class UserController {
 	@ApiOperation({ summary: '创建用户' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.UserCreateUserResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.CreateUserResponse })
 	@Post('create')
 	async createUser(@Body() body: DTO.CreateUser, @Session() session: { code: number }) {
 		return await this.userService.createUser(body, session.code)
@@ -21,7 +21,7 @@ export class UserController {
 	@ApiOperation({ summary: '用户登录' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.UserCreateUserResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.LoginUserResponse })
 	@Post('login')
 	async loginUser(@Body() body: DTO.LoginUser) {
 		return await this.userService.loginUser(body)
@@ -29,10 +29,11 @@ export class UserController {
 
 	@ApiOperation({ summary: '用户信息' })
 	@ApiHeader({ name: APP_AUTH_TOKEN, required: true })
-	@AuthToken({ login: true })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.FindUserResponse })
+	@AuthToken({ login: true, error: true })
 	@Get('info')
-	async findUser(@Query() query, @Req() req) {
-		console.log(req.user)
+	async findUser(@Req() req: { user: { uid: number } }) {
+		return await this.userService.findUidUser(req.user.uid)
 	}
 
 	@ApiOperation({ summary: '更新用户' })

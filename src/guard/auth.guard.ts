@@ -1,6 +1,8 @@
 import { CanActivate, SetMetadata, ExecutionContext, Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { JwtAuthService } from '@/module/jwt/jwt.service'
+import { RedisService } from '@/module/redis/redis.service'
+import { UserService } from '@/module/user/user.service'
 
 export const APP_AUTH = Symbol('APP_AUTH')
 export const APP_AUTH_TOKEN = 'app-token'
@@ -12,7 +14,12 @@ export class AuthTokenInterface {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-	constructor(private readonly reflector: Reflector, private readonly jwtAuthService: JwtAuthService) {}
+	constructor(
+		private readonly reflector: Reflector,
+		private readonly jwtAuthService: JwtAuthService,
+		private readonly redisService: RedisService,
+		private readonly userService: UserService
+	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest()
@@ -30,8 +37,18 @@ export class AuthGuard implements CanActivate {
 			}
 
 			//token解密
-			const user = await this.jwtAuthService.signverify(token)
-			if (user) {
+			const { uid } = await this.jwtAuthService.signverify(token)
+			const store = await this.redisService.getStore(`user-${uid}`)
+			if (store) {
+				request.user = store
+			} else {
+				const user = await this.userService.findUidUser(uid)
+				if (!user) {
+					throw new HttpException('用户不存在', HttpStatus.FORBIDDEN)
+				} else if (!props.error && user.status !== 1) {
+					throw new HttpException('用户已被禁用', HttpStatus.FORBIDDEN)
+				}
+				await this.redisService.setStore(`user-${uid}`, user, 24 * 60 * 60)
 				request.user = user
 			}
 		}
