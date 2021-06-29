@@ -91,6 +91,13 @@ class UserParameter {
 	size: number
 }
 
+export class CreateCode {
+	@ApiProperty({ description: 'text', example: 3045 })
+	text: string
+	@ApiProperty({ description: 'text', example: 3045 })
+	data: string
+}
+
 export class CreateUser extends PickType(UserParameter, ['username', 'nickname', 'password', 'email', 'code']) {}
 export class CreateUserResponse extends OmitType(UserInterface, ['total']) {}
 

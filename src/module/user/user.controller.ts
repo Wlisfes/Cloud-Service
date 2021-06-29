@@ -1,4 +1,4 @@
-import { Controller, Session, Post, Put, Get, Body, Query, Req } from '@nestjs/common'
+import { Controller, Session, Post, Put, Get, Body, Query, Req, Response } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse, ApiHeader } from '@nestjs/swagger'
 import { UserService } from './user.service'
 import { AuthToken, APP_AUTH_TOKEN } from '@/guard/auth.guard'
@@ -8,6 +8,16 @@ import * as DTO from './user.interface'
 @Controller('user')
 export class UserController {
 	constructor(private readonly userService: UserService) {}
+
+	@ApiOperation({ summary: '登录验证码' })
+	@ApiResponse({ status: 200, description: 'OK' })
+	@Get('code')
+	public async svgCode(@Session() session: { code: string }, @Response() res) {
+		const Code = await this.userService.createCode()
+		session.code = Code.text.toUpperCase()
+		res.type('svg')
+		res.send(Code.data)
+	}
 
 	@ApiOperation({ summary: '创建用户' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')

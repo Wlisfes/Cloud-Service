@@ -4,6 +4,7 @@ import { Repository } from 'typeorm'
 import { UserEntity } from '@/entity/user.entity'
 import { JwtAuthService } from '@/module/jwt/jwt.service'
 import { compareSync } from 'bcryptjs'
+import { create } from 'svg-captcha'
 import * as DTO from './user.interface'
 
 @Injectable()
@@ -12,6 +13,18 @@ export class UserService {
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
 		private readonly jwtAuthService: JwtAuthService
 	) {}
+
+	//验证码
+	async createCode(): Promise<DTO.CreateCode> {
+		return create({
+			fontSize: 36,
+			noise: 2,
+			width: 125,
+			height: 32,
+			inverse: true,
+			background: '#cc9966'
+		})
+	}
 
 	//创建用户
 	async createUser(props: DTO.CreateUser, code: number): Promise<UserEntity> {
