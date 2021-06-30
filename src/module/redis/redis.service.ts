@@ -29,4 +29,9 @@ export class RedisService {
 			return null
 		}
 	}
+
+	//删除
+	public async delStore(key: string) {
+		return this.client.del(key)
+	}
 }

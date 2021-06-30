@@ -43,8 +43,8 @@ class UserParameter {
 	@Type(type => Number)
 	uid: number
 
-	@ApiProperty({ description: '验证码', example: 599348 })
-	@IsNotEmpty({ message: '验证码 必填' })
+	@ApiProperty({ description: '邮箱验证码', example: 599348 })
+	@IsNotEmpty({ message: '邮箱验证码 必填' })
 	@Type(type => Number)
 	code: number
 
@@ -101,7 +101,12 @@ export class CreateCode {
 export class CreateUser extends PickType(UserParameter, ['username', 'nickname', 'password', 'email', 'code']) {}
 export class CreateUserResponse extends OmitType(UserInterface, ['total']) {}
 
-export class LoginUser extends PickType(UserParameter, ['username', 'password']) {}
+export class LoginUser extends PickType(UserParameter, ['username', 'password']) {
+	@ApiProperty({ description: '验证码', example: 'hj56' })
+	@IsNotEmpty({ message: '验证码 必填' })
+	@Type(type => String)
+	code: string
+}
 export class LoginUserResponse extends PickType(JwtInterface, ['token']) {}
 
 export class FindUserResponse extends OmitType(UserInterface, ['total']) {}

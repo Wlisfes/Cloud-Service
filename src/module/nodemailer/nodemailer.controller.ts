@@ -1,4 +1,4 @@
-import { Controller, Session, Post, Get, Body, Query } from '@nestjs/common'
+import { Controller, Post, Get, Body, Query } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse } from '@nestjs/swagger'
 import { NodemailerService } from './nodemailer.service'
 import * as DTO from './nodemailer.interface'
@@ -13,7 +13,7 @@ export class NodemailerController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.NodemailerResponse })
 	@Post('register-code')
-	async registerCode(@Body() body: DTO.RegisterCode, @Session() session): Promise<DTO.NodemailerResponse> {
-		return await this.nodemailerService.registerCode(body, session)
+	async registerCode(@Body() body: DTO.RegisterCode): Promise<DTO.NodemailerResponse> {
+		return await this.nodemailerService.registerCode(body)
 	}
 }

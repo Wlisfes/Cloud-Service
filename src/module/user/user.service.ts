@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UserEntity } from '@/entity/user.entity'
 import { JwtAuthService } from '@/module/jwt/jwt.service'
+import { RedisService } from '@/module/redis/redis.service'
 import { compareSync } from 'bcryptjs'
 import { create } from 'svg-captcha'
 import * as DTO from './user.interface'
@@ -11,7 +12,8 @@ import * as DTO from './user.interface'
 export class UserService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
-		private readonly jwtAuthService: JwtAuthService
+		private readonly jwtAuthService: JwtAuthService,
+		private readonly redisService: RedisService
 	) {}
 
 	//验证码
@@ -27,10 +29,11 @@ export class UserService {
 	}
 
 	//创建用户
-	async createUser(props: DTO.CreateUser, code: number): Promise<UserEntity> {
+	async createUser(props: DTO.CreateUser): Promise<UserEntity> {
 		try {
-			if (code !== props.code) {
-				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
+			const code = await this.redisService.getStore(props.email)
+			if (code && code !== props.code) {
+				throw new HttpException('邮箱验证码错误', HttpStatus.BAD_REQUEST)
 			}
 			if (await this.userModel.findOne({ username: props.username })) {
 				throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST)
@@ -57,8 +60,11 @@ export class UserService {
 	}
 
 	//用户登录
-	async loginUser(props: DTO.LoginUser) {
+	async loginUser(props: DTO.LoginUser, code: string) {
 		try {
+			if (code && code !== props.code) {
+				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
+			}
 			const user = await this.userModel
 				.createQueryBuilder('user')
 				.orWhere('user.username = :username', { username: props.username })

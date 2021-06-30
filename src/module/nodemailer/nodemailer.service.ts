@@ -1,12 +1,14 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common'
 import { Nodemailer, NODEMAILER, NODEMAILER_CONFIG, Config, SendMailOption } from './nodemailer.provider'
+import { RedisService } from '@/module/redis/redis.service'
 import * as DTO from './nodemailer.interface'
 
 @Injectable()
 export class NodemailerService {
 	constructor(
 		@Inject(NODEMAILER_CONFIG) public readonly options: Config,
-		@Inject(NODEMAILER) public readonly client: Nodemailer
+		@Inject(NODEMAILER) public readonly client: Nodemailer,
+		private readonly redisService: RedisService
 	) {}
 
 	//创建数字验证码
@@ -32,10 +34,10 @@ export class NodemailerService {
 	}
 
 	//发送注册验证码
-	async registerCode(props: DTO.RegisterCode, session): Promise<DTO.NodemailerResponse> {
+	async registerCode(props: DTO.RegisterCode): Promise<DTO.NodemailerResponse> {
 		try {
 			const code = await this.createNumberCode(6)
-			session.code = code
+			await this.redisService.setStore(props.email, code, 1800)
 			return await this.sendEmailCode({
 				from: '"妖雨纯" <876451336@qq.com>',
 				to: props.email,

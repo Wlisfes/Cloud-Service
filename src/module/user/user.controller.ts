@@ -13,10 +13,10 @@ export class UserController {
 	@ApiResponse({ status: 200, description: 'OK' })
 	@Get('code')
 	public async svgCode(@Session() session: { code: string }, @Response() res) {
-		const Code = await this.userService.createCode()
-		session.code = Code.text.toUpperCase()
+		const { text, data } = await this.userService.createCode()
+		session.code = text.toUpperCase()
 		res.type('svg')
-		res.send(Code.data)
+		res.send(data)
 	}
 
 	@ApiOperation({ summary: '创建用户' })
@@ -24,8 +24,8 @@ export class UserController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.CreateUserResponse })
 	@Post('create')
-	async createUser(@Body() body: DTO.CreateUser, @Session() session: { code: number }) {
-		return await this.userService.createUser(body, session.code)
+	async createUser(@Body() body: DTO.CreateUser) {
+		return await this.userService.createUser(body)
 	}
 
 	@ApiOperation({ summary: '用户登录' })
@@ -33,8 +33,8 @@ export class UserController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.LoginUserResponse })
 	@Post('login')
-	async loginUser(@Body() body: DTO.LoginUser) {
-		return await this.userService.loginUser(body)
+	async loginUser(@Body() body: DTO.LoginUser, @Session() session: { code: string }) {
+		return await this.userService.loginUser(body, session.code)
 	}
 
 	@ApiOperation({ summary: '更新用户信息' })
