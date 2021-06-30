@@ -19,10 +19,10 @@ export class UserService {
 	//验证码
 	async createCode(): Promise<DTO.CreateCode> {
 		return create({
-			fontSize: 36,
+			fontSize: 32,
 			noise: 2,
-			width: 120,
-			height: 40,
+			width: 100,
+			height: 32,
 			inverse: true,
 			background: '#cc9966'
 		})
