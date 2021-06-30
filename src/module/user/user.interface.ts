@@ -99,7 +99,10 @@ export class CreateCode {
 }
 
 export class CreateUser extends PickType(UserParameter, ['username', 'nickname', 'password', 'email', 'code']) {}
-export class CreateUserResponse extends OmitType(UserInterface, ['total']) {}
+export class CreateUserResponse {
+	@ApiProperty({ description: 'message', example: '注册成功' })
+	message: string
+}
 
 export class LoginUser extends PickType(UserParameter, ['username', 'password']) {
 	@ApiProperty({ description: '验证码', example: 'hj56' })

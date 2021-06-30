@@ -19,20 +19,20 @@ export class UserService {
 	//验证码
 	async createCode(): Promise<DTO.CreateCode> {
 		return create({
-			fontSize: 32,
+			fontSize: 36,
 			noise: 2,
 			width: 120,
-			height: 32,
+			height: 40,
 			inverse: true,
 			background: '#cc9966'
 		})
 	}
 
 	//创建用户
-	async createUser(props: DTO.CreateUser): Promise<UserEntity> {
+	async createUser(props: DTO.CreateUser) {
 		try {
 			const code = await this.redisService.getStore(props.email)
-			if (code && code !== props.code) {
+			if (!code || code !== props.code) {
 				throw new HttpException('邮箱验证码错误', HttpStatus.BAD_REQUEST)
 			}
 			if (await this.userModel.findOne({ username: props.username })) {
@@ -43,8 +43,10 @@ export class UserService {
 				email: '876451336@qq.com',
 				mobile: 18676361342
 			})
-			const { uid } = await this.userModel.save(newUser)
-			return await this.findUidUser(uid)
+			await this.userModel.save(newUser)
+			//注册成功删除redis中的邮箱验证码
+			await this.redisService.delStore(props.email)
+			return { message: '注册成功' }
 
 			// Object.keys([...Array(35)]).forEach(async k => {
 			// 	const newUser = await this.userModel.create({
@@ -62,7 +64,7 @@ export class UserService {
 	//用户登录
 	async loginUser(props: DTO.LoginUser, code: string) {
 		try {
-			if (code && code !== props.code) {
+			if (!code || code !== props.code.toUpperCase()) {
 				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
 			}
 			const user = await this.userModel
