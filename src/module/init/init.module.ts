@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { SessionModule } from 'nestjs-session'
 
 //依赖模块挂载
+import { UtilsModule } from '@/module/utils/utils.module'
 import { RedisModule } from '@/module/redis/redis.module'
 import { JwtAuthModule } from '@/module/jwt/jwt.module'
 import { AliyunModule } from '@/module/aliyun/aliyun.module'
@@ -47,6 +48,7 @@ import { UserModule } from '@/module/user/user.module'
 				pass: process.env.NODEMAILER_AUTH_PASS
 			}
 		}),
+		UtilsModule,
 		JwtAuthModule,
 		BannerModule,
 		UserModule

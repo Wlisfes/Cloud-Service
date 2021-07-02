@@ -15,7 +15,7 @@ export async function webSwagger(app) {
 		.addBearerAuth({ type: 'apiKey', name: APP_AUTH_TOKEN, in: 'header' }, APP_AUTH_TOKEN)
 		.build()
 	const document = SwaggerModule.createDocument(app, options)
-	SwaggerModule.setup('api-desc', app, document)
+	SwaggerModule.setup('api-doc', app, document)
 	return this
 }
 
@@ -47,6 +47,6 @@ async function bootstrap() {
 	const port = process.env.PORT || 3005
 	await app.listen(port)
 	console.log(`http://localhost:${port}`)
-	console.log(`http://localhost:${port}/api-desc`)
+	console.log(`http://localhost:${port}/api-doc`)
 }
 bootstrap()

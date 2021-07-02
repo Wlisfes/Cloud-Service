@@ -1,21 +1,15 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common'
 import { RPCClient, CLIENT, CLIENT_CONFIG, Config } from './aliyun.provider'
+import { UtilsService } from '@/module/utils/utils.service'
 import * as DTO from './aliyun.interface'
-import * as day from 'dayjs'
-
-export class AliyunBase {
-	protected client: RPCClient
-	protected options: Config
-}
 
 @Injectable()
-export class AliyunService extends AliyunBase {
+export class AliyunService {
 	constructor(
 		@Inject(CLIENT_CONFIG) public readonly options: Config,
-		@Inject(CLIENT) public readonly client: RPCClient
-	) {
-		super()
-	}
+		@Inject(CLIENT) public readonly client: RPCClient,
+		private readonly utilsService: UtilsService
+	) {}
 
 	/**创建上传凭证**/
 	async createUpload(prosp: DTO.CreateUpload): Promise<DTO.AliyunCreateUploadResponse> {
@@ -38,19 +32,23 @@ export class AliyunService extends AliyunBase {
 	/**获取转码模板列表**/
 	async transferTmplate(): Promise<DTO.TransferTmplateResponse> {
 		try {
-			const response: any = await this.client.request('ListTranscodeTemplateGroup', {}, {})
-			if (response?.TranscodeTemplateGroupList?.length > 0) {
-				const list = response.TranscodeTemplateGroupList.map(k => ({
+			const { RequestId, TranscodeTemplateGroupList }: any = await this.client.request(
+				'ListTranscodeTemplateGroup',
+				{},
+				{}
+			)
+			if (TranscodeTemplateGroupList?.length > 0) {
+				const list = TranscodeTemplateGroupList.map(k => ({
 					...k,
 					Name: k.TranscodeTemplateGroupId === 'VOD_NO_TRANSCODE' ? '不转码' : k.Name,
 					IsDefault: k.IsDefault === 'Default',
 					Locked: k.Locked === 'Enabled',
-					ModifyTime: day(k.ModifyTime).format('YYYY-MM-DD HH:mm:ss'),
-					CreationTime: day(k.CreationTime).format('YYYY-MM-DD HH:mm:ss')
+					ModifyTime: this.utilsService.format(k.ModifyTime),
+					CreationTime: this.utilsService.format(k.ModifyTime)
 				}))
-				return { RequestId: response?.RequestId, list }
+				return { RequestId, list }
 			}
-			return { RequestId: response?.RequestId, list: [] }
+			return { RequestId, list: [] }
 		} catch (e) {
 			throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -104,31 +102,20 @@ export class AliyunService extends AliyunBase {
 				},
 				{}
 			)
+			const base = {
+				...VideoBase,
+				Duration: Math.floor(VideoBase.Duration * 100) / 100,
+				CreationTime: this.utilsService.format(VideoBase.CreationTime)
+			}
 			if (PlayInfoList?.PlayInfo?.length) {
 				const list = PlayInfoList.PlayInfo.map(k => ({
 					...k,
-					CreationTime: day(k.CreationTime).format('YYYY-MM-DD HH:mm:ss'),
-					ModificationTime: day(k.ModificationTime).format('YYYY-MM-DD HH:mm:ss')
+					CreationTime: this.utilsService.format(k.CreationTime),
+					ModificationTime: this.utilsService.format(k.ModificationTime)
 				}))
-				return {
-					RequestId,
-					base: {
-						...VideoBase,
-						Duration: Math.floor(VideoBase.Duration * 100) / 100,
-						CreationTime: day(VideoBase.CreationTime).format('YYYY-MM-DD HH:mm:ss')
-					},
-					list: list
-				}
+				return { RequestId, base, list }
 			}
-			return {
-				RequestId,
-				base: {
-					...VideoBase,
-					Duration: Math.floor(VideoBase.Duration * 100) / 100,
-					CreationTime: day(VideoBase.CreationTime).format('YYYY-MM-DD HH:mm:ss')
-				},
-				list: []
-			}
+			return { RequestId, base, list: [] }
 		} catch (e) {
 			throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

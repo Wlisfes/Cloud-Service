@@ -1,6 +1,7 @@
 import { Controller, Post, Get, Body, Query } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiProduces } from '@nestjs/swagger'
+import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiProduces, ApiBearerAuth } from '@nestjs/swagger'
 import { AliyunService } from './aliyun.service'
+import { AuthToken, APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as DTO from './aliyun.interface'
 
 @ApiTags('阿里云模块')
@@ -9,6 +10,8 @@ export class AliyunController {
 	constructor(private readonly aliyunService: AliyunService) {}
 
 	@ApiOperation({ summary: '创建上传凭证' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.AliyunCreateUploadResponse })
@@ -18,6 +21,8 @@ export class AliyunController {
 	}
 
 	@ApiOperation({ summary: '刷新上传凭证' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.AliyunRefreshUploadResponse })

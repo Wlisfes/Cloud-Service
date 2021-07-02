@@ -1,4 +1,4 @@
-import { ApiProperty, PickType } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger'
 import { IsNotEmpty, IsNumber, Min, IsOptional } from 'class-validator'
 import { Type } from 'class-transformer'
 
@@ -124,17 +124,16 @@ class AliyunParameter {
 	@Type(() => String)
 	FileName: string
 
-	@ApiProperty({ required: false, description: '视频封面', example: 'https://oss.lisfes.cn/xxx.png' })
+	@ApiPropertyOptional({ description: '视频封面', example: 'https://oss.lisfes.cn/xxx.png' })
 	CoverURL?: string
 
-	@ApiProperty({ required: false, description: '视频描述' })
+	@ApiPropertyOptional({ description: '视频描述' })
 	Description?: string
 
-	@ApiProperty({ required: false, description: '视频文件大小。单位：字节。' })
+	@ApiPropertyOptional({ description: '视频文件大小。单位：字节。' })
 	FileSize?: number
 
-	@ApiProperty({
-		required: false,
+	@ApiPropertyOptional({
 		description: '视频标签,最多不超过16个标签,如需传入多个视频标签，请使用英文逗号分隔'
 	})
 	Tags?: string
@@ -142,8 +141,7 @@ class AliyunParameter {
 	@ApiProperty({ description: '转码模板组ID' })
 	TemplateGroupId: string
 
-	@ApiProperty({
-		required: false,
+	@ApiPropertyOptional({
 		description: '工作流ID,如果同时传递了WorkflowId和TemplateGroupId,以WorkflowId为准'
 	})
 	WorkflowId?: string
@@ -172,9 +170,9 @@ class AliyunParameter {
 	AuthTimeout: number
 
 	/**---华丽的分割线-------------------------------------------------------------------------**/
-	@ApiProperty({ required: true, description: '分类ID。默认为根节点分类ID，即-1', example: '-1' })
+	@ApiProperty({ description: '分类ID。默认为根节点分类ID，即-1', example: '-1' })
 	@IsOptional()
-	CateId?: string
+	CateId: string
 }
 
 /**创建上传凭证--Parameter**/
