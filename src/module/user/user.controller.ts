@@ -1,5 +1,5 @@
 import { Controller, Session, Post, Put, Get, Body, Query, Req, Response } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse, ApiHeader } from '@nestjs/swagger'
+import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { UserService } from './user.service'
 import { AuthToken, APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as DTO from './user.interface'
@@ -38,22 +38,22 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: '更新用户信息' })
-	@ApiHeader({ name: APP_AUTH_TOKEN, required: true })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateUserResponse })
-	@AuthToken({ login: true })
 	@Put('update')
 	async updateUser(@Body() body: DTO.UpdateUser, @Req() req: { user: { uid: number } }) {
 		return await this.userService.updateUser(body, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '更新用户邮箱' })
-	@ApiHeader({ name: APP_AUTH_TOKEN, required: true })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateUserEmailResponse })
-	@AuthToken({ login: true })
 	@Put('update-email')
 	async updateUserEmail(
 		@Body() body: DTO.UpdateUserEmail,
@@ -64,9 +64,11 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: '用户信息' })
-	@ApiHeader({ name: APP_AUTH_TOKEN, required: true })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.FindUserResponse })
-	@AuthToken({ login: true, error: true })
 	@Get('info')
 	async findUser(@Req() req: { user: { uid: number } }) {
 		return await this.userService.findUidUser(req.user.uid)

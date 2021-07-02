@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { SessionModule } from 'nestjs-session'
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 
 //依赖模块挂载
 import { RedisModule } from '@/module/redis/redis.module'
@@ -54,14 +53,3 @@ import { UserModule } from '@/module/user/user.module'
 	]
 })
 export class InitModule {}
-
-export async function webSwagger(app) {
-	const options = new DocumentBuilder()
-		.setTitle('Cloud-Service')
-		.setDescription('Cloud-Service Api Documentation')
-		.setVersion('1.0')
-		.build()
-	const document = SwaggerModule.createDocument(app, options)
-	SwaggerModule.setup('api-desc', app, document)
-	return this
-}

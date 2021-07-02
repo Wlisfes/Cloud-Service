@@ -1,10 +1,23 @@
 import { NestFactory } from '@nestjs/core'
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ValidationPipe } from '@nestjs/common'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { HttpExceptionFilter } from '@/filters/http-exception.filter'
 import { TransformInterceptor } from '@/interceptor/transform.interceptor'
 import { AppModule } from '@/app.module'
-import { webSwagger } from '@/module/init/init.module'
+import { APP_AUTH_TOKEN } from '@/guard/auth.guard'
+
+export async function webSwagger(app) {
+	const options = new DocumentBuilder()
+		.setTitle('Cloud-Service')
+		.setDescription('Cloud-Service Api Documentation')
+		.setVersion('1.0')
+		.addBearerAuth({ type: 'apiKey', name: APP_AUTH_TOKEN, in: 'header' }, APP_AUTH_TOKEN)
+		.build()
+	const document = SwaggerModule.createDocument(app, options)
+	SwaggerModule.setup('api-desc', app, document)
+	return this
+}
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -14,7 +27,7 @@ async function bootstrap() {
 	//接口前缀
 	app.setGlobalPrefix('/api')
 
-	//B端文档挂载
+	//文档挂载
 	await webSwagger(app)
 
 	//全局注册验证管道
