@@ -38,11 +38,7 @@ export class UserService {
 			if (await this.userModel.findOne({ username: props.username })) {
 				throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST)
 			}
-			const newUser = await this.userModel.create({
-				...props,
-				email: '876451336@qq.com',
-				mobile: 18676361342
-			})
+			const newUser = await this.userModel.create({ ...props })
 			await this.userModel.save(newUser)
 			//注册成功删除redis中的邮箱验证码
 			await this.redisService.delStore(props.email)
@@ -103,10 +99,11 @@ export class UserService {
 	}
 
 	//修改用户邮箱
-	async updateUserEmail(props: DTO.UpdateUserEmail, uid: number, code: number): Promise<UserEntity> {
+	async updateUserEmail(props: DTO.UpdateUserEmail, uid: number): Promise<UserEntity> {
 		try {
-			if (code !== props.code) {
-				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
+			const code = await this.redisService.getStore(props.email)
+			if (!code || code !== props.code) {
+				throw new HttpException('邮箱验证码错误', HttpStatus.BAD_REQUEST)
 			}
 
 			await this.userModel.update({ uid }, { email: props.email })
@@ -132,7 +129,7 @@ export class UserService {
 	//用户列表
 	async findUsers(props: DTO.FindUsers) {
 		try {
-			const [list = [], total] = await this.userModel.findAndCount({
+			const [list = [], total = 0] = await this.userModel.findAndCount({
 				order: { uid: 'DESC' },
 				skip: (props.page - 1) * props.size,
 				take: props.size

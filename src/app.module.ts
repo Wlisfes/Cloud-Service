@@ -12,9 +12,10 @@ import { InitModule } from '@/module/init/init.module'
 
 //表注入
 import { UserEntity } from '@/entity/user.entity'
+import { MenuEntity } from '@/entity/menu.entity'
 
 @Module({
-	imports: [TypeOrmModule.forFeature([UserEntity]), InitModule],
+	imports: [TypeOrmModule.forFeature([UserEntity, MenuEntity]), InitModule],
 	controllers: [AppController],
 	providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }]
 })

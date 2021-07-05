@@ -11,6 +11,7 @@ import { AliyunModule } from '@/module/aliyun/aliyun.module'
 import { NodemailerModule } from '@/module/nodemailer/nodemailer.module'
 import { BannerModule } from '@/module/banner/banner.module'
 import { UserModule } from '@/module/user/user.module'
+import { MenuModule } from '@/module/menu/menu.module'
 
 @Module({
 	imports: [
@@ -51,7 +52,8 @@ import { UserModule } from '@/module/user/user.module'
 		UtilsModule,
 		JwtAuthModule,
 		BannerModule,
-		UserModule
+		UserModule,
+		MenuModule
 	]
 })
 export class InitModule {}

@@ -55,12 +55,8 @@ export class UserController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateUserEmailResponse })
 	@Put('update-email')
-	async updateUserEmail(
-		@Body() body: DTO.UpdateUserEmail,
-		@Req() req: { user: { uid: number } },
-		@Session() session: { code: number }
-	) {
-		return await this.userService.updateUserEmail(body, req.user.uid, session.code)
+	async updateUserEmail(@Body() body: DTO.UpdateUserEmail, @Req() req: { user: { uid: number } }) {
+		return await this.userService.updateUserEmail(body, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '用户信息' })
