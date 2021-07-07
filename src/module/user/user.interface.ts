@@ -10,8 +10,8 @@ class UserInterface {
 	@ApiProperty({ required: false, description: 'uid', example: 1624521523438 })
 	uid: number
 
-	@ApiProperty({ required: false, description: '用户名', example: 'lisfes' })
-	username: string
+	@ApiProperty({ required: false, description: '账户', example: 88888888 })
+	account: number
 
 	@ApiProperty({ required: false, description: '昵称', example: '妖雨纯' })
 	nickname: string
@@ -48,10 +48,11 @@ class UserParameter {
 	@Type(type => Number)
 	code: number
 
-	@ApiProperty({ description: '用户名', example: 'lisfes' })
-	@IsNotEmpty({ message: '用户名 必填' })
-	@Length(4, 20, { message: '用户名长度必须4~20位' })
-	username: string
+	@ApiProperty({ description: '账户', example: 88888888 })
+	@IsNotEmpty({ message: '账户 必填' })
+	@Length(8, 8, { message: '账户格式错误' })
+	@Type(type => Number)
+	account: number
 
 	@ApiProperty({ description: '昵称', example: '妖雨纯' })
 	@IsNotEmpty({ message: '昵称 必填' })
@@ -98,13 +99,13 @@ export class CreateCode {
 	data: string
 }
 
-export class CreateUser extends PickType(UserParameter, ['username', 'nickname', 'password', 'email', 'code']) {}
+export class CreateUser extends PickType(UserParameter, ['nickname', 'password', 'email', 'code']) {}
 export class CreateUserResponse {
 	@ApiProperty({ description: 'message', example: '注册成功' })
 	message: string
 }
 
-export class LoginUser extends PickType(UserParameter, ['username', 'password']) {
+export class LoginUser extends PickType(UserParameter, ['account', 'password']) {
 	@ApiProperty({ description: '验证码', example: 'hj56' })
 	@IsNotEmpty({ message: '验证码 必填' })
 	@Type(type => String)

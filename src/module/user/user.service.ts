@@ -16,7 +16,7 @@ export class UserService {
 		private readonly redisService: RedisService
 	) {}
 
-	//验证码
+	/**验证码**/
 	async createCode(): Promise<DTO.CreateCode> {
 		return create({
 			fontSize: 32,
@@ -28,6 +28,20 @@ export class UserService {
 		})
 	}
 
+	/**创建8位数账户**/
+	async createAccount(): Promise<number> {
+		try {
+			const account = parseInt(('0000000' + 100000000 * Math.random()).match(/(\d{8})(\.|$)/)[1])
+			const user = await this.userModel.findOne({ where: { account } })
+			if (user) {
+				return await this.createAccount()
+			}
+			return account
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
 	//创建用户
 	async createUser(props: DTO.CreateUser) {
 		try {
@@ -35,23 +49,17 @@ export class UserService {
 			if (!code || code !== props.code) {
 				throw new HttpException('邮箱验证码错误', HttpStatus.BAD_REQUEST)
 			}
-			if (await this.userModel.findOne({ username: props.username })) {
-				throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST)
+			if (await this.userModel.findOne({ where: { email: props.email } })) {
+				throw new HttpException('邮箱已注册', HttpStatus.BAD_REQUEST)
 			}
-			const newUser = await this.userModel.create({ ...props })
+			const newUser = await this.userModel.create({
+				...props,
+				account: await this.createAccount()
+			})
 			await this.userModel.save(newUser)
 			//注册成功删除redis中的邮箱验证码
 			await this.redisService.delStore(props.email)
 			return { message: '注册成功' }
-
-			// Object.keys([...Array(35)]).forEach(async k => {
-			// 	const newUser = await this.userModel.create({
-			// 		...props,
-			// 		email: '876451336@qq.com',
-			// 		mobile: 18676361342
-			// 	})
-			// 	await this.userModel.save(newUser)
-			// })
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -65,9 +73,9 @@ export class UserService {
 			}
 			const user = await this.userModel
 				.createQueryBuilder('user')
-				.orWhere('user.username = :username', { username: props.username })
-				.orWhere('user.email = :email', { email: props.username })
-				.orWhere('user.mobile = :mobile', { mobile: props.username })
+				.orWhere('user.account = :account', { account: props.account })
+				.orWhere('user.email = :email', { email: props.account })
+				.orWhere('user.mobile = :mobile', { mobile: props.account })
 				.getOne()
 
 			if (!user) {

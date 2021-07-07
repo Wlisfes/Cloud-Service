@@ -15,8 +15,8 @@ export class UserEntity extends DateEntity {
 	@Column({ type: 'double', comment: 'uid', readonly: true })
 	uid: number
 
-	@Column({ comment: '用户名', nullable: false })
-	username: string
+	@Column({ comment: '账户', type: 'int', readonly: true })
+	account: number
 
 	@Column({ comment: '昵称', nullable: false })
 	nickname: string
