@@ -18,6 +18,9 @@ export class MenuEntity extends DateEntity {
 	@Column({ comment: '节点路由' })
 	router: string
 
+	@Column({ comment: '重定向地址' })
+	redirect: string
+
 	@Column({ comment: '路由缓存: 0.关闭 1.开启', type: 'enum', enum: [0, 1], default: 1, nullable: false })
 	keepAlive: number
 
