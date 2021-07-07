@@ -79,7 +79,7 @@ export class UserService {
 				.getOne()
 
 			if (!user) {
-				throw new HttpException('用户名错误', HttpStatus.BAD_REQUEST)
+				throw new HttpException('账户错误', HttpStatus.BAD_REQUEST)
 			}
 			if (user.status !== 1) {
 				throw new HttpException('账户已被禁用', HttpStatus.BAD_REQUEST)
