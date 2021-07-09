@@ -1,7 +1,12 @@
-import { Module } from '@nestjs/common'
+import { Module, Global } from '@nestjs/common'
+import { InitService } from './init.service'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { SessionModule } from 'nestjs-session'
+import { UserEntity } from '@/entity/user.entity'
+import { RoleEntity } from '@/entity/role.entity'
+import { AuthEntity } from '@/entity/auth.entity'
+import { ActionEntity } from '@/entity/action.entity'
 
 //依赖模块挂载
 import { UtilsModule } from '@/module/utils/utils.module'
@@ -17,6 +22,7 @@ import { MenuModule } from '@/module/menu/menu.module'
 	imports: [
 		ConfigModule.forRoot({ isGlobal: true }),
 		TypeOrmModule.forRoot(),
+		TypeOrmModule.forFeature([UserEntity, RoleEntity, AuthEntity, ActionEntity]),
 		RedisModule.forRoot({
 			host: process.env.REDIS_HOST,
 			port: Number(process.env.REDIS_PORT),
@@ -54,6 +60,7 @@ import { MenuModule } from '@/module/menu/menu.module'
 		BannerModule,
 		UserModule,
 		MenuModule
-	]
+	],
+	providers: [InitService]
 })
 export class InitModule {}
