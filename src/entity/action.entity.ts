@@ -7,8 +7,11 @@ export class ActionEntity extends DateEntity {
 	@PrimaryGeneratedColumn({ comment: '自增长主键' })
 	id: number
 
-	@Column({ comment: '接口权限唯一标识', readonly: true })
+	@Column({ comment: '接口权限唯一标识', nullable: false })
 	primary: string
+
+	@Column({ comment: '接口权限名称', nullable: false })
+	name: string
 
 	@Column({
 		comment: '状态',
@@ -17,7 +20,7 @@ export class ActionEntity extends DateEntity {
 		default: 1,
 		nullable: false
 	})
-	status: 0 | 1
+	status: number
 
 	@ManyToOne(
 		type => AuthEntity,

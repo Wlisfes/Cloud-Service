@@ -7,8 +7,11 @@ export class RoleEntity extends DateEntity {
 	@PrimaryGeneratedColumn({ comment: '自增长主键' })
 	id: number
 
-	@Column({ comment: '角色唯一标识', readonly: true })
+	@Column({ comment: '角色唯一标识', nullable: false })
 	primary: string
+
+	@Column({ comment: '角色名称', nullable: false })
+	name: string
 
 	@Column({
 		comment: '状态',
@@ -17,7 +20,7 @@ export class RoleEntity extends DateEntity {
 		default: 1,
 		nullable: false
 	})
-	status: 0 | 1
+	status: number
 
 	@OneToMany(
 		type => AuthEntity,

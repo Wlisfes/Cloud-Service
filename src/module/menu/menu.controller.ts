@@ -4,7 +4,7 @@ import { MenuService } from './menu.service'
 import { AuthToken, APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as DTO from './menu.interface'
 
-@ApiTags('菜单模块')
+@ApiTags('系统管理-菜单模块')
 @Controller('menu')
 export class MenuController {
 	constructor(private readonly menuService: MenuService) {}

@@ -36,6 +36,6 @@ export class MenuEntity extends DateEntity {
 	@Column({ comment: '排序号', default: 0, nullable: false })
 	order: number
 
-	@Column({ comment: '权限' })
-	permission: string
+	// @Column({ comment: '权限' })
+	// permission: string
 }
