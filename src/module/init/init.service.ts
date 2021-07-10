@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
-import { AuthEntity } from '@/entity/auth.entity'
-import { ActionEntity } from '@/entity/action.entity'
 
 const action = {
 	admin: [
@@ -57,7 +55,7 @@ const roles: Role[] = [
 		]
 	},
 	{
-		primary: 'user',
+		primary: 'super',
 		name: '管理员',
 		status: 1,
 		auth: [
@@ -84,9 +82,7 @@ const roles: Role[] = [
 export class InitService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
-		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>,
-		@InjectRepository(AuthEntity) private readonly authModel: Repository<AuthEntity>,
-		@InjectRepository(ActionEntity) private readonly actionModel: Repository<ActionEntity>
+		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>
 	) {
 		this.init()
 	}
@@ -94,7 +90,9 @@ export class InitService {
 	private async init() {
 		try {
 			await this.initRole()
-			await this.initAdminUser()
+			setTimeout(async () => {
+				await this.initAdminUser()
+			}, 1500)
 		} catch (e) {
 			console.log(e)
 		}
@@ -111,8 +109,8 @@ export class InitService {
 						name: props.name,
 						status: props.status
 					})
-					const { id } = await this.roleModel.save(newRole)
-					await this.initAuth(id, props.auth)
+					const roleParent = await this.roleModel.save(newRole)
+					await this.initAuth(roleParent, props.auth)
 				}
 			})
 			return console.log('角色初始化完毕')
@@ -122,39 +120,37 @@ export class InitService {
 	}
 
 	/**初始化权限**/
-	private async initAuth(roleId: number, auth: Auth[]) {
+	private async initAuth(parent: RoleEntity, auth: Auth[]) {
 		try {
-			const role = await this.roleModel.findOne({ where: { id: roleId } })
-			auth.map(async props => {
-				const newAuth = await this.authModel.create({
+			auth.forEach(async props => {
+				const newAuth = await this.roleModel.create({
 					primary: props.primary,
 					name: props.name,
 					status: props.status,
-					role
+					parent
 				})
-				const { id } = await this.authModel.save(newAuth)
-				await this.initAction(id, props.action)
+				const roleParent = await this.roleModel.save(newAuth)
+				await this.initAction(roleParent, props.action)
 			})
-			return role
+			return true
 		} catch (e) {
 			console.log(e)
 		}
 	}
 
 	/**初始化接口权限**/
-	private async initAction(authId: number, action: Action[]) {
+	private async initAction(parent: RoleEntity, action: Action[]) {
 		try {
-			const auth = await this.authModel.findOne({ where: { id: authId } })
-			action.map(async props => {
-				const newAction = await this.actionModel.create({
+			action.forEach(async props => {
+				const newAction = await this.roleModel.create({
 					primary: props.primary,
 					name: props.name,
 					status: props.status,
-					auth
+					parent
 				})
-				await this.actionModel.save(newAction)
+				await this.roleModel.save(newAction)
 			})
-			return auth
+			return true
 		} catch (e) {
 			console.log(e)
 		}
@@ -163,11 +159,6 @@ export class InitService {
 	/**初始化管理员**/
 	private async initAdminUser() {
 		try {
-			// const role = await this.roleModel.findOne({
-			// 	where: { primary: 'admin' },
-			// 	relations: ['auth', 'auth.action']
-			// })
-
 			const user = await this.userModel.findOne({ where: { account: 88888888 } })
 			if (!user) {
 				const newUser = await this.userModel.create({
