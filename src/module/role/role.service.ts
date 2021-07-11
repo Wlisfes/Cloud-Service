@@ -1,20 +1,28 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Repository, In, IsNull, Not } from 'typeorm'
+import { UtilsService } from '@/module/utils/utils.service'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
+import * as DTO from './role.interface'
 
 @Injectable()
 export class RoleService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
-		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>
+		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>,
+		private readonly utilsService: UtilsService
 	) {}
 
 	/**角色列表-不包括子类**/
 	public async nodeRoles(): Promise<RoleEntity[]> {
 		try {
-			return this.roleModel.manager.getTreeRepository(RoleEntity).findRoots()
+			return await this.roleModel.find({
+				where: {
+					parent: IsNull(),
+					user: IsNull()
+				}
+			})
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -23,20 +31,29 @@ export class RoleService {
 	/**角色列表-包括子类**/
 	public async nodeRolesChild(): Promise<RoleEntity[]> {
 		try {
-			return this.roleModel.manager.getTreeRepository(RoleEntity).findTrees()
+			return await this.roleModel.find({
+				where: {
+					parent: IsNull(),
+					user: IsNull()
+				},
+				relations: ['children', 'children.children']
+			})
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 
 	/**角色信息**/
-	public async nodeRole(): Promise<RoleEntity> {
+	public async nodeRole(id: number): Promise<RoleEntity> {
 		try {
-			const parent = await this.roleModel.findOne({ where: { id: 1 } })
-			if (!parent) {
+			const role = await this.roleModel.findOne({ where: { id } })
+			if (!role) {
 				throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
 			}
-			return await this.roleModel.manager.getTreeRepository(RoleEntity).findDescendantsTree(parent)
+			return await this.roleModel.findOne({
+				where: { id },
+				relations: ['children', 'children.children']
+			})
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -45,9 +62,14 @@ export class RoleService {
 	/**用户角色信息**/
 	public async nodeUserRole(uid: number) {
 		try {
-			console.log(uid)
 			const user = await this.userModel.findOne({ where: { uid } })
-			return await this.roleModel.findOne({ where: { primary: 'admin' } })
+			return await this.roleModel.findOne({
+				where: {
+					parent: IsNull(),
+					user
+				},
+				relations: ['user', 'children', 'children.children']
+			})
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

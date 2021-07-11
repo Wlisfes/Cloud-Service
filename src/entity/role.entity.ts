@@ -1,10 +1,8 @@
-import { Entity, Tree, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm'
-import { TreeChildren, TreeParent, TreeLevelColumn } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm'
 import { DateEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
 
 @Entity('role')
-@Tree('nested-set')
 export class RoleEntity extends DateEntity {
 	@PrimaryGeneratedColumn({ comment: '自增长主键' })
 	id: number
@@ -24,16 +22,21 @@ export class RoleEntity extends DateEntity {
 	})
 	status: number
 
-	@TreeParent()
+	@ManyToOne(
+		type => RoleEntity,
+		role => role.children
+	)
 	parent: RoleEntity
 
-	@TreeChildren()
+	@OneToMany(
+		type => RoleEntity,
+		role => role.parent
+	)
 	children: RoleEntity[]
 
-	@OneToOne(
+	@ManyToOne(
 		type => UserEntity,
 		user => user.role
 	)
-	@JoinColumn()
 	user: UserEntity
 }

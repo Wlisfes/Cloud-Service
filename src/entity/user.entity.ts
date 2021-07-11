@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToOne } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToOne, OneToMany } from 'typeorm'
 import { DateEntity } from '@/entity/common.entity'
 import { RoleEntity } from '@/entity/role.entity'
 import { hashSync } from 'bcryptjs'
@@ -52,12 +52,12 @@ export class UserEntity extends DateEntity {
 		default: 1,
 		nullable: false
 	})
-	status: 0 | 1
+	status: number
 
-	@OneToOne(
+	@OneToMany(
 		type => RoleEntity,
 		role => role.user,
 		{ cascade: true }
 	)
-	role: RoleEntity
+	role: RoleEntity[]
 }

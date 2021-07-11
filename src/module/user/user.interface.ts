@@ -3,7 +3,7 @@ import { IsNotEmpty, IsEmail, Length, IsOptional, IsNumber, Min } from 'class-va
 import { Type } from 'class-transformer'
 import { JwtInterface } from '@/module/jwt/jwt.interface'
 
-class UserInterface {
+export class UserInterface {
 	@ApiProperty({ required: false, description: '主键id', example: 1 })
 	id: number
 
