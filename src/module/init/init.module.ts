@@ -1,10 +1,7 @@
-import { Module, Global } from '@nestjs/common'
-import { InitService } from './init.service'
+import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
+import { InitService } from './init.service'
 import { SessionModule } from 'nestjs-session'
-import { UserEntity } from '@/entity/user.entity'
-import { RoleEntity } from '@/entity/role.entity'
 
 //依赖模块挂载
 import { UtilsModule } from '@/module/utils/utils.module'
@@ -20,8 +17,6 @@ import { MenuModule } from '@/module/menu/menu.module'
 @Module({
 	imports: [
 		ConfigModule.forRoot({ isGlobal: true }),
-		TypeOrmModule.forRoot(),
-		TypeOrmModule.forFeature([UserEntity, RoleEntity]),
 		RedisModule.forRoot({
 			host: process.env.REDIS_HOST,
 			port: Number(process.env.REDIS_PORT),

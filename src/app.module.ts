@@ -16,7 +16,7 @@ import { RoleEntity } from '@/entity/role.entity'
 import { MenuEntity } from '@/entity/menu.entity'
 
 @Module({
-	imports: [TypeOrmModule.forFeature([UserEntity, RoleEntity, MenuEntity]), InitModule],
+	imports: [TypeOrmModule.forRoot(), TypeOrmModule.forFeature([UserEntity, RoleEntity, MenuEntity]), InitModule],
 	controllers: [AppController],
 	providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }]
 })

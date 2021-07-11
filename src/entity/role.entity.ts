@@ -1,4 +1,4 @@
-import { Entity, Tree, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
+import { Entity, Tree, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm'
 import { TreeChildren, TreeParent, TreeLevelColumn } from 'typeorm'
 import { DateEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
@@ -30,9 +30,10 @@ export class RoleEntity extends DateEntity {
 	@TreeChildren()
 	children: RoleEntity[]
 
-	@ManyToOne(
+	@OneToOne(
 		type => UserEntity,
 		user => user.role
 	)
+	@JoinColumn()
 	user: UserEntity
 }
