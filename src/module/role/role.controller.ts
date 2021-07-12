@@ -31,7 +31,7 @@ export class RoleController {
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.RoleResponse })
-	@Get('node-id')
+	@Get('node')
 	public async nodeRole(@Query() query: DTO.NodeRole) {
 		return await this.roleService.nodeRole(query.id)
 	}
@@ -42,7 +42,7 @@ export class RoleController {
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.RoleResponse })
-	@Get('user')
+	@Get('user-node')
 	public async nodeUserRole(@Req() req: { user: { uid: number } }) {
 		return await this.roleService.nodeUserRole(req.user.uid)
 	}

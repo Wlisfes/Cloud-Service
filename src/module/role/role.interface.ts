@@ -20,10 +20,15 @@ class RoleInterface {
 	user: UserInterface
 }
 
-class RoleParameter {}
+class RoleParameter {
+	@ApiProperty({ description: '角色、权限id', example: 1 })
+	@IsNotEmpty({ message: '角色、权限id 必填' })
+	@Type(type => Number)
+	id: number
+}
 
 /**角色公用信息-RoleResponse**/
 export class RoleResponse extends RoleInterface {}
 
 /**角色信息-Parameter**/
-export class NodeRole extends PickType(RoleInterface, ['id']) {}
+export class NodeRole extends PickType(RoleParameter, ['id']) {}
