@@ -29,12 +29,17 @@ export class UserService {
 	}
 
 	/**创建8位数账户**/
-	async createAccount(): Promise<number> {
+	async createAccount(num: number): Promise<number> {
 		try {
-			const account = parseInt(('0000000' + 100000000 * Math.random()).match(/(\d{8})(\.|$)/)[1])
+			const account = Number(
+				Array(num)
+					.fill(num)
+					.map(() => Math.floor(Math.random() * 10))
+					.join('')
+			)
 			const user = await this.userModel.findOne({ where: { account } })
 			if (user) {
-				return await this.createAccount()
+				return await this.createAccount(num)
 			}
 			return account
 		} catch (e) {
@@ -54,7 +59,7 @@ export class UserService {
 			}
 			const newUser = await this.userModel.create({
 				...props,
-				account: await this.createAccount()
+				account: await this.createAccount(8)
 			})
 			await this.userModel.save(newUser)
 			//注册成功删除redis中的邮箱验证码
@@ -64,7 +69,7 @@ export class UserService {
 			// Object.keys([...Array(55)]).map(async () => {
 			// 	const newUser = await this.userModel.create({
 			// 		...props,
-			// 		account: await this.createAccount()
+			// 		account: await this.createAccount(8)
 			// 	})
 			// 	await this.userModel.save(newUser)
 			// })
@@ -147,7 +152,7 @@ export class UserService {
 	async findUsers(props: DTO.FindUsers) {
 		try {
 			const [list = [], total = 0] = await this.userModel.findAndCount({
-				order: { uid: 'DESC' },
+				order: { uid: 'ASC' },
 				skip: (props.page - 1) * props.size,
 				take: props.size
 			})
