@@ -60,6 +60,15 @@ export class UserService {
 			//注册成功删除redis中的邮箱验证码
 			await this.redisService.delStore(props.email)
 			return { message: '注册成功' }
+
+			// Object.keys([...Array(55)]).map(async () => {
+			// 	const newUser = await this.userModel.create({
+			// 		...props,
+			// 		account: await this.createAccount()
+			// 	})
+			// 	await this.userModel.save(newUser)
+			// })
+			// return { message: '注册成功' }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
