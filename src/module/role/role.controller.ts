@@ -12,27 +12,27 @@ export class RoleController {
 	@ApiOperation({ summary: '角色列表-不包括子类' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: [DTO.RoleResponse] })
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRolesResponse })
 	@Get('list')
-	public async nodeRoles() {
-		return await this.roleService.nodeRoles()
+	public async nodeRoles(@Query() query: DTO.NodeRolesParameter) {
+		return await this.roleService.nodeRoles(query)
 	}
 
 	@ApiOperation({ summary: '角色列表-包括子类' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: [DTO.RoleResponse] })
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRolesResponse })
 	@Get('list-node')
-	public async nodeRolesChild() {
-		return await this.roleService.nodeRolesChild()
+	public async nodeRolesChild(@Query() query: DTO.NodeRolesParameter) {
+		return await this.roleService.nodeRolesChild(query)
 	}
 
 	@ApiOperation({ summary: '角色信息' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.RoleResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRoleResponse })
 	@Get('node')
-	public async nodeRole(@Query() query: DTO.NodeRole) {
+	public async nodeRole(@Query() query: DTO.NodeRoleParameter) {
 		return await this.roleService.nodeRole(query.id)
 	}
 
@@ -41,7 +41,7 @@ export class RoleController {
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.RoleResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.NodeUserRoleResponse })
 	@Get('user-node')
 	public async nodeUserRole(@Req() req: { user: { uid: number } }) {
 		return await this.roleService.nodeUserRole(req.user.uid)

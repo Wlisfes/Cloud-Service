@@ -15,29 +15,35 @@ export class RoleService {
 	) {}
 
 	/**角色列表-不包括子类**/
-	public async nodeRoles(): Promise<RoleEntity[]> {
+	public async nodeRoles(props: DTO.NodeRolesParameter) {
 		try {
-			return await this.roleModel.find({
+			const [list = [], total = 0] = await this.roleModel.findAndCount({
 				where: {
 					parent: IsNull(),
 					user: IsNull()
-				}
+				},
+				skip: (props.page - 1) * props.size,
+				take: props.size
 			})
+			return { total, size: props.size, page: props.page, list }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 
 	/**角色列表-包括子类**/
-	public async nodeRolesChild(): Promise<RoleEntity[]> {
+	public async nodeRolesChild(props: DTO.NodeRolesParameter) {
 		try {
-			return await this.roleModel.find({
+			const [list = [], total = 0] = await this.roleModel.findAndCount({
 				where: {
 					parent: IsNull(),
 					user: IsNull()
 				},
-				relations: ['children', 'children.children']
+				relations: ['children', 'children.children'],
+				skip: (props.page - 1) * props.size,
+				take: props.size
 			})
+			return { total, size: props.size, page: props.page, list }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

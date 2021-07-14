@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional, PickType, OmitType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional, PickType, PartialType, OmitType } from '@nestjs/swagger'
+import { IsNotEmpty, IsNumber, Min } from 'class-validator'
 import { Type } from 'class-transformer'
 import { UserInterface } from '@/module/user/user.interface'
 
@@ -18,6 +18,12 @@ class RoleInterface {
 	children: RoleInterface[]
 	@ApiProperty({ description: '角色、权限所属用户', type: OmitType(UserInterface, ['total']), example: null })
 	user: UserInterface
+	@ApiProperty({ description: '总数', example: 0 })
+	total: number
+	@ApiProperty({ description: '当前页', example: 1 })
+	page: number
+	@ApiProperty({ description: '当前页数量', example: 10 })
+	size: number
 }
 
 class RoleParameter {
@@ -25,10 +31,45 @@ class RoleParameter {
 	@IsNotEmpty({ message: '角色、权限id 必填' })
 	@Type(type => Number)
 	id: number
+
+	@ApiProperty({ description: '分页', example: 1 })
+	@IsNotEmpty({ message: 'page 必填' })
+	@IsNumber({}, { message: 'page必须是数字' })
+	@Min(1, { message: 'page不能小于1' })
+	@Type(type => Number)
+	page: number
+
+	@ApiProperty({ description: '分页数量', example: 10 })
+	@IsNotEmpty({ message: 'size 必填' })
+	@IsNumber({}, { message: 'size必须是数字' })
+	@Min(1, { message: 'size不能小于1' })
+	@Type(type => Number)
+	size: number
 }
 
-/**角色公用信息-RoleResponse**/
-export class RoleResponse extends RoleInterface {}
+/**角色、权限列表-Parameter***********************************************************************/
+export class NodeRolesParameter extends PickType(RoleParameter, ['page', 'size']) {}
+/**角色、权限列表-Response**/
+export class NodeRolesResponse extends PickType(RoleInterface, ['total', 'page', 'size']) {
+	@ApiProperty({
+		description: '角色、权限列表',
+		type: [PickType(RoleInterface, ['id', 'primary', 'name', 'status', 'children', 'user'])],
+		example: []
+	})
+	list: RoleInterface[]
+}
 
-/**角色信息-Parameter**/
-export class NodeRole extends PickType(RoleParameter, ['id']) {}
+/**角色信息-Parameter***********************************************************************/
+export class NodeRoleParameter extends PickType(RoleParameter, ['id']) {}
+/**角色信息-Response**/
+export class NodeRoleResponse extends PickType(RoleInterface, ['id', 'primary', 'name', 'status', 'children']) {}
+
+/**用户角色信息-Response***********************************************************************/
+export class NodeUserRoleResponse extends PickType(RoleInterface, [
+	'user',
+	'id',
+	'primary',
+	'name',
+	'status',
+	'children'
+]) {}
