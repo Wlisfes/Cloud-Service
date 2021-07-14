@@ -42,7 +42,7 @@ export class AuthGuard implements CanActivate {
 			if (store) {
 				request.user = store
 			} else {
-				const user = await this.userService.findUidUser(uid)
+				const user = await this.userService.nodeUidUser(uid)
 				if (!user) {
 					throw new HttpException('账户不存在', HttpStatus.FORBIDDEN)
 				} else if (!props.error && user.status !== 1) {
