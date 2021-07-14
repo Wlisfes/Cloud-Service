@@ -24,7 +24,7 @@ export class UserController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.CreateUserResponse })
 	@Post('create')
-	async createUser(@Body() body: DTO.CreateUser) {
+	async createUser(@Body() body: DTO.CreateUserParameter) {
 		return await this.userService.createUser(body)
 	}
 
@@ -33,7 +33,7 @@ export class UserController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.LoginUserResponse })
 	@Post('login')
-	async loginUser(@Body() body: DTO.LoginUser, @Session() session: { code: string }) {
+	async loginUser(@Body() body: DTO.LoginUserParameter, @Session() session: { code: string }) {
 		return await this.userService.loginUser(body, session.code)
 	}
 
@@ -42,10 +42,10 @@ export class UserController {
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateUserResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateNodeUserResponse })
 	@Put('update')
-	async updateUser(@Body() body: DTO.UpdateUser, @Req() req: { user: { uid: number } }) {
-		return await this.userService.updateUser(body, req.user.uid)
+	async updateNodeUser(@Body() body: DTO.UpdateNodeUserParameter, @Req() req: { user: { uid: number } }) {
+		return await this.userService.updateNodeUser(body, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '更新用户邮箱' })
@@ -53,10 +53,10 @@ export class UserController {
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateUserEmailResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateNodeUserEmailResponse })
 	@Put('update-email')
-	async updateUserEmail(@Body() body: DTO.UpdateUserEmail, @Req() req: { user: { uid: number } }) {
-		return await this.userService.updateUserEmail(body, req.user.uid)
+	async updateNodeUserEmail(@Body() body: DTO.UpdateNodeUserEmailParameter, @Req() req: { user: { uid: number } }) {
+		return await this.userService.updateNodeUserEmail(body, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '用户信息' })
@@ -64,18 +64,18 @@ export class UserController {
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.FindUserResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.NodeUserResponse })
 	@Get('info')
-	async findUser(@Req() req: { user: { uid: number } }) {
-		return await this.userService.findUidUser(req.user.uid)
+	async nodeUser(@Req() req: { user: { uid: number } }) {
+		return await this.userService.nodeUidUser(req.user.uid)
 	}
 
 	@ApiOperation({ summary: '用户列表' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.FindUsersResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeUsersResponse })
 	@Get('list')
-	async findUsers(@Query() query: DTO.FindUsers) {
-		return await this.userService.findUsers(query)
+	async nodeUsers(@Query() query: DTO.NodeUsersParameter) {
+		return await this.userService.nodeUsers(query)
 	}
 }

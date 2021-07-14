@@ -98,33 +98,44 @@ export class CreateCode {
 	data: string
 }
 
-export class CreateUser extends PickType(UserParameter, ['nickname', 'password', 'email', 'code']) {}
+/**创建用户-Parameter******************************************************************************/
+export class CreateUserParameter extends PickType(UserParameter, ['nickname', 'password', 'email', 'code']) {}
+/**创建用户-Response**/
 export class CreateUserResponse {
 	@ApiProperty({ description: 'message', example: '注册成功' })
 	message: string
 }
 
-export class LoginUser extends PickType(UserParameter, ['account', 'password']) {
+/**用户登录-Parameter******************************************************************************/
+export class LoginUserParameter extends PickType(UserParameter, ['account', 'password']) {
 	@ApiProperty({ description: '验证码', example: 'hj56' })
 	@IsNotEmpty({ message: '验证码 必填' })
 	@Type(type => String)
 	code: string
 }
+/**用户登录-Response**/
 export class LoginUserResponse extends PickType(JwtInterface, ['token']) {}
 
-export class FindUserResponse extends OmitType(UserInterface, ['total']) {}
+/**用户信息-Response******************************************************************************/
+export class NodeUserResponse extends OmitType(UserInterface, ['total']) {}
 
-export class FindUsers extends PickType(UserParameter, ['page', 'size']) {}
-export class FindUsersResponse extends PickType(UserInterface, ['total']) {
+/**用户列表-Parameter******************************************************************************/
+export class NodeUsersParameter extends PickType(UserParameter, ['page', 'size']) {}
+/**用户列表-Response**/
+export class NodeUsersResponse extends PickType(UserInterface, ['total']) {
 	@ApiProperty({ description: '用户列表', type: [OmitType(UserInterface, ['total'])], example: [] })
 	list: UserInterface[]
 }
 
-export class UpdateUser extends IntersectionType(
+/**更新用户信息-Parameter******************************************************************************/
+export class UpdateNodeUserParameter extends IntersectionType(
 	PickType(UserParameter, ['nickname', 'status']),
 	PickType(UserInterface, ['avatar'])
 ) {}
-export class UpdateUserResponse extends OmitType(UserInterface, ['total']) {}
+/**更新用户信息-Response**/
+export class UpdateNodeUserResponse extends OmitType(UserInterface, ['total']) {}
 
-export class UpdateUserEmail extends PickType(UserParameter, ['email', 'code']) {}
-export class UpdateUserEmailResponse extends OmitType(UserInterface, ['total']) {}
+/**修改用户邮箱-Parameter******************************************************************************/
+export class UpdateNodeUserEmailParameter extends PickType(UserParameter, ['email', 'code']) {}
+/**修改用户邮箱-Response**/
+export class UpdateNodeUserEmailResponse extends OmitType(UserInterface, ['total']) {}

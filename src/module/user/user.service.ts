@@ -47,8 +47,8 @@ export class UserService {
 		}
 	}
 
-	//创建用户
-	async createUser(props: DTO.CreateUser) {
+	/**创建用户**/
+	async createUser(props: DTO.CreateUserParameter) {
 		try {
 			const code = await this.redisService.getStore(props.email)
 			if (!code || code !== props.code) {
@@ -79,8 +79,8 @@ export class UserService {
 		}
 	}
 
-	//用户登录
-	async loginUser(props: DTO.LoginUser, code: string) {
+	/**用户登录**/
+	async loginUser(props: DTO.LoginUserParameter, code: string) {
 		try {
 			if (!code || code !== props.code.toUpperCase()) {
 				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
@@ -110,18 +110,18 @@ export class UserService {
 		}
 	}
 
-	//修改用户
-	async updateUser(props: DTO.UpdateUser, uid: number): Promise<UserEntity> {
+	/**修改用户**/
+	async updateNodeUser(props: DTO.UpdateNodeUserParameter, uid: number): Promise<UserEntity> {
 		try {
 			await this.userModel.update({ uid }, { ...props })
-			return await this.findUidUser(uid)
+			return await this.nodeUidUser(uid)
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 
-	//修改用户邮箱
-	async updateUserEmail(props: DTO.UpdateUserEmail, uid: number): Promise<UserEntity> {
+	/**修改用户邮箱**/
+	async updateNodeUserEmail(props: DTO.UpdateNodeUserEmailParameter, uid: number): Promise<UserEntity> {
 		try {
 			const code = await this.redisService.getStore(props.email)
 			if (!code || code !== props.code) {
@@ -129,14 +129,14 @@ export class UserService {
 			}
 
 			await this.userModel.update({ uid }, { email: props.email })
-			return await this.findUidUser(uid)
+			return await this.nodeUidUser(uid)
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 
-	//uid获取用户信息
-	async findUidUser(uid: number): Promise<UserEntity> {
+	/**uid获取用户信息**/
+	async nodeUidUser(uid: number): Promise<UserEntity> {
 		try {
 			const user = await this.userModel.findOne({ uid })
 			if (user) {
@@ -148,8 +148,8 @@ export class UserService {
 		}
 	}
 
-	//用户列表
-	async findUsers(props: DTO.FindUsers) {
+	/**用户列表**/
+	async nodeUsers(props: DTO.NodeUsersParameter) {
 		try {
 			const [list = [], total = 0] = await this.userModel.findAndCount({
 				order: { uid: 'ASC' },
