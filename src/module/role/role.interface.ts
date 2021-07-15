@@ -1,6 +1,6 @@
-import { ApiProperty, ApiPropertyOptional, PickType, PartialType, OmitType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, Min } from 'class-validator'
-import { Type } from 'class-transformer'
+import { ApiProperty, ApiPropertyOptional, PickType, OmitType } from '@nestjs/swagger'
+import { IsNotEmpty, IsNumber, Min, IsOptional, IsArray } from 'class-validator'
+import { Type, Transform } from 'class-transformer'
 import { UserInterface } from '@/module/user/user.interface'
 
 class RoleInterface {
@@ -39,19 +39,19 @@ class RoleInterface {
 }
 
 class RoleParameter {
-	@ApiProperty({ description: '角色、权限id', example: 1 })
+	@ApiProperty({ description: '角色、权限id', type: Number, example: 1 })
 	@IsNotEmpty({ message: '角色、权限id 必填' })
 	@Type(type => Number)
 	id: number
 
-	@ApiProperty({ description: '分页', example: 1 })
+	@ApiProperty({ description: '分页', type: Number, example: 1 })
 	@IsNotEmpty({ message: 'page 必填' })
 	@IsNumber({}, { message: 'page必须是数字' })
 	@Min(1, { message: 'page不能小于1' })
 	@Type(type => Number)
 	page: number
 
-	@ApiProperty({ description: '分页数量', example: 10 })
+	@ApiProperty({ description: '分页数量', type: Number, example: 10 })
 	@IsNotEmpty({ message: 'size 必填' })
 	@IsNumber({}, { message: 'size必须是数字' })
 	@Min(1, { message: 'size不能小于1' })
@@ -62,6 +62,15 @@ class RoleParameter {
 	@IsNotEmpty({ message: '状态 必填' })
 	@Type(type => Number)
 	status: 1 | 0
+
+	@ApiPropertyOptional({ description: '备注', example: '备注' })
+	@IsOptional()
+	comment: string
+
+	@ApiProperty({ description: '权限id', type: [Number], example: [] })
+	@Transform(({ value }) => (value ? value.split(',') : []), { toClassOnly: true })
+	@IsOptional()
+	role: number[]
 }
 
 /**角色、权限列表-Parameter***********************************************************************/
@@ -100,7 +109,7 @@ export class NodeUserRoleResponse extends PickType(RoleInterface, [
 ]) {}
 
 /**修改角色权限-Parameter***********************************************************************/
-export class UpdateNodeRoleParameter extends PickType(RoleParameter, ['id', 'status']) {}
+export class UpdateNodeRoleParameter extends PickType(RoleParameter, ['id', 'status', 'comment', 'role']) {}
 /**修改角色权限-Response**/
 export class UpdateNodeRoleResponse {
 	@ApiProperty({ description: 'message', example: '修改成功' })

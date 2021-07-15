@@ -84,6 +84,8 @@ export class RoleService {
 	/**修改角色权限**/
 	public async updateNodeRole(props: DTO.UpdateNodeRoleParameter) {
 		try {
+			console.log(props)
+			return props
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
