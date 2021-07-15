@@ -13,6 +13,9 @@ export class RoleEntity extends DateEntity {
 	@Column({ comment: '角色名称', nullable: false })
 	name: string
 
+	@Column({ comment: '角色备注' })
+	comment: string
+
 	@Column({
 		comment: '状态',
 		type: 'enum',

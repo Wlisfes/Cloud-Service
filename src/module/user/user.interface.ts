@@ -34,6 +34,9 @@ export class UserInterface {
 
 	@ApiProperty({ description: '总数', example: 0 })
 	total: number
+
+	@ApiProperty({ description: '备注', example: '备注' })
+	comment: string
 }
 
 class UserParameter {

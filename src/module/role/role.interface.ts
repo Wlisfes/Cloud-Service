@@ -6,24 +6,36 @@ import { UserInterface } from '@/module/user/user.interface'
 class RoleInterface {
 	@ApiProperty({ description: '角色、权限id', example: 1 })
 	id: number
+
 	@ApiProperty({ description: '角色、权限唯一标识', example: 'admin' })
 	primary: string
+
 	@ApiProperty({ description: '角色、权限名称', example: '超级管理员' })
 	name: string
+
 	@ApiProperty({ description: '角色、权限状态', enum: [0, 1], example: 1 })
 	status: number
+
 	@ApiProperty({ description: '角色、权限父级', type: RoleInterface, example: null })
 	parent: number
+
 	@ApiProperty({ description: '角色、权限子级', type: [RoleInterface], example: [] })
 	children: RoleInterface[]
+
 	@ApiProperty({ description: '角色、权限所属用户', type: OmitType(UserInterface, ['total']), example: null })
 	user: UserInterface
+
 	@ApiProperty({ description: '总数', example: 0 })
 	total: number
+
 	@ApiProperty({ description: '当前页', example: 1 })
 	page: number
+
 	@ApiProperty({ description: '当前页数量', example: 10 })
 	size: number
+
+	@ApiProperty({ description: '备注', example: '备注' })
+	comment: string
 }
 
 class RoleParameter {
@@ -53,7 +65,7 @@ export class NodeRolesParameter extends PickType(RoleParameter, ['page', 'size']
 export class NodeRolesResponse extends PickType(RoleInterface, ['total', 'page', 'size']) {
 	@ApiProperty({
 		description: '角色、权限列表',
-		type: [PickType(RoleInterface, ['id', 'primary', 'name', 'status', 'children', 'user'])],
+		type: [PickType(RoleInterface, ['id', 'primary', 'name', 'status', 'children', 'user', 'comment'])],
 		example: []
 	})
 	list: RoleInterface[]
@@ -62,7 +74,14 @@ export class NodeRolesResponse extends PickType(RoleInterface, ['total', 'page',
 /**角色信息-Parameter***********************************************************************/
 export class NodeRoleParameter extends PickType(RoleParameter, ['id']) {}
 /**角色信息-Response**/
-export class NodeRoleResponse extends PickType(RoleInterface, ['id', 'primary', 'name', 'status', 'children']) {}
+export class NodeRoleResponse extends PickType(RoleInterface, [
+	'id',
+	'primary',
+	'name',
+	'status',
+	'children',
+	'comment'
+]) {}
 
 /**用户角色信息-Response***********************************************************************/
 export class NodeUserRoleResponse extends PickType(RoleInterface, [
@@ -71,5 +90,6 @@ export class NodeUserRoleResponse extends PickType(RoleInterface, [
 	'primary',
 	'name',
 	'status',
-	'children'
+	'children',
+	'comment'
 ]) {}
