@@ -41,7 +41,7 @@ export class RoleController {
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.NodeUserRoleResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeUserRoleResponse })
 	@Get('user-node')
 	public async nodeUserRole(@Req() req: { user: { uid: number } }) {
 		return await this.roleService.nodeUserRole(req.user.uid)
@@ -52,10 +52,10 @@ export class RoleController {
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK' })
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.UpdateNodeRoleResponse })
 	@Put('update')
-	public async updateNodeRole(@Req() req: { user: { uid: number } }) {
-		return 'ok'
+	public async updateNodeRole(@Body() body: DTO.UpdateNodeRoleParameter, @Req() req: { user: { uid: number } }) {
+		return await this.roleService.updateNodeRole(body)
 	}
 
 	@ApiOperation({ summary: '修改用户角色权限' })
@@ -63,9 +63,12 @@ export class RoleController {
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK' })
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.UpdateNodeUserRoleResponse })
 	@Put('update/user')
-	public async updatenodeUserRole(@Req() req: { user: { uid: number } }) {
-		return 'ok'
+	public async updateNodeUserRole(
+		@Body() body: DTO.UpdateNodeUserRoleParameter,
+		@Req() req: { user: { uid: number } }
+	) {
+		return this.roleService.updateNodeUserRole(body, req.user.uid)
 	}
 }

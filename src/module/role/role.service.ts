@@ -50,7 +50,7 @@ export class RoleService {
 	}
 
 	/**角色信息**/
-	public async nodeRole(id: number): Promise<RoleEntity> {
+	public async nodeRole(id: number) {
 		try {
 			const role = await this.roleModel.findOne({ where: { id } })
 			if (!role) {
@@ -76,6 +76,22 @@ export class RoleService {
 				},
 				relations: ['user', 'children', 'children.children']
 			})
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**修改角色权限**/
+	public async updateNodeRole(props: DTO.UpdateNodeRoleParameter) {
+		try {
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**修改用户角色权限**/
+	public async updateNodeUserRole(props: DTO.UpdateNodeUserRoleParameter, uid: number) {
+		try {
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

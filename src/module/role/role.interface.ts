@@ -57,6 +57,11 @@ class RoleParameter {
 	@Min(1, { message: 'size不能小于1' })
 	@Type(type => Number)
 	size: number
+
+	@ApiProperty({ description: '状态', enum: [0, 1], example: 0 | 1 })
+	@IsNotEmpty({ message: '状态 必填' })
+	@Type(type => Number)
+	status: 1 | 0
 }
 
 /**角色、权限列表-Parameter***********************************************************************/
@@ -93,3 +98,16 @@ export class NodeUserRoleResponse extends PickType(RoleInterface, [
 	'children',
 	'comment'
 ]) {}
+
+/**修改角色权限-Parameter***********************************************************************/
+export class UpdateNodeRoleParameter extends PickType(RoleParameter, ['id', 'status']) {}
+/**修改角色权限-Response**/
+export class UpdateNodeRoleResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
+
+/**修改用户角色权限-Parameter***********************************************************************/
+export class UpdateNodeUserRoleParameter extends PickType(RoleParameter, ['id', 'status']) {}
+/**修改用户角色权限-Response**/
+export class UpdateNodeUserRoleResponse extends UpdateNodeRoleResponse {}
