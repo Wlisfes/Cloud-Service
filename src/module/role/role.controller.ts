@@ -47,6 +47,17 @@ export class RoleController {
 		return await this.roleService.nodeUserRole(req.user.uid)
 	}
 
+	@ApiOperation({ summary: '切换角色状态' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRoleCutoverResponse })
+	@Put('cutover')
+	public async nodeRoleCutover(@Body() body: DTO.NodeRoleCutoverParameter) {
+		return await this.roleService.nodeRoleCutover(body)
+	}
+
 	@ApiOperation({ summary: '修改角色权限' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })

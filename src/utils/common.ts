@@ -1,10 +1,13 @@
 /**权限筛选 losence不存在 resence存在**/
-export function inteRole(list: any[], role: number[]) {
-	const losence = []
-	const resence = []
+export function inteRole<T extends { id: number; children: Array<T> }>(
+	list: Array<T>,
+	role: Array<number>
+): { losence: Array<number>; resence: Array<number> } {
+	const losence: Array<number> = []
+	const resence: Array<number> = []
 	for (const mode of list) {
-		const left = []
-		const right = []
+		const left: Array<number> = []
+		const right: Array<number> = []
 		for (const node of mode.children) {
 			if (role.includes(node.id)) {
 				left.push(node.id)
