@@ -11,6 +11,10 @@ export interface RolesConfig extends Action {
 	auth: Auth[]
 }
 
+export type RoleEnum = 'admin' | 'super' | 'visitor'
+export type RoleModuleEnum = 'user' | 'role' | 'menu' | 'cloud'
+export type RoleActionEnum = 'create' | 'update' | 'delete' | 'params'
+
 const action = {
 	admin: [
 		{ primary: 'create', name: '新增', status: 1, type: 3 },

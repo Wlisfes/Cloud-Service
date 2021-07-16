@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Body, Query, Req } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { RoleService } from './role.service'
-import { AuthToken, APP_AUTH_TOKEN } from '@/guard/auth.guard'
+import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as DTO from './role.interface'
 
 @ApiTags('系统管理-角色模块')
@@ -50,6 +50,7 @@ export class RoleController {
 	@ApiOperation({ summary: '切换角色状态' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin'], module: 'role', action: 'update' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRoleCutoverResponse })
@@ -61,6 +62,7 @@ export class RoleController {
 	@ApiOperation({ summary: '修改角色权限' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin'], module: 'role', action: 'update' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.UpdateNodeRoleResponse })
@@ -72,6 +74,7 @@ export class RoleController {
 	@ApiOperation({ summary: '修改用户角色权限' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin'], module: 'role', action: 'update' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.UpdateNodeUserRoleResponse })
