@@ -28,7 +28,7 @@ export class UserEntity extends DateEntity {
 	@Column({ comment: '头像', nullable: true })
 	avatar: string | null
 
-	@Column({ comment: '备注' })
+	@Column({ comment: '备注', nullable: true })
 	comment: string
 
 	@Column({

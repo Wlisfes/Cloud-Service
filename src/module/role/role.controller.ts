@@ -48,13 +48,13 @@ export class RoleController {
 	}
 
 	@ApiOperation({ summary: '修改角色权限' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.UpdateNodeRoleResponse })
 	@Put('update')
-	public async updateNodeRole(@Body() body: DTO.UpdateNodeRoleParameter, @Req() req: { user: { uid: number } }) {
+	public async updateNodeRole(@Body() body: DTO.UpdateNodeRoleParameter) {
 		return await this.roleService.updateNodeRole(body)
 	}
 

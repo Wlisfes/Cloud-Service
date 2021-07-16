@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional, PickType, OmitType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, Min, IsOptional, IsArray } from 'class-validator'
+import { IsNotEmpty, IsNumber, Min, IsOptional } from 'class-validator'
 import { Type, Transform } from 'class-transformer'
 import { UserInterface } from '@/module/user/user.interface'
+import { toArrayNumber } from '@/utils/validate'
 
 class RoleInterface {
 	@ApiProperty({ description: '角色、权限id', example: 1 })
@@ -67,9 +68,10 @@ class RoleParameter {
 	@IsOptional()
 	comment: string
 
-	@ApiProperty({ description: '权限id', type: [Number], example: [] })
-	@Transform(({ value }) => (value ? value.split(',') : []), { toClassOnly: true })
+	@ApiPropertyOptional({ description: '权限id', type: [Number], example: [] })
 	@IsOptional()
+	@Transform(type => toArrayNumber(type), { toClassOnly: true })
+	@IsNumber({}, { each: true, message: '权限id 必须为Array<number>' })
 	role: number[]
 }
 

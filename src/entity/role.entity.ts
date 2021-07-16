@@ -13,7 +13,7 @@ export class RoleEntity extends DateEntity {
 	@Column({ comment: '角色名称', nullable: false })
 	name: string
 
-	@Column({ comment: '角色备注' })
+	@Column({ comment: '角色备注', nullable: true })
 	comment: string
 
 	@Column({
@@ -24,6 +24,15 @@ export class RoleEntity extends DateEntity {
 		nullable: false
 	})
 	status: number
+
+	@Column({
+		comment: '类型: 1.角色 2.功能 3.权限',
+		type: 'enum',
+		enum: [1, 2, 3],
+		default: 3,
+		nullable: false
+	})
+	type: number
 
 	@ManyToOne(
 		type => RoleEntity,

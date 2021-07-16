@@ -4,6 +4,7 @@ import { Repository, In, IsNull, Not } from 'typeorm'
 import { UtilsService } from '@/module/utils/utils.service'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
+import { inteRole } from '@/utils/common'
 import * as DTO from './role.interface'
 
 @Injectable()
@@ -84,8 +85,21 @@ export class RoleService {
 	/**修改角色权限**/
 	public async updateNodeRole(props: DTO.UpdateNodeRoleParameter) {
 		try {
-			console.log(props)
-			return props
+			const role = await this.roleModel.findOne({
+				where: { id: props.id, type: 1 },
+				relations: ['children', 'children.children']
+			})
+			if (!role) {
+				throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
+			}
+
+			//更新角色
+			const { losence, resence } = inteRole(role.children, props.role)
+			await this.roleModel.update({ id: props.id }, { status: props.status, comment: props.comment })
+			await this.roleModel.update({ id: In(losence) }, { status: 0 })
+			await this.roleModel.update({ id: In(resence) }, { status: 1 })
+
+			return { message: '修改成功' }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -94,6 +108,7 @@ export class RoleService {
 	/**修改用户角色权限**/
 	public async updateNodeUserRole(props: DTO.UpdateNodeUserRoleParameter, uid: number) {
 		try {
+			return { message: '修改成功' }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

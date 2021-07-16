@@ -22,7 +22,8 @@ import { MenuModule } from '@/module/menu/menu.module'
 			port: Number(process.env.REDIS_PORT),
 			db: Number(process.env.REDIS_DB),
 			password: process.env.REDIS_PASSWORD,
-			keyPrefix: process.env.REDIS_KEYPREFIX
+			keyPrefix: process.env.REDIS_KEYPREFIX,
+			lazyConnect: true
 		}),
 		SessionModule.forRootAsync({
 			useFactory: () => ({

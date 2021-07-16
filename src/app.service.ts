@@ -34,7 +34,8 @@ export class AppService {
 					const newRole = await this.roleModel.create({
 						primary: props.primary,
 						name: props.name,
-						status: props.status
+						status: props.status,
+						type: props.type
 					})
 					const roleParent = await this.roleModel.save(newRole)
 					props.auth.forEach(async auth => {
@@ -42,6 +43,7 @@ export class AppService {
 							primary: auth.primary,
 							name: auth.name,
 							status: auth.status,
+							type: auth.type,
 							parent: roleParent
 						})
 						const authParent = await this.roleModel.save(newAuth)
@@ -50,6 +52,7 @@ export class AppService {
 								primary: action.primary,
 								name: action.name,
 								status: action.status,
+								type: action.type,
 								parent: authParent
 							})
 							await this.roleModel.save(newAction)
@@ -82,6 +85,7 @@ export class AppService {
 					primary: props.primary,
 					name: props.name,
 					status: props.status,
+					type: props.type,
 					user
 				})
 				const roleParent = await this.roleModel.save(newRole)
@@ -90,6 +94,7 @@ export class AppService {
 						primary: auth.primary,
 						name: auth.name,
 						status: auth.status,
+						type: auth.type,
 						parent: roleParent,
 						user
 					})
@@ -99,6 +104,7 @@ export class AppService {
 							primary: action.primary,
 							name: action.name,
 							status: action.status,
+							type: action.type,
 							parent: authParent,
 							user
 						})
