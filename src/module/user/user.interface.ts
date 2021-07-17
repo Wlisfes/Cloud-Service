@@ -42,7 +42,6 @@ export class UserInterface {
 class UserParameter {
 	@ApiProperty({ description: 'uid', example: 1624521523438 })
 	@IsNotEmpty({ message: 'uid 必填' })
-	@Length(13, 13, { message: 'uid 格式错误' })
 	@Type(type => Number)
 	uid: number
 
@@ -119,7 +118,9 @@ export class LoginUserParameter extends PickType(UserParameter, ['account', 'pas
 /**用户登录-Response**/
 export class LoginUserResponse extends PickType(JwtInterface, ['token']) {}
 
-/**用户信息-Response******************************************************************************/
+/**用户信息-Parameter******************************************************************************/
+export class NodeUidUserParameter extends PickType(UserParameter, ['uid']) {}
+/**用户信息-Response**/
 export class NodeUserResponse extends OmitType(UserInterface, ['total']) {}
 
 /**用户列表-Parameter******************************************************************************/

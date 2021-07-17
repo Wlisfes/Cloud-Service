@@ -52,21 +52,30 @@ export class AuthGuard implements CanActivate {
 				return useThrow('未登陆', HttpStatus.UNAUTHORIZED, props.error)
 			}
 
-			//token解密
 			const { uid } = await this.jwtAuthService.signverify(token)
-			const store = await this.redisService.getStore(`user-${uid}`)
-			if (store) {
-				request.user = store
-			} else {
-				const user = await this.userService.nodeUidUser(uid)
-				if (!user) {
-					return useThrow('账户不存在', HttpStatus.FORBIDDEN, props.error)
-				} else if (!props.error && user.status !== 1) {
-					return useThrow('账户已被禁用', HttpStatus.FORBIDDEN, props.error)
-				}
-				await this.redisService.setStore(`user-${uid}`, user, 24 * 60 * 60)
-				request.user = user
+			const user = await this.userService.nodeUidUser(uid)
+			if (!user) {
+				return useThrow('账户不存在', HttpStatus.FORBIDDEN, props.error)
+			} else if (!props.error && user.status !== 1) {
+				return useThrow('账户已被禁用', HttpStatus.FORBIDDEN, props.error)
 			}
+			request.user = user
+
+			//token解密
+			// const { uid } = await this.jwtAuthService.signverify(token)
+			// const store = await this.redisService.getStore(`user-${uid}`)
+			// if (store) {
+			// 	request.user = store
+			// } else {
+			// 	const user = await this.userService.nodeUidUser(uid)
+			// 	if (!user) {
+			// 		return useThrow('账户不存在', HttpStatus.FORBIDDEN, props.error)
+			// 	} else if (!props.error && user.status !== 1) {
+			// 		return useThrow('账户已被禁用', HttpStatus.FORBIDDEN, props.error)
+			// 	}
+			// 	await this.redisService.setStore(`user-${uid}`, user, 24 * 60 * 60)
+			// 	request.user = user
+			// }
 		}
 
 		if (petence?.role?.length > 0) {

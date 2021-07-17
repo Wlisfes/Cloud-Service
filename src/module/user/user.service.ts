@@ -138,7 +138,7 @@ export class UserService {
 	/**uid获取用户信息**/
 	async nodeUidUser(uid: number): Promise<UserEntity> {
 		try {
-			const user = await this.userModel.findOne({ uid })
+			const user = await this.userModel.findOne({ where: { uid } })
 			if (user) {
 				return user
 			}
