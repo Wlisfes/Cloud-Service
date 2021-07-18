@@ -37,10 +37,27 @@ import { MenuModule } from '@/module/menu/menu.module'
 			})
 		}),
 		AliyunModule.forRoot({
-			accessKeyId: process.env.ALIYUN_ACCESSKEYID,
-			accessKeySecret: process.env.ALIYUN_ACCESSKEYSECRET,
-			endpoint: process.env.ALIYUN_ENDPOINT,
-			apiVersion: process.env.ALIYUN_APIVERSION
+			aliyun: {
+				accessKeyId: process.env.ALIYUN_ACCESSKEYID,
+				accessKeySecret: process.env.ALIYUN_ACCESSKEYSECRET,
+				endpoint: process.env.ALIYUN_ENDPOINT,
+				apiVersion: process.env.ALIYUN_APIVERSION
+			},
+			oss: {
+				client: {
+					endpoint: process.env.OSS_ENDPOINT, // endpoint域名
+					accessKeyId: process.env.OSS_ACCESSKEYID, // 账号
+					accessKeySecret: process.env.OSS_ACCESSKEYSECRET, // 密码
+					bucket: process.env.OSS_BUCKET, // 存储桶
+					internal: false,
+					secure: true,
+					cname: false,
+					timeout: process.env.OSS_TIMEOUT
+				},
+				roleArn: process.env.OSS_ROLEARN,
+				sessionName: process.env.OSS_SESSIONNAME,
+				domain: process.env.OSS_DOMAIN // 自定义域名
+			}
 		}),
 		NodemailerModule.forRoot({
 			host: process.env.NODEMAILER_HOST,

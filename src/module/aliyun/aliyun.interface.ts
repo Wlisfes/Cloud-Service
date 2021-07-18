@@ -230,3 +230,26 @@ export class AliyunCreatePlayInfoResponse extends PickType(AliyunInterface, ['Re
 	@ApiProperty({ description: '视频播放信息列表', type: [VideoPlayInfo], example: [] })
 	list: VideoPlayInfo[]
 }
+
+/**Oss******************************************************************************************************************/
+class OssInterface {
+	@ApiProperty({ description: 'Bucket所在地域', example: 'oss-cn-shenzhen.aliyuncs.com' })
+	region: string
+	@ApiProperty({ description: 'Bucket名称', example: 'linvc' })
+	bucket: string
+	@ApiProperty({ description: '临时accessKeyId', example: 'STS.CI6Imh0dHBzOi8vb3NzL...******' })
+	accessKeyId: string
+	@ApiProperty({ description: '临时accessKeySecret', example: 'I6Imh0dHBzOi8vb3NzL...******' })
+	accessKeySecret: string
+	@ApiProperty({ description: '临时stsToken', example: 'joiQ0FJUzBBsll09MKJD...******' })
+	stsToken: string
+}
+
+/**创建OssSTS授权-Response**************************************************/
+export class CreateOssStsResponse extends PickType(OssInterface, [
+	'accessKeyId',
+	'accessKeySecret',
+	'bucket',
+	'region',
+	'stsToken'
+]) {}

@@ -1,13 +1,18 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common'
 import { RPCClient, CLIENT, CLIENT_CONFIG, Config } from './aliyun.provider'
+import { OSS_CONST, OSS_STS_CONST, OSS_OPTIONS, OSSOptions } from './aliyun.provider'
 import { UtilsService } from '@/module/utils/utils.service'
+import * as OSS from 'ali-oss'
 import * as DTO from './aliyun.interface'
 
 @Injectable()
 export class AliyunService {
 	constructor(
-		@Inject(CLIENT_CONFIG) public readonly options: Config,
+		@Inject(CLIENT_CONFIG) public readonly aliyunOptions: Config,
 		@Inject(CLIENT) public readonly client: RPCClient,
+		@Inject(OSS_CONST) protected readonly ossClient: OSS,
+		@Inject(OSS_STS_CONST) protected readonly stsClient: OSS.STS,
+		@Inject(OSS_OPTIONS) protected readonly ossOptions: OSSOptions,
 		private readonly utilsService: UtilsService
 	) {}
 
@@ -118,6 +123,23 @@ export class AliyunService {
 			return { RequestId, base, list: [] }
 		} catch (e) {
 			throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**创建OssSTS授权**/
+	async createOssSts() {
+		try {
+			const { roleArn, sessionName, client } = this.ossOptions
+			const { credentials } = await this.stsClient.assumeRole(roleArn, '', 3600, sessionName)
+			return {
+				accessKeyId: credentials.AccessKeyId,
+				accessKeySecret: credentials.AccessKeySecret,
+				stsToken: credentials.SecurityToken,
+				bucket: client.endpoint,
+				region: client.bucket
+			}
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 }
