@@ -47,8 +47,8 @@ export class UserService {
 		}
 	}
 
-	/**创建用户**/
-	async createUser(props: DTO.CreateUserParameter) {
+	/**注册用户**/
+	public async registerUser(props: DTO.RegisterUserParameter) {
 		try {
 			const code = await this.redisService.getStore(props.email)
 			if (!code || code !== props.code) {
@@ -65,15 +65,16 @@ export class UserService {
 			//注册成功删除redis中的邮箱验证码
 			await this.redisService.delStore(props.email)
 			return { message: '注册成功' }
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
 
-			// Object.keys([...Array(55)]).map(async () => {
-			// 	const newUser = await this.userModel.create({
-			// 		...props,
-			// 		account: await this.createAccount(8)
-			// 	})
-			// 	await this.userModel.save(newUser)
-			// })
-			// return { message: '注册成功' }
+	/**创建用户**/
+	async createUser(props: DTO.CreateUserParameter) {
+		try {
+			console.log(props)
+			return props
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

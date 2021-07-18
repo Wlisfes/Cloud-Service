@@ -19,6 +19,15 @@ export class UserController {
 		res.send(data)
 	}
 
+	@ApiOperation({ summary: '注册用户' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.RegisterUserResponse })
+	@Post('register')
+	async registerUser(@Body() body: DTO.RegisterUserParameter) {
+		return await this.userService.registerUser(body)
+	}
+
 	@ApiOperation({ summary: '创建用户' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
