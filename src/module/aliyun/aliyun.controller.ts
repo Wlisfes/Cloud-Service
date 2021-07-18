@@ -14,10 +14,10 @@ export class AliyunController {
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.AliyunCreateUploadResponse })
-	@Post('create-upload')
-	async createUpload(@Body() props: DTO.CreateUpload) {
-		return await this.aliyunService.createUpload(props)
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCreateResponse })
+	@Post('node-create')
+	async nodeCreate(@Body() props: DTO.NodeCreateParameter) {
+		return await this.aliyunService.nodeCreate(props)
 	}
 
 	@ApiOperation({ summary: '刷新上传凭证' })
@@ -25,28 +25,28 @@ export class AliyunController {
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.AliyunRefreshUploadResponse })
-	@Post('refresh-upload')
-	async refreshUpload(@Body() props: DTO.RefreshUpload) {
-		return await this.aliyunService.refreshUpload(props)
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRefreshResponse })
+	@Post('node-refresh')
+	async nodeRefresh(@Body() props: DTO.NodeRefreshParameter) {
+		return await this.aliyunService.nodeRefresh(props)
 	}
 
 	@ApiOperation({ summary: '获取转码模板列表' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.TransferTmplateResponse })
-	@Get('transfer-list')
-	async transferTmplate() {
-		return await this.aliyunService.transferTmplate()
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeTransferResponse })
+	@Get('node-transfer')
+	async nodeTransfer() {
+		return await this.aliyunService.nodeTransfer()
 	}
 
 	@ApiOperation({ summary: '获取分类列表' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.AssetsSourceResponse })
-	@Get('source-list')
-	async assetsSource(@Query() props: DTO.AssetsSource) {
-		return await this.aliyunService.assetsSource(props)
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeSourceResponse })
+	@Get('node-source')
+	async nodeSource(@Query() props: DTO.NodeSourceParameter) {
+		return await this.aliyunService.nodeSource(props)
 	}
 
 	@ApiOperation({ summary: '获取播放凭证' })
@@ -72,9 +72,9 @@ export class AliyunController {
 	// @AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.CreateOssStsResponse })
-	@Get('oss-sts')
-	async createOssSts() {
-		return await this.aliyunService.createOssSts()
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeOssStsResponse })
+	@Post('node-oss-sts')
+	async nodeOssSts() {
+		return await this.aliyunService.nodeOssSts()
 	}
 }

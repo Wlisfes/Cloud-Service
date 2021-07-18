@@ -17,7 +17,7 @@ export class AliyunService {
 	) {}
 
 	/**创建上传凭证**/
-	async createUpload(prosp: DTO.CreateUpload): Promise<DTO.AliyunCreateUploadResponse> {
+	async nodeCreate(prosp: DTO.NodeCreateParameter): Promise<DTO.NodeCreateResponse> {
 		try {
 			return await this.client.request('CreateUploadVideo', { ...prosp }, {})
 		} catch (e) {
@@ -26,7 +26,7 @@ export class AliyunService {
 	}
 
 	/**刷新上传凭证**/
-	async refreshUpload(prosp: DTO.RefreshUpload): Promise<DTO.AliyunRefreshUploadResponse> {
+	async nodeRefresh(prosp: DTO.NodeRefreshParameter): Promise<DTO.NodeRefreshResponse> {
 		try {
 			return await this.client.request('RefreshUploadVideo', { ...prosp }, {})
 		} catch (e) {
@@ -35,7 +35,7 @@ export class AliyunService {
 	}
 
 	/**获取转码模板列表**/
-	async transferTmplate(): Promise<DTO.TransferTmplateResponse> {
+	async nodeTransfer(): Promise<DTO.NodeTransferResponse> {
 		try {
 			const { RequestId, TranscodeTemplateGroupList }: any = await this.client.request(
 				'ListTranscodeTemplateGroup',
@@ -60,7 +60,7 @@ export class AliyunService {
 	}
 
 	/**分类列表**/
-	async assetsSource(props: DTO.AssetsSource): Promise<DTO.AssetsSourceResponse> {
+	async nodeSource(props: DTO.NodeSourceParameter): Promise<DTO.NodeSourceResponse> {
 		try {
 			const { RequestId, SubTotal, SubCategories } = await this.client.request('GetCategories', {
 				CateId: props.CateId || -1,
@@ -127,16 +127,15 @@ export class AliyunService {
 	}
 
 	/**创建OssSTS授权**/
-	async createOssSts() {
+	async nodeOssSts() {
 		try {
-			const { roleArn, sessionName, client } = this.ossOptions
+			const { roleArn, sessionName, domain } = this.ossOptions
 			const { credentials } = await this.stsClient.assumeRole(roleArn, '', 3600, sessionName)
 			return {
 				accessKeyId: credentials.AccessKeyId,
 				accessKeySecret: credentials.AccessKeySecret,
 				stsToken: credentials.SecurityToken,
-				bucket: client.endpoint,
-				region: client.bucket
+				path: domain
 			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)

@@ -63,7 +63,7 @@ export class UserController {
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.NodeUserResponse })
-	@Get('info-uid')
+	@Get('uid-info')
 	async nodeUidUser(@Query() query: DTO.NodeUidUserParameter) {
 		return await this.userService.nodeUidUser(query.uid)
 	}

@@ -176,7 +176,7 @@ class AliyunParameter {
 }
 
 /**创建上传凭证--Parameter**/
-export class CreateUpload extends PickType(AliyunParameter, [
+export class NodeCreateParameter extends PickType(AliyunParameter, [
 	'Title',
 	'FileName',
 	'CoverURL',
@@ -187,7 +187,7 @@ export class CreateUpload extends PickType(AliyunParameter, [
 	'WorkflowId'
 ]) {}
 /**创建上传凭证--Response**/
-export class AliyunCreateUploadResponse extends PickType(AliyunInterface, [
+export class NodeCreateResponse extends PickType(AliyunInterface, [
 	'RequestId',
 	'UploadAddress',
 	'UploadAuth',
@@ -195,20 +195,20 @@ export class AliyunCreateUploadResponse extends PickType(AliyunInterface, [
 ]) {}
 
 /**刷新上传凭证--Parameter**/
-export class RefreshUpload extends PickType(AliyunParameter, ['VideoId']) {}
+export class NodeRefreshParameter extends PickType(AliyunParameter, ['VideoId']) {}
 /**刷新上传凭证--Response**/
-export class AliyunRefreshUploadResponse extends AliyunCreateUploadResponse {}
+export class NodeRefreshResponse extends NodeCreateResponse {}
 
 /**获取转码模板列表--Response**/
-export class TransferTmplateResponse extends PickType(AliyunInterface, ['RequestId']) {
+export class NodeTransferResponse extends PickType(AliyunInterface, ['RequestId']) {
 	@ApiProperty({ description: '模板组列表', type: [TemplateGroupList], example: [] })
 	list: TemplateGroupList[]
 }
 
 /**获取分类列表--Parameter**/
-export class AssetsSource extends PickType(AliyunParameter, ['CateId']) {}
+export class NodeSourceParameter extends PickType(AliyunParameter, ['CateId']) {}
 /**获取分类列表--Response**/
-export class AssetsSourceResponse extends PickType(AliyunInterface, ['RequestId', 'SubTotal']) {
+export class NodeSourceResponse extends PickType(AliyunInterface, ['RequestId', 'SubTotal']) {
 	@ApiProperty({ description: '分类数据列表', type: [SourceGroupList], example: [] })
 	list: SourceGroupList[]
 }
@@ -243,13 +243,14 @@ class OssInterface {
 	accessKeySecret: string
 	@ApiProperty({ description: '临时stsToken', example: 'joiQ0FJUzBBsll09MKJD...******' })
 	stsToken: string
+	@ApiProperty({ description: 'oss加速域名', example: 'https://oss.lisfes.cn' })
+	path: string
 }
 
 /**创建OssSTS授权-Response**************************************************/
-export class CreateOssStsResponse extends PickType(OssInterface, [
+export class NodeOssStsResponse extends PickType(OssInterface, [
 	'accessKeyId',
 	'accessKeySecret',
-	'bucket',
-	'region',
-	'stsToken'
+	'stsToken',
+	'path'
 ]) {}
