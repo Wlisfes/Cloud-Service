@@ -1,7 +1,7 @@
 import { Controller, Session, Post, Put, Get, Body, Query, Req, Response } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { UserService } from './user.service'
-import { AuthToken, APP_AUTH_TOKEN } from '@/guard/auth.guard'
+import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as DTO from './user.interface'
 
 @ApiTags('用户模块')
@@ -28,15 +28,6 @@ export class UserController {
 		return await this.userService.registerUser(body)
 	}
 
-	@ApiOperation({ summary: '创建用户' })
-	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
-	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.CreateUserResponse })
-	@Post('create')
-	async createUser(@Body() body: DTO.CreateUserParameter) {
-		return await this.userService.createUser(body)
-	}
-
 	@ApiOperation({ summary: '用户登录' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
@@ -46,9 +37,22 @@ export class UserController {
 		return await this.userService.loginUser(body, session.code)
 	}
 
+	@ApiOperation({ summary: '创建用户' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin'], module: 'user', action: 'create' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.CreateUserResponse })
+	@Post('create')
+	async createUser(@Body() body: DTO.CreateUserParameter) {
+		return await this.userService.createUser(body)
+	}
+
 	@ApiOperation({ summary: '更新用户信息' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super'], module: 'user', action: 'update' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateNodeUserResponse })
@@ -60,6 +64,7 @@ export class UserController {
 	@ApiOperation({ summary: '更新用户邮箱' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super'], module: 'user', action: 'update' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateNodeUserEmailResponse })
@@ -68,7 +73,21 @@ export class UserController {
 		return await this.userService.updateNodeUserEmail(body, req.user.uid)
 	}
 
+	@ApiOperation({ summary: '切换用户状态' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin'], module: 'user', action: 'update' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeUserCutoverResponse })
+	@Put('cutover')
+	public async nodeUserCutover(@Body() body: DTO.NodeUserCutoverParameter) {
+		return await this.userService.nodeUserCutover(body)
+	}
+
 	@ApiOperation({ summary: '用户信息-uid' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: DTO.NodeUserResponse })
@@ -89,6 +108,8 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: '用户列表' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeUsersResponse })

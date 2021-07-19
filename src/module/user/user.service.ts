@@ -2,6 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UserEntity } from '@/entity/user.entity'
+import { RoleEntity } from '@/entity/role.entity'
 import { JwtAuthService } from '@/module/jwt/jwt.service'
 import { RedisService } from '@/module/redis/redis.service'
 import { compareSync } from 'bcryptjs'
@@ -12,12 +13,13 @@ import * as DTO from './user.interface'
 export class UserService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
+		@InjectRepository(UserEntity) private readonly roleModel: Repository<RoleEntity>,
 		private readonly jwtAuthService: JwtAuthService,
 		private readonly redisService: RedisService
 	) {}
 
 	/**验证码**/
-	async createCode(): Promise<DTO.CreateCode> {
+	public async createCode(): Promise<DTO.CreateCode> {
 		return create({
 			fontSize: 32,
 			noise: 2,
@@ -29,7 +31,7 @@ export class UserService {
 	}
 
 	/**创建8位数账户**/
-	async createAccount(num: number): Promise<number> {
+	public async createAccount(num: number): Promise<number> {
 		try {
 			const account = Number(
 				Array(num)
@@ -71,17 +73,93 @@ export class UserService {
 	}
 
 	/**创建用户**/
-	async createUser(props: DTO.CreateUserParameter) {
+	public async createUser(props: DTO.CreateUserParameter) {
 		try {
-			console.log(props)
-			return props
+			if (props.email && (await this.userModel.findOne({ where: { email: props.email } }))) {
+				throw new HttpException('邮箱已存在', HttpStatus.BAD_REQUEST)
+			}
+
+			if (props.mobile && (await this.userModel.findOne({ where: { mobile: props.mobile } }))) {
+				throw new HttpException('手机号已存在', HttpStatus.BAD_REQUEST)
+			}
+
+			if (props.role) {
+				console.log(props.role)
+				const role = await this.roleModel.findOne({ where: { id: props.role } })
+				console.log(role, props.role)
+				if (!role) {
+					throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
+				} else if (role.status !== 1) {
+					throw new HttpException('角色已禁用', HttpStatus.BAD_REQUEST)
+				}
+			}
+
+			const newUser = await this.userModel.create({
+				nickname: props.nickname,
+				password: props.password,
+				status: props.status,
+				email: props.email || null,
+				mobile: props.mobile || null,
+				avatar: props.avatar || null,
+				comment: props.comment || null,
+				account: await this.createAccount(8)
+			})
+			const user = await this.roleModel.save(newUser)
+			await this.createUserRole(user.uid, props.role)
+
+			return { message: '创建成功' }
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**创建用户角色**/
+	public async createUserRole(uid: number, id: number) {
+		try {
+			const user = await this.userModel.findOne({ where: { uid } })
+			const role = await this.roleModel.findOne({
+				where: { id },
+				relations: ['children', 'children.children']
+			})
+			const newRole = await this.roleModel.create({
+				primary: role.primary,
+				name: role.name,
+				status: role.status,
+				type: role.type,
+				user
+			})
+			const roleParent = await this.roleModel.save(newRole)
+			role.children.forEach(async auth => {
+				const newAuth = await this.roleModel.create({
+					primary: auth.primary,
+					name: auth.name,
+					status: auth.status,
+					type: auth.type,
+					parent: roleParent,
+					user
+				})
+				const authParent = await this.roleModel.save(newAuth)
+				auth.children.forEach(async action => {
+					const newAction = await this.roleModel.create({
+						primary: action.primary,
+						name: action.name,
+						status: action.status,
+						type: action.type,
+						parent: authParent,
+						user
+					})
+					await this.roleModel.save(newAction)
+				})
+			})
+
+			return true
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 
 	/**用户登录**/
-	async loginUser(props: DTO.LoginUserParameter, code: string) {
+	public async loginUser(props: DTO.LoginUserParameter, code: string) {
 		try {
 			if (!code || code !== props.code.toUpperCase()) {
 				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
@@ -112,7 +190,7 @@ export class UserService {
 	}
 
 	/**修改用户**/
-	async updateNodeUser(props: DTO.UpdateNodeUserParameter, uid: number): Promise<UserEntity> {
+	public async updateNodeUser(props: DTO.UpdateNodeUserParameter, uid: number): Promise<UserEntity> {
 		try {
 			await this.userModel.update({ uid }, { ...props })
 			return await this.nodeUidUser(uid)
@@ -136,8 +214,27 @@ export class UserService {
 		}
 	}
 
+	/**切换用户状态**/
+	public async nodeUserCutover({ uid }: DTO.NodeUserCutoverParameter) {
+		try {
+			const role = await this.userModel.findOne({ where: { uid } })
+			if (!role) {
+				throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
+			}
+			if (role.status) {
+				await this.userModel.update({ uid }, { status: 0 })
+			} else {
+				await this.userModel.update({ uid }, { status: 1 })
+			}
+
+			return { message: '修改成功' }
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
 	/**uid获取用户信息**/
-	async nodeUidUser(uid: number): Promise<UserEntity> {
+	public async nodeUidUser(uid: number): Promise<UserEntity> {
 		try {
 			const user = await this.userModel.findOne({ where: { uid } })
 			if (user) {
@@ -150,7 +247,7 @@ export class UserService {
 	}
 
 	/**用户列表**/
-	async nodeUsers(props: DTO.NodeUsersParameter) {
+	public async nodeUsers(props: DTO.NodeUsersParameter) {
 		try {
 			const [list = [], total = 0] = await this.userModel.findAndCount({
 				order: { uid: 'ASC' },

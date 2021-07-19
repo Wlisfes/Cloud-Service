@@ -160,3 +160,11 @@ export class UpdateNodeUserResponse extends OmitType(UserInterface, ['total']) {
 export class UpdateNodeUserEmailParameter extends PickType(UserParameter, ['email', 'code']) {}
 /**修改用户邮箱-Response**/
 export class UpdateNodeUserEmailResponse extends OmitType(UserInterface, ['total']) {}
+
+/**切换用户状态-Parameter***********************************************************************/
+export class NodeUserCutoverParameter extends PickType(UserParameter, ['uid']) {}
+/**切换用户状态-Response**/
+export class NodeUserCutoverResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
