@@ -118,6 +118,14 @@ export class NodeUserRoleResponse extends PickType(RoleInterface, [
 	'comment'
 ]) {}
 
+/**用户角色信息-uid-Response***********************************************************************/
+export class NodeUserUidRoleParameter {
+	@ApiProperty({ description: '用户uid', type: Number, example: 1624521523438 })
+	@IsNotEmpty({ message: '用户uid 必填' })
+	@Type(type => Number)
+	uid: number
+}
+
 /**修改角色权限-Parameter***********************************************************************/
 export class UpdateNodeRoleParameter extends PickType(RoleParameter, ['id', 'status', 'comment', 'role']) {}
 /**修改角色权限-Response**/

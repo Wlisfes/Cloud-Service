@@ -70,13 +70,26 @@ export class RoleService {
 	public async nodeUserRole(uid: number) {
 		try {
 			const user = await this.userModel.findOne({ where: { uid } })
+			if (!user) {
+				throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST)
+			}
 			return await this.roleModel.findOne({
 				where: {
 					parent: IsNull(),
+					type: 1,
 					user
 				},
 				relations: ['user', 'children', 'children.children']
 			})
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**用户角色信息-uid**/
+	public async nodeUserUidRole(uid: number) {
+		try {
+			return await this.nodeUserRole(uid)
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

@@ -10,6 +10,8 @@ export class RoleController {
 	constructor(private readonly roleService: RoleService) {}
 
 	@ApiOperation({ summary: '角色列表-不包括子类' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRolesResponse })
@@ -19,6 +21,8 @@ export class RoleController {
 	}
 
 	@ApiOperation({ summary: '角色列表-包括子类' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRolesResponse })
@@ -28,6 +32,8 @@ export class RoleController {
 	}
 
 	@ApiOperation({ summary: '角色信息' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRoleResponse })
@@ -45,6 +51,18 @@ export class RoleController {
 	@Get('user-node')
 	public async nodeUserRole(@Req() req: { user: { uid: number } }) {
 		return await this.roleService.nodeUserRole(req.user.uid)
+	}
+
+	@ApiOperation({ summary: '用户角色信息-uid' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin'], module: 'role', action: 'params' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeUserRoleResponse })
+	@Get('user-uid-node')
+	public async nodeUserUidRole(@Query() query: DTO.NodeUserUidRoleParameter) {
+		return await this.roleService.nodeUserUidRole(query.uid)
 	}
 
 	@ApiOperation({ summary: '切换角色状态' })

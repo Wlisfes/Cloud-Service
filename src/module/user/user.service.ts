@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Repository, IsNull } from 'typeorm'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
 import { JwtAuthService } from '@/module/jwt/jwt.service'
@@ -13,7 +13,7 @@ import * as DTO from './user.interface'
 export class UserService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
-		@InjectRepository(UserEntity) private readonly roleModel: Repository<RoleEntity>,
+		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>,
 		private readonly jwtAuthService: JwtAuthService,
 		private readonly redisService: RedisService
 	) {}
@@ -63,9 +63,18 @@ export class UserService {
 				...props,
 				account: await this.createAccount(8)
 			})
-			await this.userModel.save(newUser)
+			const user = await this.userModel.save(newUser)
 			//注册成功删除redis中的邮箱验证码
 			await this.redisService.delStore(props.email)
+
+			const role = await this.roleModel.findOne({
+				where: {
+					parent: IsNull(),
+					user: IsNull(),
+					primary: 'super'
+				}
+			})
+			await this.createUserRole(user.uid, role.id)
 			return { message: '注册成功' }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
@@ -84,9 +93,7 @@ export class UserService {
 			}
 
 			if (props.role) {
-				console.log(props.role)
 				const role = await this.roleModel.findOne({ where: { id: props.role } })
-				console.log(role, props.role)
 				if (!role) {
 					throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
 				} else if (role.status !== 1) {

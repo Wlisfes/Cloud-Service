@@ -27,7 +27,7 @@ export class NodemailerService {
 				if (error) {
 					reject(new HttpException('发送失败', HttpStatus.BAD_REQUEST))
 				} else {
-					resolve({ code: 200, messsage: '发送成功' })
+					resolve({ code: 200, message: '发送成功' })
 				}
 			})
 		})

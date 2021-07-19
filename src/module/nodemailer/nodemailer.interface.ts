@@ -6,7 +6,7 @@ class NodemailerInterface {
 	@ApiProperty({ description: '状态码', example: 200 })
 	code: number
 	@ApiProperty({ description: '状态描述', example: '发送成功' })
-	messsage: string
+	message: string
 }
 
 class NodemailerParameter {
@@ -17,4 +17,4 @@ class NodemailerParameter {
 }
 
 export class RegisterCode extends PickType(NodemailerParameter, ['email']) {}
-export class NodemailerResponse extends PickType(NodemailerInterface, ['messsage', 'code']) {}
+export class NodemailerResponse extends PickType(NodemailerInterface, ['message', 'code']) {}
