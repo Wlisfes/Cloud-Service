@@ -51,12 +51,14 @@ export class AuthGuard implements CanActivate {
 				return useThrow('未登陆', HttpStatus.UNAUTHORIZED, props.error)
 			}
 
-			const { uid } = await this.jwtAuthService.signverify(token)
+			const { uid, password } = await this.jwtAuthService.signverify(token)
 			const user = await this.userService.nodeUidUser(uid)
 			if (!user) {
 				return useThrow('账户不存在', HttpStatus.FORBIDDEN, props.error)
 			} else if (user.status !== 1) {
 				return useThrow('账户已被禁用', HttpStatus.FORBIDDEN, props.error)
+			} else if (password !== user.password) {
+				throw new HttpException('密码已更换，请重新登录', HttpStatus.FORBIDDEN)
 			}
 			request.user = user
 		}
