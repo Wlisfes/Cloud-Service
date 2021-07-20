@@ -52,7 +52,7 @@ export class AuthGuard implements CanActivate {
 			}
 
 			const { uid, password } = await this.jwtAuthService.signverify(token)
-			const user = await this.userService.nodeUidUser(uid)
+			const user = await this.userService.nodeUidUser(uid, true)
 			if (!user) {
 				return useThrow('账户不存在', HttpStatus.FORBIDDEN, props.error)
 			} else if (user.status !== 1) {

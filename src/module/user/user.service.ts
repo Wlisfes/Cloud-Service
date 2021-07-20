@@ -287,9 +287,16 @@ export class UserService {
 	}
 
 	/**uid获取用户信息**/
-	public async nodeUidUser(uid: number): Promise<UserEntity> {
+	public async nodeUidUser(uid: number, password?: boolean): Promise<UserEntity> {
 		try {
-			const user = await this.userModel.findOne({ where: { uid } })
+			const select: (keyof UserEntity)[] = []
+			if (password) {
+				select.push('password')
+			}
+			const user = await this.userModel.findOne({
+				where: { uid },
+				select: ['id', 'uid', 'nickname', 'avatar', 'email', 'mobile', 'status', 'account', ...select]
+			})
 			if (user) {
 				return user
 			}
@@ -302,10 +309,12 @@ export class UserService {
 	/**用户列表**/
 	public async nodeUsers(props: DTO.NodeUsersParameter) {
 		try {
+			const select: (keyof UserEntity)[] = ['status', 'comment', 'createTime', 'updateTime']
 			const [list = [], total = 0] = await this.userModel.findAndCount({
 				order: { uid: 'ASC' },
 				skip: (props.page - 1) * props.size,
-				take: props.size
+				take: props.size,
+				select: ['id', 'uid', 'nickname', 'avatar', 'email', 'mobile', 'account', ...select]
 			})
 
 			return { total, size: props.size, page: props.page, list }
