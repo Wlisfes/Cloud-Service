@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PickType, OmitType, IntersectionType } from '@nestjs/swagger'
 import { IsNotEmpty, IsEmail, Length, IsOptional, IsNumber, Min, IsMobilePhone } from 'class-validator'
-import { Type, Transform } from 'class-transformer'
+import { Type } from 'class-transformer'
 import { JwtInterface } from '@/module/jwt/jwt.interface'
 
 export class UserInterface {
@@ -22,6 +22,8 @@ export class UserInterface {
 	email: string
 
 	@ApiPropertyOptional({ description: '密码', example: '****************' })
+	@IsOptional()
+	@Length(6, 16, { message: '密码长度必须6~16位' })
 	password: string | null
 
 	@ApiPropertyOptional({ description: '头像', example: 'https://oss.lisfes.cn/xxx/xxx.png' })
@@ -152,15 +154,21 @@ export class NodeUsersResponse extends PickType(UserInterface, ['total']) {
 	list: UserInterface[]
 }
 
-/**更新用户信息-Parameter******************************************************************************/
-export class UpdateNodeUserParameter extends PickType(UserParameter, ['nickname', 'status', 'avatar']) {}
-/**更新用户信息-Response**/
-export class UpdateNodeUserResponse extends OmitType(UserInterface, ['total']) {}
+/**修改用户信息-Parameter******************************************************************************/
+export class NodeUpdateUserParameter extends IntersectionType(
+	PickType(UserParameter, ['uid', 'nickname', 'status']),
+	PickType(UserInterface, ['avatar', 'email', 'mobile', 'comment', 'password'])
+) {}
+/**修改用户信息-Response**/
+export class NodeUpdateUserResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
 
 /**修改用户邮箱-Parameter******************************************************************************/
-export class UpdateNodeUserEmailParameter extends PickType(UserParameter, ['email', 'code']) {}
+export class NodeUpdateUserEmailParameter extends PickType(UserParameter, ['email', 'code']) {}
 /**修改用户邮箱-Response**/
-export class UpdateNodeUserEmailResponse extends OmitType(UserInterface, ['total']) {}
+export class NodeUpdateUserEmailResponse extends OmitType(UserInterface, ['total']) {}
 
 /**切换用户状态-Parameter***********************************************************************/
 export class NodeUserCutoverParameter extends PickType(UserParameter, ['uid']) {}

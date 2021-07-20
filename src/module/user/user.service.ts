@@ -5,6 +5,7 @@ import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
 import { JwtAuthService } from '@/module/jwt/jwt.service'
 import { RedisService } from '@/module/redis/redis.service'
+import { NodemailerService } from '@/module/nodemailer/nodemailer.service'
 import { compareSync } from 'bcryptjs'
 import { create } from 'svg-captcha'
 import * as DTO from './user.interface'
@@ -15,7 +16,8 @@ export class UserService {
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
 		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>,
 		private readonly jwtAuthService: JwtAuthService,
-		private readonly redisService: RedisService
+		private readonly redisService: RedisService,
+		private readonly nodemailerService: NodemailerService
 	) {}
 
 	/**验证码**/
@@ -31,17 +33,24 @@ export class UserService {
 	}
 
 	/**创建8位数账户**/
-	public async createAccount(num: number): Promise<number> {
+	private createNumber(): number {
+		const captcha = Array(8)
+			.fill(8)
+			.map(() => Math.floor(Math.random() * 10))
+			.join('')
+		if (Number(captcha) < 80000000) {
+			return this.createNumber()
+		}
+		return Number(captcha)
+	}
+
+	/**验证8位数账户**/
+	public async createAccount(): Promise<number> {
 		try {
-			const account = Number(
-				Array(num)
-					.fill(num)
-					.map(() => Math.floor(Math.random() * 10))
-					.join('')
-			)
+			const account = this.createNumber()
 			const user = await this.userModel.findOne({ where: { account } })
 			if (user) {
-				return await this.createAccount(num)
+				return await this.createAccount()
 			}
 			return account
 		} catch (e) {
@@ -63,12 +72,13 @@ export class UserService {
 				nickname: props.nickname,
 				password: props.password,
 				email: props.email,
-				account: await this.createAccount(8)
+				account: await this.createAccount()
 			})
 			const user = await this.userModel.save(newUser)
 			//注册成功删除redis中的邮箱验证码
 			await this.redisService.delStore(props.email)
 
+			//创建角色
 			const role = await this.roleModel.findOne({
 				where: {
 					parent: IsNull(),
@@ -77,6 +87,10 @@ export class UserService {
 				}
 			})
 			await this.createUserRole(user.uid, role.id)
+
+			//发送账户
+			await this.nodemailerService.registerSend(user.account, user.email)
+
 			return { message: '注册成功' }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
@@ -111,7 +125,7 @@ export class UserService {
 				mobile: props.mobile || null,
 				avatar: props.avatar || null,
 				comment: props.comment || null,
-				account: await this.createAccount(8)
+				account: await this.createAccount()
 			})
 			const user = await this.userModel.save(newUser)
 			await this.createUserRole(user.uid, props.role)
@@ -199,18 +213,47 @@ export class UserService {
 		}
 	}
 
-	/**修改用户**/
-	public async updateNodeUser(props: DTO.UpdateNodeUserParameter, uid: number) {
+	/**修改用户信息**/
+	public async nodeUpdateUser(props: DTO.NodeUpdateUserParameter) {
 		try {
-			await this.userModel.update({ uid }, { ...props })
-			return await this.nodeUidUser(uid)
+			if (props.email) {
+				const user = await this.userModel.findOne({ where: { email: props.email } })
+				if (user && user.uid !== props.uid) {
+					throw new HttpException('邮箱已存在', HttpStatus.BAD_REQUEST)
+				}
+			}
+
+			if (props.mobile) {
+				const user = await this.userModel.findOne({ where: { mobile: props.mobile } })
+				if (user && user.uid !== props.uid) {
+					throw new HttpException('手机号已存在', HttpStatus.BAD_REQUEST)
+				}
+			}
+
+			if (props.password) {
+				await this.userModel.update({ uid: props.uid }, { password: props.password })
+			}
+
+			await this.userModel.update(
+				{ uid: props.uid },
+				{
+					nickname: props.nickname,
+					status: props.status,
+					email: props.email || null,
+					mobile: props.mobile || null,
+					avatar: props.avatar || null,
+					comment: props.comment || null
+				}
+			)
+			return { message: '修改成功' }
 		} catch (e) {
+			console.log(e)
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 
 	/**修改用户邮箱**/
-	async updateNodeUserEmail(props: DTO.UpdateNodeUserEmailParameter, uid: number) {
+	async nodeUpdateUserEmail(props: DTO.NodeUpdateUserEmailParameter, uid: number) {
 		try {
 			const code = await this.redisService.getStore(props.email)
 			if (!code || code !== props.code) {

@@ -11,16 +11,19 @@ export class NodemailerService {
 		private readonly redisService: RedisService
 	) {}
 
-	//创建数字验证码
-	public async createNumberCode(num: number): Promise<number> {
-		const captcha = Array(num)
-			.fill(num)
+	/**创建数字验证码**/
+	public async createNumberCode(): Promise<number> {
+		const captcha = Array(6)
+			.fill(6)
 			.map(() => Math.floor(Math.random() * 10))
 			.join('')
+		if (Number(captcha) < 600000) {
+			return await this.createNumberCode()
+		}
 		return Number(captcha)
 	}
 
-	//发送邮箱验证码
+	/**发送邮箱验证码**/
 	private sendEmailCode(props: SendMailOption): Promise<DTO.NodemailerResponse> {
 		return new Promise((resolve, reject) => {
 			this.client.sendMail(props, (error, data) => {
@@ -33,16 +36,30 @@ export class NodemailerService {
 		})
 	}
 
-	//发送注册验证码
-	async registerCode(props: DTO.RegisterCode): Promise<DTO.NodemailerResponse> {
+	/**发送注册验证码**/
+	public async registerCode(props: DTO.RegisterCode): Promise<DTO.NodemailerResponse> {
 		try {
-			const code = await this.createNumberCode(6)
+			const code = await this.createNumberCode()
 			await this.redisService.setStore(props.email, code, 1800)
 			return await this.sendEmailCode({
 				from: '"妖雨纯" <876451336@qq.com>',
 				to: props.email,
 				subject: '温馨提示',
-				html: `欢迎注册lisfes.cn, 您的验证码是: <b>${code}</b> 有效时间30分钟`
+				html: `欢迎注册情雨随风的妖雨录, 您的验证码是: <b>${code}</b> 有效时间30分钟`
+			})
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**注册成功发送账号**/
+	public async registerSend(account: number, email: string) {
+		try {
+			return await this.sendEmailCode({
+				from: '"妖雨纯" <876451336@qq.com>',
+				to: email,
+				subject: '温馨提示',
+				html: `欢迎注册情雨随风的妖雨录, 您的登录账户是: <b>${account}</b>`
 			})
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)

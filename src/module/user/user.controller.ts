@@ -49,28 +49,28 @@ export class UserController {
 		return await this.userService.createUser(body)
 	}
 
-	@ApiOperation({ summary: '更新用户信息' })
+	@ApiOperation({ summary: '修改用户信息' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
-	@AuthRole({ role: ['admin', 'super'], module: 'user', action: 'update' })
+	@AuthRole({ role: ['admin'], module: 'user', action: 'update' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateNodeUserResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.NodeUpdateUserResponse })
 	@Put('update')
-	async updateNodeUser(@Body() body: DTO.UpdateNodeUserParameter, @Req() req: { user: { uid: number } }) {
-		return await this.userService.updateNodeUser(body, req.user.uid)
+	async nodeUpdateUser(@Body() body: DTO.NodeUpdateUserParameter) {
+		return await this.userService.nodeUpdateUser(body)
 	}
 
 	@ApiOperation({ summary: '更新用户邮箱' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
-	@AuthRole({ role: ['admin', 'super'], module: 'user', action: 'update' })
+	@AuthRole({ role: ['admin'], module: 'user', action: 'update' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: DTO.UpdateNodeUserEmailResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.NodeUpdateUserEmailResponse })
 	@Put('update-email')
-	async updateNodeUserEmail(@Body() body: DTO.UpdateNodeUserEmailParameter, @Req() req: { user: { uid: number } }) {
-		return await this.userService.updateNodeUserEmail(body, req.user.uid)
+	async nodeUpdateUserEmail(@Body() body: DTO.NodeUpdateUserEmailParameter, @Req() req: { user: { uid: number } }) {
+		return await this.userService.nodeUpdateUserEmail(body, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '切换用户状态' })
