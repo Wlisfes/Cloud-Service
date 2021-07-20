@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PickType, OmitType, IntersectionType } from '@nestjs/swagger'
 import { IsNotEmpty, IsEmail, Length, IsOptional, IsNumber, Min, IsMobilePhone } from 'class-validator'
-import { Type } from 'class-transformer'
+import { Type, Transform } from 'class-transformer'
 import { JwtInterface } from '@/module/jwt/jwt.interface'
 
 export class UserInterface {
@@ -25,12 +25,12 @@ export class UserInterface {
 	password: string | null
 
 	@ApiPropertyOptional({ description: '头像', example: 'https://oss.lisfes.cn/xxx/xxx.png' })
+	@IsOptional()
 	avatar: string | null
 
 	@ApiPropertyOptional({ description: '手机号', example: 18888888888 })
 	@IsOptional()
-	@IsMobilePhone('zh-CN', {}, { message: '手机号格式 错误' })
-	@Type(type => Number)
+	@IsMobilePhone('zh-CN', { strictMode: true }, { message: '手机号格式 错误' })
 	mobile: number | null
 
 	@ApiPropertyOptional({ description: '状态', enum: [0, 1], example: 0 | 1 })
@@ -40,6 +40,7 @@ export class UserInterface {
 	total: number
 
 	@ApiPropertyOptional({ description: '备注', example: '备注' })
+	@IsOptional()
 	comment: string
 }
 

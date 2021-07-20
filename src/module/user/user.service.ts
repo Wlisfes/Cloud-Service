@@ -60,7 +60,9 @@ export class UserService {
 				throw new HttpException('邮箱已注册', HttpStatus.BAD_REQUEST)
 			}
 			const newUser = await this.userModel.create({
-				...props,
+				nickname: props.nickname,
+				password: props.password,
+				email: props.email,
 				account: await this.createAccount(8)
 			})
 			const user = await this.userModel.save(newUser)
@@ -111,7 +113,7 @@ export class UserService {
 				comment: props.comment || null,
 				account: await this.createAccount(8)
 			})
-			const user = await this.roleModel.save(newUser)
+			const user = await this.userModel.save(newUser)
 			await this.createUserRole(user.uid, props.role)
 
 			return { message: '创建成功' }
@@ -128,6 +130,7 @@ export class UserService {
 				where: { id },
 				relations: ['children', 'children.children']
 			})
+
 			const newRole = await this.roleModel.create({
 				primary: role.primary,
 				name: role.name,
@@ -197,7 +200,7 @@ export class UserService {
 	}
 
 	/**修改用户**/
-	public async updateNodeUser(props: DTO.UpdateNodeUserParameter, uid: number): Promise<UserEntity> {
+	public async updateNodeUser(props: DTO.UpdateNodeUserParameter, uid: number) {
 		try {
 			await this.userModel.update({ uid }, { ...props })
 			return await this.nodeUidUser(uid)
@@ -207,7 +210,7 @@ export class UserService {
 	}
 
 	/**修改用户邮箱**/
-	async updateNodeUserEmail(props: DTO.UpdateNodeUserEmailParameter, uid: number): Promise<UserEntity> {
+	async updateNodeUserEmail(props: DTO.UpdateNodeUserEmailParameter, uid: number) {
 		try {
 			const code = await this.redisService.getStore(props.email)
 			if (!code || code !== props.code) {
