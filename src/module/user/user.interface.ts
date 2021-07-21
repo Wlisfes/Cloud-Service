@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PickType, OmitType, IntersectionType } from '@nestjs/swagger'
-import { IsNotEmpty, IsEmail, Length, IsOptional, IsNumber, Min, IsMobilePhone } from 'class-validator'
+import { IsNotEmpty, IsEmail, Length, IsNumber, Min, IsMobilePhone } from 'class-validator'
+import { IsOptional } from '@/decorator/common.decorator'
 import { Type } from 'class-transformer'
 import { JwtInterface } from '@/module/jwt/jwt.interface'
 
@@ -17,21 +18,21 @@ export class UserInterface {
 	nickname: string
 
 	@ApiPropertyOptional({ description: '邮箱', example: '876451336@qq.com' })
-	@IsOptional()
+	@IsOptional({}, { string: true })
 	@IsEmail({}, { message: '邮箱格式 错误' })
 	email: string
 
 	@ApiPropertyOptional({ description: '密码', example: '****************' })
-	@IsOptional()
+	@IsOptional({}, { string: true })
 	@Length(6, 16, { message: '密码长度必须6~16位' })
 	password: string | null
 
 	@ApiPropertyOptional({ description: '头像', example: 'https://oss.lisfes.cn/xxx/xxx.png' })
-	@IsOptional()
+	@IsOptional({}, { string: true })
 	avatar: string | null
 
 	@ApiPropertyOptional({ description: '手机号', example: 18888888888 })
-	@IsOptional()
+	@IsOptional({}, { string: true, number: true })
 	@IsMobilePhone('zh-CN', { strictMode: true }, { message: '手机号格式 错误' })
 	mobile: number | null
 
@@ -42,7 +43,7 @@ export class UserInterface {
 	total: number
 
 	@ApiPropertyOptional({ description: '备注', example: '备注' })
-	@IsOptional()
+	@IsOptional({}, { string: true })
 	comment: string
 }
 
