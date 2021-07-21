@@ -40,6 +40,7 @@ export class UserEntity extends DateEntity {
 
 	@Column({
 		comment: '密码',
+		select: false,
 		nullable: false,
 		transformer: {
 			from: value => value,

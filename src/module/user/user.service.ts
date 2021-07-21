@@ -193,6 +193,7 @@ export class UserService {
 				.orWhere('user.account = :account', { account: props.account })
 				.orWhere('user.email = :email', { email: props.account })
 				.orWhere('user.mobile = :mobile', { mobile: props.account })
+				.addSelect('user.password')
 				.getOne()
 
 			if (!user) {
@@ -247,7 +248,6 @@ export class UserService {
 			)
 			return { message: '修改成功' }
 		} catch (e) {
-			console.log(e)
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
@@ -289,14 +289,16 @@ export class UserService {
 	/**uid获取用户信息**/
 	public async nodeUidUser(uid: number, password?: boolean): Promise<UserEntity> {
 		try {
-			const select: (keyof UserEntity)[] = []
+			let user = null
 			if (password) {
-				select.push('password')
+				user = await this.userModel
+					.createQueryBuilder('user')
+					.where('user.uid = :uid', { uid })
+					.addSelect('user.password')
+					.getOne()
+			} else {
+				user = await this.userModel.findOne({ where: { uid } })
 			}
-			const user = await this.userModel.findOne({
-				where: { uid },
-				select: ['id', 'uid', 'nickname', 'avatar', 'email', 'mobile', 'status', 'account', ...select]
-			})
 			if (user) {
 				return user
 			}
@@ -309,13 +311,14 @@ export class UserService {
 	/**用户列表**/
 	public async nodeUsers(props: DTO.NodeUsersParameter) {
 		try {
-			const select: (keyof UserEntity)[] = ['status', 'comment', 'createTime', 'updateTime']
-			const [list = [], total = 0] = await this.userModel.findAndCount({
-				order: { uid: 'ASC' },
-				skip: (props.page - 1) * props.size,
-				take: props.size,
-				select: ['id', 'uid', 'nickname', 'avatar', 'email', 'mobile', 'account', ...select]
-			})
+			const [list = [], total = 0] = await this.userModel
+				.createQueryBuilder('user')
+				.leftJoinAndSelect('user.role', 'role')
+				.where('role.type = :type', { type: 1 })
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.orderBy('user.uid', 'ASC')
+				.getManyAndCount()
 
 			return { total, size: props.size, page: props.page, list }
 		} catch (e) {
