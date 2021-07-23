@@ -61,6 +61,18 @@ export class UserController {
 		return await this.userService.nodeUpdateUser(body)
 	}
 
+	@ApiOperation({ summary: '重置用户密码' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin'], module: 'user', action: 'update' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: DTO.NodeUpdatePwsUserResponse })
+	@Put('update-reset')
+	async nodeUpdatePwsUser(@Body() body: DTO.NodeUpdatePwsUserParameter) {
+		return await this.userService.nodeUpdatePwsUser(body)
+	}
+
 	@ApiOperation({ summary: '更新用户邮箱' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })

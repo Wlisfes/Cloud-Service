@@ -166,6 +166,14 @@ export class NodeUpdateUserResponse {
 	message: string
 }
 
+/**修改用户密码-Parameter******************************************************************************/
+export class NodeUpdatePwsUserParameter extends PickType(UserParameter, ['uid', 'password']) {}
+/**修改用户密码-Response**/
+export class NodeUpdatePwsUserResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
+
 /**修改用户邮箱-Parameter******************************************************************************/
 export class NodeUpdateUserEmailParameter extends PickType(UserParameter, ['email', 'code']) {}
 /**修改用户邮箱-Response**/

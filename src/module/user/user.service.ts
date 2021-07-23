@@ -252,6 +252,20 @@ export class UserService {
 		}
 	}
 
+	/**重置用户密码**/
+	async nodeUpdatePwsUser(props: DTO.NodeUpdatePwsUserParameter) {
+		try {
+			const user = await this.userModel.findOne({ where: { uid: props.uid } })
+			if (!user) {
+				throw new HttpException('账户不存在', HttpStatus.BAD_REQUEST)
+			}
+			await this.userModel.update({ uid: props.uid }, { password: props.password })
+			return { message: '修改成功' }
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
 	/**修改用户邮箱**/
 	async nodeUpdateUserEmail(props: DTO.NodeUpdateUserEmailParameter, uid: number) {
 		try {
