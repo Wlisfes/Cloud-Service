@@ -96,7 +96,7 @@ export class RoleController {
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.UpdateNodeUserRoleResponse })
-	@Put('update/user')
+	@Put('update-user')
 	public async updateNodeUserRole(
 		@Body() body: DTO.UpdateNodeUserRoleParameter,
 		@Req() req: { user: { uid: number } }
