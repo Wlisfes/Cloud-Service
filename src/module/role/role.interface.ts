@@ -48,6 +48,15 @@ class RoleParameter {
 	@Type(type => Number)
 	id: number
 
+	@ApiProperty({ description: 'uid', example: 1624521523438 })
+	@IsNotEmpty({ message: 'uid 必填' })
+	@Type(type => Number)
+	uid: number
+
+	@ApiProperty({ description: '角色、权限唯一标识', example: 'admin' })
+	@IsNotEmpty({ message: '角色、权限唯一标识 必填' })
+	primary: string
+
 	@ApiProperty({ description: '分页', type: Number, example: 1 })
 	@IsNotEmpty({ message: 'page 必填' })
 	@IsNumber({}, { message: 'page必须是数字' })
@@ -78,7 +87,11 @@ class RoleParameter {
 	role: number[]
 }
 
-/**角色、权限列表-Parameter***********************************************************************/
+/**
+ *
+ *
+ * 角色、权限列表-Parameter
+ *******************************************************************************************************************/
 export class NodeRolesParameter extends PickType(RoleParameter, ['page', 'size']) {}
 /**角色、权限列表-Response**/
 export class NodeRolesResponse extends PickType(RoleInterface, ['total', 'page', 'size']) {
@@ -90,7 +103,11 @@ export class NodeRolesResponse extends PickType(RoleInterface, ['total', 'page',
 	list: RoleInterface[]
 }
 
-/**角色信息-Parameter***********************************************************************/
+/**
+ *
+ *
+ * 角色信息-Parameter
+ *******************************************************************************************************************/
 export class NodeRoleParameter extends PickType(RoleParameter, ['id']) {}
 /**角色信息-Response**/
 export class NodeRoleResponse extends PickType(RoleInterface, [
@@ -102,12 +119,20 @@ export class NodeRoleResponse extends PickType(RoleInterface, [
 	'comment'
 ]) {}
 
-/**切换角色状态-Parameter***********************************************************************/
+/**
+ *
+ *
+ *切换角色状态-Parameter
+ *******************************************************************************************************************/
 export class NodeRoleCutoverParameter extends PickType(RoleParameter, ['id']) {}
 /**切换角色状态-Response**/
 export class NodeRoleCutoverResponse extends PickType(RoleInterface, ['message']) {}
 
-/**用户角色信息-Response***********************************************************************/
+/**
+ *
+ *
+ *用户角色信息-Response
+ *******************************************************************************************************************/
 export class NodeUserRoleResponse extends PickType(RoleInterface, [
 	'user',
 	'id',
@@ -118,7 +143,11 @@ export class NodeUserRoleResponse extends PickType(RoleInterface, [
 	'comment'
 ]) {}
 
-/**用户角色信息-uid-Response***********************************************************************/
+/**
+ *
+ *
+ *用户角色信息-uid-Parameter
+ *******************************************************************************************************************/
 export class NodeUserUidRoleParameter {
 	@ApiProperty({ description: '用户uid', type: Number, example: 1624521523438 })
 	@IsNotEmpty({ message: '用户uid 必填' })
@@ -126,12 +155,26 @@ export class NodeUserUidRoleParameter {
 	uid: number
 }
 
-/**修改角色权限-Parameter***********************************************************************/
-export class UpdateNodeRoleParameter extends PickType(RoleParameter, ['id', 'status', 'comment', 'role']) {}
+/**
+ *
+ *
+ *修改角色权限-Parameter
+ *******************************************************************************************************************/
+export class NodeUpdateRoleParameter extends PickType(RoleParameter, ['id', 'status', 'comment', 'role']) {}
 /**修改角色权限-Response**/
-export class UpdateNodeRoleResponse extends PickType(RoleInterface, ['message']) {}
+export class NodeUpdateRoleResponse extends PickType(RoleInterface, ['message']) {}
 
-/**修改用户角色权限-Parameter***********************************************************************/
-export class UpdateNodeUserRoleParameter extends PickType(RoleParameter, ['id', 'status']) {}
+/**
+ *
+ *
+ *修改用户角色权限-Parameter
+ *******************************************************************************************************************/
+export class NodeUpdateUserRoleParameter extends PickType(RoleParameter, [
+	'uid',
+	'primary',
+	'status',
+	'comment',
+	'role'
+]) {}
 /**修改用户角色权限-Response**/
-export class UpdateNodeUserRoleResponse extends PickType(RoleInterface, ['message']) {}
+export class NodeUpdateUserRoleResponse extends PickType(RoleInterface, ['message']) {}

@@ -115,7 +115,7 @@ export class RoleService {
 	}
 
 	/**修改角色权限**/
-	public async updateNodeRole(props: DTO.UpdateNodeRoleParameter) {
+	public async nodeUpdateRole(props: DTO.NodeUpdateRoleParameter) {
 		try {
 			const role = await this.roleModel.findOne({
 				where: { id: props.id },
@@ -138,9 +138,47 @@ export class RoleService {
 	}
 
 	/**修改用户角色权限**/
-	public async updateNodeUserRole(props: DTO.UpdateNodeUserRoleParameter, uid: number) {
+	public async nodeUpdateUserRole(props: DTO.NodeUpdateUserRoleParameter) {
 		try {
-			const user = await this.userModel.findOne({ where: { uid } })
+			const user = await this.userModel.findOne({ where: { uid: props.uid } })
+			if (!user) {
+				throw new HttpException('账户不存在', HttpStatus.BAD_REQUEST)
+			}
+
+			const node = await this.roleModel.findOne({
+				where: {
+					primary: props.primary,
+					parent: IsNull(),
+					user: IsNull()
+				}
+			})
+			if (!node) {
+				throw new HttpException(`${props.primary} 不存在`, HttpStatus.BAD_REQUEST)
+			} else if (node.status !== 1) {
+				throw new HttpException(`${props.primary} 已禁用`, HttpStatus.BAD_REQUEST)
+			}
+
+			const role = await this.roleModel.findOne({
+				where: { user },
+				relations: ['children', 'children.children']
+			})
+			if (!role) {
+				throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
+			}
+
+			//更新用户角色权限
+			await this.roleModel.update(
+				{ id: role.id },
+				{
+					primary: node.primary,
+					name: node.name,
+					status: props.status,
+					comment: props.comment
+				}
+			)
+			const { losence, resence } = inteRole(role.children, props.role)
+			await this.roleModel.update({ id: In(losence) }, { status: 0 })
+			await this.roleModel.update({ id: In(resence) }, { status: 1 })
 
 			return { message: '修改成功' }
 		} catch (e) {
