@@ -17,8 +17,8 @@ export class MenuService {
 	/**创建菜单**/
 	public async createMenu(props: DTO.CreateMenu) {
 		try {
-			const newMenu = await this.menuModel.create({ ...props })
-			return await this.menuModel.save(newMenu)
+			// const newMenu = await this.menuModel.create({ ...props })
+			// return await this.menuModel.save(newMenu)
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

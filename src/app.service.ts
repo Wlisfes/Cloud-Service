@@ -10,7 +10,9 @@ export class AppService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
 		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>
-	) {
+	) {}
+
+	onApplicationBootstrap() {
 		this.init()
 	}
 
