@@ -16,7 +16,19 @@ import { RoleEntity } from '@/entity/role.entity'
 import { MenuEntity } from '@/entity/menu.entity'
 
 @Module({
-	imports: [TypeOrmModule.forRoot(), TypeOrmModule.forFeature([UserEntity, RoleEntity, MenuEntity]), InitModule],
+	imports: [
+		TypeOrmModule.forRoot({
+			extra: {
+				poolMax: 32,
+				poolMin: 16,
+				queueTimeout: 60000,
+				pollPingInterval: 60, // 每隔60秒连接
+				pollTimeout: 60 // 连接有效60秒
+			}
+		}),
+		TypeOrmModule.forFeature([UserEntity, RoleEntity, MenuEntity]),
+		InitModule
+	],
 	controllers: [AppController],
 	providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }]
 })
