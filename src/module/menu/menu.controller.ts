@@ -14,13 +14,13 @@ export class MenuController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK' })
 	@Post('create')
-	public async createMenu(@Body() body: DTO.CreateMenu) {
-		return await this.menuService.createMenu(body)
+	public async nodeCreate(@Body() body: DTO.NodeCreate) {
+		return await this.menuService.nodeCreate(body)
 	}
 
 	@ApiOperation({ summary: '菜单列表' })
 	@Get('list')
-	public async findMenus() {
-		return this.menuService.findMenus()
+	public async nodeMenus() {
+		return await this.menuService.nodeMenus()
 	}
 }

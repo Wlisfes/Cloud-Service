@@ -15,10 +15,44 @@ export class MenuService {
 	) {}
 
 	/**创建菜单**/
-	public async createMenu(props: DTO.CreateMenu) {
+	public async nodeCreate(props: DTO.NodeCreate) {
 		try {
-			// const newMenu = await this.menuModel.create({ ...props })
-			// return await this.menuModel.save(newMenu)
+			let parent = null
+			if (props.parent) {
+				parent = await this.menuModel.findOne({ where: { id: props.parent } })
+				if (!parent) {
+					throw new HttpException('上级节点不存在', HttpStatus.BAD_REQUEST)
+				} else if (parent.ststus !== 1) {
+					throw new HttpException('上级节点已禁用', HttpStatus.BAD_REQUEST)
+				}
+			}
+
+			const newMenu = await this.menuModel.create({
+				type: props.type,
+				name: props.name,
+				router: props.router,
+				path: props.path,
+				keepAlive: props.keepAlive,
+				ststus: props.status,
+				redirect: props.redirect,
+				icon: props.icon,
+				order: props.order || 1,
+				parent
+			})
+			await this.menuModel.save(newMenu)
+
+			return { message: '创建成功' }
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**菜单列表**/
+	public async nodeMenus() {
+		try {
+			return await this.menuModel.find({
+				relations: ['children', 'children.children', 'children.children.children']
+			})
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
