@@ -18,7 +18,28 @@ export class MenuController {
 		return await this.menuService.nodeCreate(body)
 	}
 
+	@ApiOperation({ summary: '目录节点' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK' })
+	@Get('conter')
+	public async nodeMenuConter() {
+		return await this.menuService.nodeMenuConter()
+	}
+
+	@ApiOperation({ summary: '动态路由节点' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK' })
+	@Get('router')
+	public async nodeRouter() {
+		return await this.menuService.nodeRouter()
+	}
+
 	@ApiOperation({ summary: '菜单列表' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK' })
 	@Get('list')
 	public async nodeMenus() {
 		return await this.menuService.nodeMenus()

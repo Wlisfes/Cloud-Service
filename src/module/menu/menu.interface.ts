@@ -18,26 +18,22 @@ class MenuParameter {
 	@Type(type => Number)
 	parent: number
 
-	@ApiProperty({ description: '节点路由' })
-	@IsNotEmpty({ message: '节点路由 必填' })
+	@ApiPropertyOptional({ description: '节点路由' })
+	@IsOptional({}, { string: true, number: true })
 	router: string
 
-	@ApiPropertyOptional({ description: '节点重定向地址' })
+	@ApiPropertyOptional({ description: '路由缓存: 0.关闭 1.开启', enum: [0, 1] })
 	@IsOptional({}, { string: true, number: true })
-	redirect: string
-
-	@ApiProperty({ description: '路由缓存: 0.关闭 1.开启', enum: [0, 1] })
-	@IsNotEmpty({ message: '路由缓存 必填' })
 	@Type(type => Number)
 	keepAlive: number
 
-	@ApiProperty({ description: '节点状态: 0.隐藏 1.显示', enum: [0, 1] })
-	@IsNotEmpty({ message: '节点状态 必填' })
+	@ApiPropertyOptional({ description: '节点状态: 0.隐藏 1.显示', enum: [0, 1] })
+	@IsOptional({}, { string: true, number: true })
 	@Type(type => Number)
 	status: number
 
-	@ApiProperty({ description: '文件路径' })
-	@IsNotEmpty({ message: '文件路径 必填' })
+	@ApiPropertyOptional({ description: '文件路径' })
+	@IsOptional({}, { string: true, number: true })
 	path: string
 
 	@ApiPropertyOptional({ description: '节点图标' })
@@ -60,7 +56,6 @@ export class NodeCreate extends PickType(MenuParameter, [
 	'name',
 	'parent',
 	'router',
-	'redirect',
 	'keepAlive',
 	'status',
 	'path',

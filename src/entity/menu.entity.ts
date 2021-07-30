@@ -12,22 +12,19 @@ export class MenuEntity extends DateEntity {
 	@Column({ comment: '节点名称', nullable: false })
 	name: string
 
-	@Column({ comment: '节点路由' })
+	@Column({ comment: '节点路由', nullable: true })
 	router: string
-
-	@Column({ comment: '重定向地址' })
-	redirect: string
 
 	@Column({ comment: '路由缓存: 0.关闭 1.开启', type: 'enum', enum: [0, 1], default: 1, nullable: false })
 	keepAlive: number
 
 	@Column({ comment: '状态: 0.隐藏 1.显示', type: 'enum', enum: [0, 1], default: 1, nullable: false })
-	ststus: number
+	status: number
 
-	@Column({ comment: '文件路径' })
+	@Column({ comment: '文件路径', nullable: true })
 	path: string
 
-	@Column({ comment: '节点图标' })
+	@Column({ comment: '节点图标', nullable: true })
 	icon: string
 
 	@Column({ comment: '排序号', default: 0, nullable: false })
