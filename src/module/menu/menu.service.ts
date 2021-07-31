@@ -14,12 +14,6 @@ export class MenuService {
 		private readonly utilsService: UtilsService
 	) {}
 
-	onApplicationBootstrap() {
-		console.log(111111)
-	}
-
-	/**初始化根节点**/
-
 	/**创建菜单**/
 	public async nodeCreate(props: DTO.NodeCreate) {
 		try {
@@ -28,7 +22,7 @@ export class MenuService {
 				parent = await this.menuModel.findOne({ where: { id: props.parent } })
 				if (!parent) {
 					throw new HttpException('上级节点不存在', HttpStatus.BAD_REQUEST)
-				} else if (parent.ststus !== 1) {
+				} else if (parent.status !== 1) {
 					throw new HttpException('上级节点已禁用', HttpStatus.BAD_REQUEST)
 				}
 			}
@@ -48,7 +42,7 @@ export class MenuService {
 
 			return { message: '创建成功' }
 		} catch (e) {
-			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+			throw new HttpException(e.message, HttpStatus.BAD_REQUEST)
 		}
 	}
 
@@ -70,11 +64,8 @@ export class MenuService {
 	/**动态路由节点**/
 	public async nodeRouter() {
 		try {
-			return await this.menuModel.find({
-				where: {
-					type: 2
-				}
-			})
+			const node = await this.menuModel.find({ where: { type: 2 } })
+			return node.filter(k => k.status === 1)
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -83,10 +74,9 @@ export class MenuService {
 	/**菜单列表**/
 	public async nodeMenus() {
 		try {
-			const node = await this.menuModel.find({
-				relations: ['parent']
-			})
-			return this.utilsService.listToTree(node.map(k => ({ ...k, parent: k.parent?.id || null })))
+			const menu = await this.menuModel.find({ relations: ['parent'] })
+			const node = menu.filter(k => k.status === 1).map(k => ({ ...k, parent: k.parent?.id || null }))
+			return this.utilsService.listToTree(node)
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
