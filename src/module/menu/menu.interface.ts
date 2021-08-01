@@ -41,7 +41,7 @@ class MenuParameter {
 	icon: string
 
 	@ApiPropertyOptional({ description: '排序号' })
-	@IsOptional({}, { string: true, number: true })
+	@IsOptional({}, { string: true })
 	@Type(type => Number)
 	order: number
 

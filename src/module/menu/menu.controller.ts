@@ -43,6 +43,17 @@ export class MenuController {
 		return await this.menuService.nodeRouter()
 	}
 
+	@ApiOperation({ summary: '角色菜单' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK' })
+	@Get('role')
+	public async nodeRoleMenus() {
+		return await this.menuService.nodeRoleMenus()
+	}
+
 	@ApiOperation({ summary: '菜单列表' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })

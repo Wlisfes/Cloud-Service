@@ -35,7 +35,7 @@ export class MenuService {
 				keepAlive: props.keepAlive || 0,
 				status: props.status || 0,
 				icon: props.icon || null,
-				order: props.order || 1,
+				order: props.order || 0,
 				parent
 			})
 			await this.menuModel.save(newMenu)
@@ -52,6 +52,10 @@ export class MenuService {
 			const node = await this.menuModel.find({
 				where: {
 					type: 1
+				},
+				order: {
+					order: 'DESC',
+					createTime: 'DESC'
 				},
 				relations: ['parent']
 			})
@@ -71,11 +75,38 @@ export class MenuService {
 		}
 	}
 
+	/**角色菜单**/
+	public async nodeRoleMenus() {
+		try {
+			const menu = await this.menuModel.find({
+				relations: ['parent'],
+				order: {
+					order: 'DESC',
+					createTime: 'DESC'
+				}
+			})
+			const node = menu.filter(k => k.status === 1).map(k => ({ ...k, parent: k.parent?.id || null }))
+			return this.utilsService.listToTree(node)
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
 	/**菜单列表**/
 	public async nodeMenus() {
 		try {
-			const menu = await this.menuModel.find({ relations: ['parent'] })
-			const node = menu.filter(k => k.status === 1).map(k => ({ ...k, parent: k.parent?.id || null }))
+			const menu = await this.menuModel.find({
+				relations: ['parent'],
+				order: {
+					order: 'DESC',
+					createTime: 'DESC'
+				}
+			})
+			const node = menu.map(k => ({
+				...k,
+				disabled: !!k.status,
+				parent: k.parent?.id || null
+			}))
 			return this.utilsService.listToTree(node)
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
