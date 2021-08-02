@@ -325,16 +325,21 @@ export class UserService {
 	/**用户列表**/
 	public async nodeUsers(props: DTO.NodeUsersParameter) {
 		try {
-			const [list = [], total = 0] = await this.userModel
-				.createQueryBuilder('user')
-				.leftJoinAndSelect('user.role', 'role')
-				.where('role.type = :type', { type: 1 })
-				.skip((props.page - 1) * props.size)
-				.take(props.size)
-				.orderBy('user.uid', 'ASC')
-				.getManyAndCount()
+			const [list = [], total = 0] = await this.userModel.findAndCount({
+				order: {
+					uid: 'ASC'
+				},
+				relations: ['role'],
+				skip: (props.page - 1) * props.size,
+				take: props.size
+			})
 
-			return { total, size: props.size, page: props.page, list }
+			return {
+				total,
+				size: props.size,
+				page: props.page,
+				list: list.map(k => ({ ...k, role: k.role.find(v => v.type === 1) }))
+			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
