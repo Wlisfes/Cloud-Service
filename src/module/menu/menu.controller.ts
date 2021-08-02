@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common'
+import { Controller, Get, Post, Body, Query } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiProduces, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { MenuService } from './menu.service'
 import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
@@ -63,5 +63,16 @@ export class MenuController {
 	@Get('list')
 	public async nodeMenus() {
 		return await this.menuService.nodeMenus()
+	}
+
+	@ApiOperation({ summary: '菜单信息' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK' })
+	@Get('info')
+	public async nodeMenu(@Query() query: DTO.NodeMenuParameter) {
+		return await this.menuService.nodeMenu(query.id)
 	}
 }

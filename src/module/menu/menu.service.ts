@@ -112,4 +112,16 @@ export class MenuService {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
+
+	/**菜单信息**/
+	public async nodeMenu(id: number) {
+		try {
+			return await this.menuModel.findOne({
+				where: { id },
+				relations: ['parent']
+			})
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
 }

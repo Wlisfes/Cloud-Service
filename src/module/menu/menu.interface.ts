@@ -4,6 +4,11 @@ import { IsOptional } from '@/decorator/common.decorator'
 import { Type } from 'class-transformer'
 
 class MenuParameter {
+	@ApiProperty({ description: '节点id', example: 1 })
+	@IsNotEmpty({ message: '节点id 必填' })
+	@Type(type => Number)
+	id: number
+
 	@ApiProperty({ description: '节点类型: 1.目录 2.菜单 3.权限', enum: [1, 2], example: 1 })
 	@IsNotEmpty({ message: '节点类型 必填' })
 	@Type(type => Number)
@@ -63,3 +68,5 @@ export class NodeCreate extends PickType(MenuParameter, [
 	'order',
 	'permission'
 ]) {}
+
+export class NodeMenuParameter extends PickType(MenuParameter, ['id']) {}
