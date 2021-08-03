@@ -14,6 +14,8 @@ import { InitModule } from '@/module/init/init.module'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
 import { MenuEntity } from '@/entity/menu.entity'
+import { CloudEntity } from '@/entity/cloud.entity'
+import { CloudSourceEntity } from '@/entity/cloud.source.entity'
 
 @Module({
 	imports: [
@@ -26,7 +28,7 @@ import { MenuEntity } from '@/entity/menu.entity'
 				pollTimeout: 60 // 连接有效60秒
 			}
 		}),
-		TypeOrmModule.forFeature([UserEntity, RoleEntity, MenuEntity]),
+		TypeOrmModule.forFeature([UserEntity, RoleEntity, MenuEntity, CloudEntity, CloudSourceEntity]),
 		InitModule
 	],
 	controllers: [AppController],

@@ -13,6 +13,8 @@ import { BannerModule } from '@/module/banner/banner.module'
 import { RoleModule } from '@/module/role/role.module'
 import { UserModule } from '@/module/user/user.module'
 import { MenuModule } from '@/module/menu/menu.module'
+import { CloudModule } from '@/module/cloud/cloud.module'
+import { CloudSourceModule } from '@/module/cloud-source/cloud-source.module'
 
 @Module({
 	imports: [
@@ -72,7 +74,9 @@ import { MenuModule } from '@/module/menu/menu.module'
 		BannerModule,
 		RoleModule,
 		UserModule,
-		MenuModule
+		MenuModule,
+		CloudModule,
+		CloudSourceModule
 	],
 	providers: [InitService]
 })
