@@ -6,7 +6,11 @@ export class MenuEntity extends DateEntity {
 	@PrimaryGeneratedColumn({ comment: '自增长主键' })
 	id: number
 
-	@Column({ comment: '节点类型: 1.目录 2.菜单 3.权限', type: 'enum', enum: [1, 2, 3], default: 1, nullable: false })
+	@Column({
+		comment: '节点类型: 1.目录 2.菜单',
+		default: 1,
+		nullable: false
+	})
 	type: number
 
 	@Column({ comment: '节点名称', nullable: false })
@@ -15,10 +19,18 @@ export class MenuEntity extends DateEntity {
 	@Column({ comment: '节点路由', nullable: true })
 	router: string
 
-	@Column({ comment: '路由缓存: 0.关闭 1.开启', type: 'enum', enum: [0, 1], default: 1, nullable: false })
+	@Column({
+		comment: '路由缓存: 0.关闭 1.开启',
+		default: 1,
+		nullable: false
+	})
 	keepAlive: number
 
-	@Column({ comment: '状态: 0.隐藏 1.显示', type: 'enum', enum: [0, 1], default: 1, nullable: false })
+	@Column({
+		comment: '状态: 0.隐藏 1.显示 2.删除',
+		default: 1,
+		nullable: false
+	})
 	status: number
 
 	@Column({ comment: '文件路径', nullable: true })

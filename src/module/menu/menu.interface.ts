@@ -3,7 +3,42 @@ import { IsNotEmpty, IsEmail, Length, IsNumber, Min } from 'class-validator'
 import { IsOptional } from '@/decorator/common.decorator'
 import { Type } from 'class-transformer'
 
-class MenuParameter {
+export class MenuResponse {
+	@ApiProperty({ description: '节点id', example: 1 })
+	id: number
+
+	@ApiProperty({ description: '节点类型: 1.目录 2.菜单 3.权限', enum: [1, 2], example: 1 })
+	type: number
+
+	@ApiProperty({ description: '节点名称', example: '工作台' })
+	name: string
+
+	@ApiPropertyOptional({ description: '上级节点' })
+	parent: MenuResponse
+
+	@ApiPropertyOptional({ description: '节点路由' })
+	router: string
+
+	@ApiPropertyOptional({ description: '路由缓存: 0.关闭 1.开启', enum: [0, 1], example: 1 })
+	keepAlive: number
+
+	@ApiPropertyOptional({ description: '节点状态: 0.隐藏 1.显示', enum: [0, 1], example: 1 })
+	status: number
+
+	@ApiPropertyOptional({ description: '文件路径' })
+	path: string
+
+	@ApiPropertyOptional({ description: '节点图标' })
+	icon: string
+
+	@ApiPropertyOptional({ description: '排序号', example: 0 })
+	order: number
+
+	@ApiProperty({ description: '节点子集', type: [MenuResponse], example: [] })
+	children: MenuResponse[]
+}
+
+export class MenuParameter {
 	@ApiProperty({ description: '节点id', example: 1 })
 	@IsNotEmpty({ message: '节点id 必填' })
 	@Type(type => Number)
@@ -55,8 +90,12 @@ class MenuParameter {
 	permission: string
 }
 
-/**创建菜单-Parameter**/
-export class NodeCreate extends PickType(MenuParameter, [
+/**
+ *
+ *
+ * 创建菜单-Parameter
+ *************************************************************************************************/
+export class NodeCreateParameter extends PickType(MenuParameter, [
 	'type',
 	'name',
 	'parent',
@@ -65,8 +104,108 @@ export class NodeCreate extends PickType(MenuParameter, [
 	'status',
 	'path',
 	'icon',
-	'order',
-	'permission'
+	'order'
 ]) {}
+/**创建菜单-Response**/
+export class NodeCreateResponse {
+	@ApiProperty({ description: 'message', example: '创建成功' })
+	message: string
+}
 
+/**
+ *
+ *
+ * 获取节点目录-Response
+ *************************************************************************************************/
+export class NodeMenuConterResponse {
+	@ApiProperty({
+		description: '节点目录列表',
+		type: [MenuResponse],
+		example: []
+	})
+	list: MenuResponse[]
+}
+
+/**
+ *
+ *
+ * 动态路由节点-Response
+ *************************************************************************************************/
+export class NodeRouterResponse {
+	@ApiProperty({
+		description: '动态路由节点列表',
+		type: [MenuResponse],
+		example: []
+	})
+	list: MenuResponse[]
+}
+
+/**
+ *
+ *
+ * 角色菜单-Response
+ *************************************************************************************************/
+export class NodeRoleMenusResponse {
+	@ApiProperty({
+		description: '角色菜单列表',
+		type: [MenuResponse],
+		example: []
+	})
+	list: MenuResponse[]
+}
+
+/**
+ *
+ *
+ * 菜单列表-Response
+ *************************************************************************************************/
+export class NodeMenusResponse {
+	@ApiProperty({
+		description: '菜单列表',
+		type: [MenuResponse],
+		example: []
+	})
+	list: MenuResponse[]
+}
+
+/**
+ *
+ *
+ * 菜单信息-Parameter
+ *************************************************************************************************/
 export class NodeMenuParameter extends PickType(MenuParameter, ['id']) {}
+export class NodeMenuResponse extends MenuResponse {}
+
+/**
+ *
+ *
+ * 修改菜单-Parameter
+ *************************************************************************************************/
+export class NodeUpdateParameter extends PickType(MenuParameter, [
+	'id',
+	'name',
+	'parent',
+	'router',
+	'keepAlive',
+	'status',
+	'path',
+	'icon',
+	'order'
+]) {}
+/** 修改菜单-Response**/
+export class NodeUpdateResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
+
+/**
+ *
+ *
+ * 删除菜单-Parameter
+ *************************************************************************************************/
+export class NodeDeleteMenuParameter extends PickType(MenuParameter, ['id']) {}
+/** 修改菜单-Response**/
+export class NodeDeleteMenuResponse {
+	@ApiProperty({ description: 'message', example: '删除成功' })
+	message: string
+}
