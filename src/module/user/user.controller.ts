@@ -4,7 +4,7 @@ import { UserService } from './user.service'
 import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as DTO from './user.interface'
 
-@ApiTags('用户模块')
+@ApiTags('系统管理-用户模块')
 @Controller('user')
 export class UserController {
 	constructor(private readonly userService: UserService) {}
