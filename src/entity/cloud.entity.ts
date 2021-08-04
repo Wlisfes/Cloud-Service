@@ -36,6 +36,6 @@ export class CloudEntity extends DateEntity {
 		source => source.cloud,
 		{ cascade: true }
 	)
-	@JoinTable()
+	@JoinTable({ name: 'cloud_source_join' })
 	source: CloudSourceEntity[]
 }

@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional, PickType, OmitType, IntersectionType } from '@nestjs/swagger'
-import { IsNotEmpty, IsEmail, Length, IsNumber, Min } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger'
+import { IsNotEmpty } from 'class-validator'
 import { IsOptional } from '@/decorator/common.decorator'
 import { Type } from 'class-transformer'
 

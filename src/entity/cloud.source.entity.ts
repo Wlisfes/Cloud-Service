@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm'
 import { DateEntity } from '@/entity/common.entity'
 import { CloudEntity } from '@/entity/cloud.entity'
 
-@Entity('cloud-source')
+@Entity('cloud_source')
 export class CloudSourceEntity extends DateEntity {
 	@PrimaryGeneratedColumn({ comment: '自增长主键' })
 	id: number
