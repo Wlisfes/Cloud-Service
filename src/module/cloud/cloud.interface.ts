@@ -1,7 +1,9 @@
-import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger'
-import { IsNotEmpty, IsHexColor, IsNumber, Min } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional, PickType, IntersectionType } from '@nestjs/swagger'
+import { IsNotEmpty, IsHexColor, IsNumber, Min, Allow } from 'class-validator'
 import { IsOptional } from '@/decorator/common.decorator'
-import { Type } from 'class-transformer'
+import { Type, Transform } from 'class-transformer'
+import { toArrayNumber } from '@/utils/validate'
+import { NodeCloudSourceResponse } from '@/module/cloud-source/cloud-source.interface'
 
 export class CloudResponse {
 	@ApiProperty({ description: '媒体id', example: 1 })
@@ -40,7 +42,10 @@ export class CloudResponse {
 	@ApiProperty({ description: '类型为多集媒体的子类', type: [CloudResponse], example: [] })
 	children: CloudResponse[]
 
-	@ApiPropertyOptional({ description: '总数', example: 0 })
+	@ApiProperty({ description: '分类标签列表', type: [NodeCloudSourceResponse], example: [] })
+	source: NodeCloudSourceResponse[]
+
+	@ApiProperty({ description: '总数', example: 0 })
 	total: number
 
 	@ApiProperty({ description: '分页', example: 1 })
@@ -61,7 +66,7 @@ export class CloudParameter {
 	@Type(type => Number)
 	type: number
 
-	@ApiProperty({ description: '媒体标题', example: '星河里的鲸' })
+	@ApiProperty({ description: '媒体标题', example: '时光背面的我' })
 	@IsNotEmpty({ message: '媒体标题 必填' })
 	title: string
 
@@ -77,7 +82,7 @@ export class CloudParameter {
 	@IsOptional({}, { string: true, number: true })
 	path: string
 
-	@ApiProperty({ description: '媒体封面' })
+	@ApiProperty({ description: '媒体封面', example: 'https://oss.lisfes.cn/upload/1592634450167.jpg' })
 	@IsNotEmpty({ message: '媒体标题 必填' })
 	cover: string
 
@@ -97,7 +102,15 @@ export class CloudParameter {
 
 	@ApiPropertyOptional({ description: '类型为多集媒体的父类id' })
 	@IsOptional({}, { string: true, number: true })
+	@IsNumber({}, { message: '父类id必须为number' })
+	@Type(type => Number)
 	parent: number
+
+	@ApiPropertyOptional({ description: '分类标签id', type: [Number], example: [] })
+	@IsOptional({}, { string: true, number: true })
+	@Transform(type => toArrayNumber(type), { toClassOnly: true })
+	@IsNumber({}, { each: true, message: '分类标签id 必须为Array<number>' })
+	source: number[]
 
 	@ApiProperty({ description: '分页', example: 1 })
 	@IsNotEmpty({ message: 'page 必填' })
@@ -112,4 +125,52 @@ export class CloudParameter {
 	@Min(1, { message: 'size不能小于1' })
 	@Type(type => Number)
 	size: number
+}
+
+/**
+ *
+ *
+ * 创建音视频-Parameter
+ *************************************************************************************************/
+export class NodeCreateCloudParameter extends IntersectionType(
+	PickType(CloudParameter, ['type', 'title', 'cover']),
+	PickType(CloudParameter, ['key', 'name', 'path', 'status', 'order', 'description', 'parent', 'source'])
+) {
+	@ApiPropertyOptional({ description: '媒体文件大小', example: 0 })
+	@IsOptional({}, { string: true })
+	@Type(type => Number)
+	size: number
+}
+/**创建音视频-Response**/
+export class NodeCreateCloudResponse {
+	@ApiProperty({ description: 'message', example: '创建成功' })
+	message: string
+}
+
+/**
+ *
+ *
+ * 音视频信息-Parameter
+ *************************************************************************************************/
+export class NodeCloudParameter extends PickType(CloudParameter, ['id']) {}
+/**音视频信息-Response**/
+export class NodeCloudResponse extends IntersectionType(
+	PickType(CloudResponse, ['id', 'type', 'title', 'cover', 'key', 'name', 'path']),
+	PickType(CloudResponse, ['status', 'order', 'description', 'parent', 'children', 'source'])
+) {}
+
+/**
+ *
+ *
+ * 音视频列表-Parameter
+ *************************************************************************************************/
+export class NodeCloudsParameter extends PickType(CloudParameter, ['page', 'size', 'status']) {}
+/**音视频列表-Response**/
+export class NodeCloudsResponse extends PickType(CloudResponse, ['page', 'size', 'total']) {
+	@ApiProperty({
+		description: '音视频列表',
+		type: [NodeCloudResponse],
+		example: []
+	})
+	list: CloudResponse[]
 }
