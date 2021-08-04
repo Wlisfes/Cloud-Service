@@ -73,7 +73,6 @@ export class CloudService {
 	public async nodeUpdateCloud(props: DTO.NodeUpdateCloudParameter) {
 		try {
 			let parent = null
-			let source = []
 			const cloud = await this.cloudModel.findOne({ where: { id: props.id }, relations: ['source'] })
 			if (!cloud) {
 				throw new HttpException('音视频媒体不存在', HttpStatus.BAD_REQUEST)
@@ -94,7 +93,7 @@ export class CloudService {
 			}
 
 			if (props.source?.length > 0) {
-				source = await this.sourceModel.find({ where: { id: In(props.source) } })
+				const source = await this.sourceModel.find({ where: { id: In(props.source) } })
 				props.source.forEach(id => {
 					const element = source.find(element => element.id === id)
 					if (!element) {
