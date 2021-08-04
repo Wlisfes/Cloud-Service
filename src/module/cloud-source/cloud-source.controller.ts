@@ -62,7 +62,7 @@ export class CloudSourceController {
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCloudSourcesResponse })
-	@Get('list')
+	@Get('list-node')
 	async nodeCloudSources(@Query() query: DTO.NodeCloudSourcesParameter) {
 		return await this.cloudSourceService.nodeCloudSources(query)
 	}
@@ -75,7 +75,7 @@ export class CloudSourceController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeDeleteCloudSourceResponse })
 	@Delete('del')
-	async nodeDeleteCloudSources(@Query() query: DTO.NodeDeleteCloudSourceParameter) {
-		return await this.cloudSourceService.nodeDeleteCloudSources(query)
+	async nodeDeleteCloudSource(@Query() query: DTO.NodeDeleteCloudSourceParameter) {
+		return await this.cloudSourceService.nodeDeleteCloudSource(query)
 	}
 }

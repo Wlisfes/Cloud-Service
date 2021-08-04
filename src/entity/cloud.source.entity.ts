@@ -19,6 +19,9 @@ export class CloudSourceEntity extends DateEntity {
 	@Column({ nullable: false, default: 0, comment: '排序号' })
 	order: number
 
+	@Column({ comment: '标签备注', nullable: true })
+	comment: string
+
 	@ManyToMany(
 		type => CloudEntity,
 		cloud => cloud.source

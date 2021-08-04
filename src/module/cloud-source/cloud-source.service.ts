@@ -16,14 +16,21 @@ export class CloudSourceService {
 	/**创建分类标签**/
 	public async nodeCreateCloudSource(props: DTO.NodeCreateCloudSourceParameter) {
 		try {
-			if (await this.sourceModel.findOne({ where: [{ name: props.name }, { status: 0 }, { status: 1 }] })) {
+			const source = await this.sourceModel.findOne({
+				where: [
+					{ name: props.name, status: 0 },
+					{ name: props.name, status: 1 }
+				]
+			})
+			if (source) {
 				throw new HttpException('分类标签已存在', HttpStatus.BAD_REQUEST)
 			}
 			const newSource = await this.sourceModel.create({
 				name: props.name,
 				color: props.color,
 				status: props.status || 0,
-				order: props.order || 0
+				order: props.order || 0,
+				comment: props.comment || null
 			})
 			await this.sourceModel.save(newSource)
 
@@ -46,7 +53,8 @@ export class CloudSourceService {
 					name: props.name,
 					color: props.color,
 					status: props.status || 0,
-					order: props.order || 0
+					order: props.order || 0,
+					comment: props.comment || null
 				}
 			)
 
@@ -99,7 +107,8 @@ export class CloudSourceService {
 					status: isEmpty(props.status) ? Not(2) : props.status
 				},
 				order: {
-					id: 'ASC'
+					createTime: 'DESC',
+					order: 'DESC'
 				},
 				skip: (props.page - 1) * props.size,
 				take: props.size
@@ -117,7 +126,7 @@ export class CloudSourceService {
 	}
 
 	/**删除分类标签**/
-	public async nodeDeleteCloudSources(props: DTO.NodeDeleteCloudSourceParameter) {
+	public async nodeDeleteCloudSource(props: DTO.NodeDeleteCloudSourceParameter) {
 		try {
 			const source = await this.sourceModel.findOne({ where: { id: props.id } })
 			if (!source) {

@@ -19,6 +19,9 @@ export class CloudSourceResponse {
 	@ApiProperty({ description: '排序号', example: 1 })
 	order: number
 
+	@ApiProperty({ description: '备注' })
+	comment: string
+
 	@ApiPropertyOptional({ description: '总数', example: 0 })
 	total: number
 
@@ -54,6 +57,10 @@ export class CloudSourceParameter {
 	@Type(type => Number)
 	order: number
 
+	@ApiPropertyOptional({ description: '备注' })
+	@IsOptional({}, { string: true, number: true })
+	comment: string
+
 	@ApiProperty({ description: '分页', example: 1 })
 	@IsNotEmpty({ message: 'page 必填' })
 	@IsNumber({}, { message: 'page必须是数字' })
@@ -78,7 +85,8 @@ export class NodeCreateCloudSourceParameter extends PickType(CloudSourceParamete
 	'name',
 	'color',
 	'order',
-	'status'
+	'status',
+	'comment'
 ]) {}
 /**创建分类标签-Response**/
 export class NodeCreateCloudSourceResponse {
@@ -96,7 +104,8 @@ export class NodeUpdateCloudSourceParameter extends PickType(CloudSourceParamete
 	'name',
 	'color',
 	'order',
-	'status'
+	'status',
+	'comment'
 ]) {}
 /**修改分类标签-Response**/
 export class NodeUpdateCloudSourceResponse {
@@ -128,7 +137,8 @@ export class NodeCloudSourceResponse extends PickType(CloudSourceResponse, [
 	'name',
 	'color',
 	'order',
-	'status'
+	'status',
+	'comment'
 ]) {}
 
 /**
@@ -141,7 +151,7 @@ export class NodeCloudSourcesParameter extends PickType(CloudSourceParameter, ['
 export class NodeCloudSourcesResponse extends PickType(CloudSourceResponse, ['total', 'page', 'size']) {
 	@ApiProperty({
 		description: '分类标签列表',
-		type: [PickType(CloudSourceResponse, ['id', 'name', 'color', 'status', 'order'])],
+		type: [PickType(CloudSourceResponse, ['id', 'name', 'color', 'status', 'order', 'comment'])],
 		example: []
 	})
 	list: CloudSourceResponse[]
