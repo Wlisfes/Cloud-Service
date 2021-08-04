@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Body, Query } from '@nestjs/common'
+import { Controller, Post, Get, Put, Delete, Body, Query } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { CloudSourceService } from './cloud-source.service'
 import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
@@ -65,5 +65,17 @@ export class CloudSourceController {
 	@Get('list')
 	async nodeCloudSources(@Query() query: DTO.NodeCloudSourcesParameter) {
 		return await this.cloudSourceService.nodeCloudSources(query)
+	}
+
+	@ApiOperation({ summary: '删除分类标签' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin'], module: 'cloud', action: 'delete' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeDeleteCloudSourceResponse })
+	@Delete('del')
+	async nodeDeleteCloudSources(@Query() query: DTO.NodeDeleteCloudSourceParameter) {
+		return await this.cloudSourceService.nodeDeleteCloudSources(query)
 	}
 }

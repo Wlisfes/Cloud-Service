@@ -146,3 +146,15 @@ export class NodeCloudSourcesResponse extends PickType(CloudSourceResponse, ['to
 	})
 	list: CloudSourceResponse[]
 }
+
+/**
+ *
+ *
+ * 删除分类标签-Parameter
+ *************************************************************************************************/
+export class NodeDeleteCloudSourceParameter extends PickType(CloudSourceParameter, ['id']) {}
+/**删除分类标签-Response**/
+export class NodeDeleteCloudSourceResponse {
+	@ApiProperty({ description: 'message', example: '删除成功' })
+	message: string
+}

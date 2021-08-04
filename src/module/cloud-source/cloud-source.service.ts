@@ -115,4 +115,21 @@ export class CloudSourceService {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
+
+	/**删除分类标签**/
+	public async nodeDeleteCloudSources(props: DTO.NodeDeleteCloudSourceParameter) {
+		try {
+			const source = await this.sourceModel.findOne({ where: { id: props.id } })
+			if (!source) {
+				throw new HttpException('分类标签不存在', HttpStatus.BAD_REQUEST)
+			} else if (source.status === 2) {
+				throw new HttpException('分类标签已删除', HttpStatus.BAD_REQUEST)
+			}
+			await this.sourceModel.update({ id: props.id }, { status: 2 })
+
+			return { message: '删除成功' }
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
 }
