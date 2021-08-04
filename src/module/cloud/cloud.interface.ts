@@ -150,6 +150,38 @@ export class NodeCreateCloudResponse {
 /**
  *
  *
+ * 修改音视频媒体-Parameter
+ *************************************************************************************************/
+export class NodeUpdateCloudParameter extends IntersectionType(
+	PickType(CloudParameter, ['id', 'type', 'title', 'cover']),
+	PickType(CloudParameter, ['key', 'name', 'path', 'status', 'order', 'description', 'parent', 'source'])
+) {
+	@ApiPropertyOptional({ description: '媒体文件大小', example: 0 })
+	@IsOptional({}, { string: true })
+	@Type(type => Number)
+	size: number
+}
+/**修改音视频媒体-Response**/
+export class NodeUpdateCloudResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
+
+/**
+ *
+ *
+ * 切换音视频媒体状态-Parameter
+ *************************************************************************************************/
+export class NodeCloudCutoverParameter extends PickType(CloudParameter, ['id']) {}
+/**切换音视频媒体状态-Response**/
+export class NodeCloudCutoverResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
+
+/**
+ *
+ *
  * 音视频信息-Parameter
  *************************************************************************************************/
 export class NodeCloudParameter extends PickType(CloudParameter, ['id']) {}
@@ -173,4 +205,16 @@ export class NodeCloudsResponse extends PickType(CloudResponse, ['page', 'size',
 		example: []
 	})
 	list: CloudResponse[]
+}
+
+/**
+ *
+ *
+ * 删除音视频媒体-Parameter
+ *************************************************************************************************/
+export class NodeDeleteCloudParameter extends PickType(CloudParameter, ['id']) {}
+/**删除音视频媒体-Response**/
+export class NodeDeleteCloudResponse {
+	@ApiProperty({ description: 'message', example: '删除成功' })
+	message: string
 }
