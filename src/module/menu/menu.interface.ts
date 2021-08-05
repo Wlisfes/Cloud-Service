@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional, PickType, IntersectionType } from '@nestjs/swagger'
 import { IsNotEmpty } from 'class-validator'
 import { IsOptional } from '@/decorator/common.decorator'
 import { Type } from 'class-transformer'
@@ -95,19 +95,13 @@ export class MenuParameter {
  *
  * 创建菜单-Parameter
  *************************************************************************************************/
-export class NodeCreateParameter extends PickType(MenuParameter, [
-	'type',
-	'name',
-	'parent',
-	'router',
-	'keepAlive',
-	'status',
-	'path',
-	'icon',
-	'order'
-]) {}
+export class NodeCreateMenuParameter extends IntersectionType(
+	PickType(MenuParameter, ['type', 'name', 'parent', 'router']),
+	PickType(MenuParameter, ['keepAlive', 'status', 'path', 'icon', 'order'])
+) {}
+
 /**创建菜单-Response**/
-export class NodeCreateResponse {
+export class NodeCreateMenuResponse {
 	@ApiProperty({ description: 'message', example: '创建成功' })
 	message: string
 }
@@ -181,17 +175,12 @@ export class NodeMenuResponse extends MenuResponse {}
  *
  * 修改菜单-Parameter
  *************************************************************************************************/
-export class NodeUpdateParameter extends PickType(MenuParameter, [
-	'id',
-	'name',
-	'parent',
-	'router',
-	'keepAlive',
-	'status',
-	'path',
-	'icon',
-	'order'
-]) {}
+export class NodeUpdateParameter extends IntersectionType(
+	PickType(MenuParameter, ['id', 'type', 'name', 'parent', 'router']),
+	PickType(MenuParameter, ['keepAlive', 'status', 'path', 'icon', 'order'])
+) {}
+{
+}
 /** 修改菜单-Response**/
 export class NodeUpdateResponse {
 	@ApiProperty({ description: 'message', example: '修改成功' })

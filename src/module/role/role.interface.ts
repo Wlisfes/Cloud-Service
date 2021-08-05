@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional, PickType, OmitType } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional, PickType, OmitType, IntersectionType } from '@nestjs/swagger'
 import { IsNotEmpty, IsNumber, Min, IsOptional } from 'class-validator'
 import { Type, Transform } from 'class-transformer'
 import { UserInterface } from '@/module/user/user.interface'
@@ -110,14 +110,10 @@ export class NodeRolesResponse extends PickType(RoleInterface, ['total', 'page',
  *******************************************************************************************************************/
 export class NodeRoleParameter extends PickType(RoleParameter, ['id']) {}
 /**角色信息-Response**/
-export class NodeRoleResponse extends PickType(RoleInterface, [
-	'id',
-	'primary',
-	'name',
-	'status',
-	'children',
-	'comment'
-]) {}
+export class NodeRoleResponse extends IntersectionType(
+	PickType(RoleInterface, ['id', 'primary', 'name']),
+	PickType(RoleInterface, ['status', 'children', 'comment'])
+) {}
 
 /**
  *
@@ -133,15 +129,10 @@ export class NodeRoleCutoverResponse extends PickType(RoleInterface, ['message']
  *
  *用户角色信息-Response
  *******************************************************************************************************************/
-export class NodeUserRoleResponse extends PickType(RoleInterface, [
-	'user',
-	'id',
-	'primary',
-	'name',
-	'status',
-	'children',
-	'comment'
-]) {}
+export class NodeUserRoleResponse extends IntersectionType(
+	PickType(RoleInterface, ['id', 'primary', 'name', 'user']),
+	PickType(RoleInterface, ['status', 'children', 'comment'])
+) {}
 
 /**
  *
@@ -169,12 +160,9 @@ export class NodeUpdateRoleResponse extends PickType(RoleInterface, ['message'])
  *
  *修改用户角色权限-Parameter
  *******************************************************************************************************************/
-export class NodeUpdateUserRoleParameter extends PickType(RoleParameter, [
-	'uid',
-	'primary',
-	'status',
-	'comment',
-	'role'
-]) {}
+export class NodeUpdateUserRoleParameter extends IntersectionType(
+	PickType(RoleParameter, ['id', 'primary', 'status']),
+	PickType(RoleParameter, ['role', 'comment'])
+) {}
 /**修改用户角色权限-Response**/
 export class NodeUpdateUserRoleResponse extends PickType(RoleInterface, ['message']) {}

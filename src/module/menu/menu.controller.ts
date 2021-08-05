@@ -15,10 +15,10 @@ export class MenuController {
 	@AuthRole({ role: ['admin'], module: 'menu', action: 'create' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
-	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCreateResponse })
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCreateMenuResponse })
 	@Post('create')
-	public async nodeCreate(@Body() body: DTO.NodeCreateParameter) {
-		return await this.menuService.nodeCreate(body)
+	public async nodeCreateMenu(@Body() body: DTO.NodeCreateMenuParameter) {
+		return await this.menuService.nodeCreateMenu(body)
 	}
 
 	@ApiOperation({ summary: '目录节点' })

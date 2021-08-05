@@ -15,7 +15,7 @@ export class MenuService {
 	) {}
 
 	/**创建菜单**/
-	public async nodeCreate(props: DTO.NodeCreateParameter) {
+	public async nodeCreateMenu(props: DTO.NodeCreateMenuParameter) {
 		try {
 			let parent = null
 			if (props.parent) {
