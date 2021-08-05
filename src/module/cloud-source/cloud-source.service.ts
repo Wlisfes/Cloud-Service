@@ -107,8 +107,8 @@ export class CloudSourceService {
 					status: isEmpty(props.status) ? Not(2) : props.status
 				},
 				order: {
-					createTime: 'DESC',
-					order: 'DESC'
+					order: 'DESC',
+					createTime: 'DESC'
 				},
 				skip: (props.page - 1) * props.size,
 				take: props.size

@@ -210,6 +210,22 @@ export class NodeCloudsResponse extends PickType(CloudResponse, ['page', 'size',
 /**
  *
  *
+ * 多集媒体目录列表-Parameter
+ *************************************************************************************************/
+export class NodeMultipleCloudsParameter extends PickType(CloudParameter, ['page', 'size']) {}
+/**多集媒体目录列表-Response**/
+export class NodeMultipleCloudsResponse extends PickType(CloudResponse, ['page', 'size', 'total']) {
+	@ApiProperty({
+		description: '多集媒体目录列表',
+		type: [NodeCloudResponse],
+		example: []
+	})
+	list: CloudResponse[]
+}
+
+/**
+ *
+ *
  * 删除音视频媒体-Parameter
  *************************************************************************************************/
 export class NodeDeleteCloudParameter extends PickType(CloudParameter, ['id']) {}

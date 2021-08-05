@@ -67,6 +67,17 @@ export class CloudController {
 		return await this.cloudService.nodeClouds(query)
 	}
 
+	@ApiOperation({ summary: '多集媒体目录列表' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeMultipleCloudsResponse })
+	@Get('list-multiple')
+	async nodeMultipleClouds(@Query() query: DTO.NodeMultipleCloudsParameter) {
+		return await this.cloudService.nodeMultipleClouds(query)
+	}
+
 	@ApiOperation({ summary: '删除音视频媒体' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
