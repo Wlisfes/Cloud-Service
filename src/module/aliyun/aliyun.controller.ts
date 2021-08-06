@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Body, Query } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiProduces, ApiBearerAuth } from '@nestjs/swagger'
 import { AliyunService } from './aliyun.service'
-import { AuthToken, APP_AUTH_TOKEN } from '@/guard/auth.guard'
+import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as DTO from './aliyun.interface'
 
 @ApiTags('阿里云视频点播模块')
@@ -12,6 +12,7 @@ export class AliyunController {
 	@ApiOperation({ summary: '创建上传凭证' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super'], module: 'cloud', action: 'create' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCreateResponse })
@@ -23,6 +24,7 @@ export class AliyunController {
 	@ApiOperation({ summary: '刷新上传凭证' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super'], module: 'cloud', action: 'create' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRefreshResponse })

@@ -19,7 +19,15 @@ export class AliyunService {
 	/**创建上传凭证**/
 	async nodeCreate(prosp: DTO.NodeCreateParameter): Promise<DTO.NodeCreateResponse> {
 		try {
-			return await this.client.request('CreateUploadVideo', { ...prosp }, {})
+			return await this.client.request(
+				'CreateUploadVideo',
+				{
+					Title: prosp.Title,
+					FileName: prosp.FileName,
+					TemplateGroupId: prosp.TemplateGroupId || 'VOD_NO_TRANSCODE'
+				},
+				{}
+			)
 		} catch (e) {
 			throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

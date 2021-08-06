@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, Min, IsOptional } from 'class-validator'
+import { IsNotEmpty, IsNumber, Min } from 'class-validator'
+import { IsOptional } from '@/decorator/common.decorator'
 import { Type } from 'class-transformer'
 
 /**转码模板组数据列表**/
@@ -138,7 +139,8 @@ class AliyunParameter {
 	})
 	Tags?: string
 
-	@ApiProperty({ description: '转码模板组ID' })
+	@ApiPropertyOptional({ description: '转码模板组ID' })
+	@IsOptional({}, { string: true, number: true })
 	TemplateGroupId: string
 
 	@ApiPropertyOptional({
