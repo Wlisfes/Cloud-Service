@@ -161,7 +161,7 @@ export class NodeUpdateRoleResponse extends PickType(RoleInterface, ['message'])
  *修改用户角色权限-Parameter
  *******************************************************************************************************************/
 export class NodeUpdateUserRoleParameter extends IntersectionType(
-	PickType(RoleParameter, ['id', 'primary', 'status']),
+	PickType(RoleParameter, ['uid', 'primary', 'status']),
 	PickType(RoleParameter, ['role', 'comment'])
 ) {}
 /**修改用户角色权限-Response**/
