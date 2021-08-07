@@ -100,7 +100,7 @@ export class AliyunService {
 	}
 
 	/**获取播放信息**/
-	async createPlayInfo(prosp: DTO.CreatePlayInfo): Promise<DTO.AliyunCreatePlayInfoResponse> {
+	async createPlayInfo(prosp: DTO.CreatePlayInfo) {
 		try {
 			const { RequestId, VideoBase, PlayInfoList } = await this.client.request(
 				'GetPlayInfo',
@@ -130,7 +130,8 @@ export class AliyunService {
 			}
 			return { RequestId, base, list: [] }
 		} catch (e) {
-			throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
+			return { RequestId: null, base: null, list: [] }
+			//throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 
