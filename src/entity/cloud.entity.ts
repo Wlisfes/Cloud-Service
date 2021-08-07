@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm'
 import { DateEntity } from '@/entity/common.entity'
+import { UserEntity } from '@/entity/user.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
 
 @Entity('cloud')
@@ -56,4 +57,7 @@ export class CloudEntity extends DateEntity {
 	)
 	@JoinTable({ name: 'cloud_source_join' })
 	source: CloudSourceEntity[]
+
+	@ManyToOne(type => UserEntity)
+	user: UserEntity
 }

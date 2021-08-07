@@ -4,17 +4,19 @@ import { Repository, In, Not } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { CloudEntity } from '@/entity/cloud.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
+import { UserEntity } from '@/entity/user.entity'
 import * as DTO from './cloud.interface'
 
 @Injectable()
 export class CloudService {
 	constructor(
 		@InjectRepository(CloudEntity) private readonly cloudModel: Repository<CloudEntity>,
-		@InjectRepository(CloudSourceEntity) private readonly sourceModel: Repository<CloudSourceEntity>
+		@InjectRepository(CloudSourceEntity) private readonly sourceModel: Repository<CloudSourceEntity>,
+		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>
 	) {}
 
 	/**创建音视频**/
-	public async nodeCreateCloud(props: DTO.NodeCreateCloudParameter) {
+	public async nodeCreateCloud(props: DTO.NodeCreateCloudParameter, uid: number) {
 		try {
 			let parent = null
 			let source = []
@@ -47,6 +49,7 @@ export class CloudService {
 				})
 			}
 
+			const user = await this.userModel.findOne({ where: { uid } })
 			const newCloud = await this.cloudModel.create({
 				type: props.type,
 				title: props.title,
@@ -59,7 +62,8 @@ export class CloudService {
 				size: props.size || 0,
 				description: props.description || null,
 				source,
-				parent
+				parent,
+				user
 			})
 			await this.cloudModel.save(newCloud)
 
@@ -166,12 +170,15 @@ export class CloudService {
 		try {
 			const cloud = await this.cloudModel.findOne({
 				where: { id: props.id },
-				relations: ['source', 'parent', 'children']
+				relations: ['source', 'parent', 'children', 'user']
 			})
 			if (!cloud) {
 				throw new HttpException('音视频媒体不存在', HttpStatus.BAD_REQUEST)
 			}
-			return cloud
+			return {
+				...cloud,
+				children: cloud.children.sort((a, b) => a.order - b.order)
+			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

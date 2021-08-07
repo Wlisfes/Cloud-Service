@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Delete, Body, Query } from '@nestjs/common'
+import { Controller, Post, Get, Put, Delete, Body, Query, Req } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { CloudService } from './cloud.service'
 import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
@@ -17,8 +17,8 @@ export class CloudController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCreateCloudResponse })
 	@Post('create')
-	async nodeCreateCloud(@Body() body: DTO.NodeCreateCloudParameter) {
-		return await this.cloudService.nodeCreateCloud(body)
+	async nodeCreateCloud(@Body() body: DTO.NodeCreateCloudParameter, @Req() req: { user: { uid: number } }) {
+		return await this.cloudService.nodeCreateCloud(body, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '修改音视频媒体' })
