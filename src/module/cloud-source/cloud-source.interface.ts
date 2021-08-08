@@ -146,7 +146,11 @@ export class NodeCloudSourceResponse extends PickType(CloudSourceResponse, [
  *
  * 分类标签列表-Parameter
  *************************************************************************************************/
-export class NodeCloudSourcesParameter extends PickType(CloudSourceParameter, ['size', 'page', 'status']) {}
+export class NodeCloudSourcesParameter extends PickType(CloudSourceParameter, ['size', 'page', 'status']) {
+	@ApiPropertyOptional({ description: '分类标签名称' })
+	@IsOptional({}, { string: true, number: true })
+	name: string
+}
 /**分类标签列表-Response**/
 export class NodeCloudSourcesResponse extends PickType(CloudSourceResponse, ['total', 'page', 'size']) {
 	@ApiProperty({

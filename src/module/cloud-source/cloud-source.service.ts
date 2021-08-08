@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, Not } from 'typeorm'
+import { Repository, Not, Like } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { CloudEntity } from '@/entity/cloud.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
@@ -104,7 +104,13 @@ export class CloudSourceService {
 		try {
 			const [list = [], total = 0] = await this.sourceModel.findAndCount({
 				where: {
-					status: isEmpty(props.status) ? Not(2) : props.status
+					status: isEmpty(props.status) ? Not(2) : props.status,
+					...(() => {
+						if (props.name) {
+							return { name: Like(`%${props.name}%`) }
+						}
+						return {}
+					})()
 				},
 				order: {
 					order: 'DESC',
