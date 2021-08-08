@@ -201,6 +201,10 @@ export class NodeCloudsParameter extends PickType(CloudParameter, ['page', 'size
 	@IsOptional({}, { string: true, number: true })
 	@Type(type => Number)
 	type: number
+
+	@ApiPropertyOptional({ description: '媒体标题' })
+	@IsOptional({}, { string: true, number: true })
+	title: string
 }
 /**音视频列表-Response**/
 export class NodeCloudsResponse extends PickType(CloudResponse, ['page', 'size', 'total']) {

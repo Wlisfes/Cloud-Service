@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, Not } from 'typeorm'
+import { Repository, In, Not, Like } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { CloudEntity } from '@/entity/cloud.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
@@ -23,10 +23,10 @@ export class CloudService {
 
 			if (props.parent) {
 				parent = await this.cloudModel.findOne({
-					where: [
-						{ id: props.parent, status: 0 },
-						{ id: props.parent, status: 1 }
-					]
+					where: {
+						id: props.parent,
+						status: Not(2)
+					}
 				})
 				if (!parent) {
 					throw new HttpException('父级媒体不存在', HttpStatus.BAD_REQUEST)
@@ -190,7 +190,13 @@ export class CloudService {
 			const [list = [], total = 0] = await this.cloudModel.findAndCount({
 				where: {
 					type: isEmpty(props.type) ? Not(10) : props.type,
-					status: isEmpty(props.status) ? Not(2) : props.status
+					status: isEmpty(props.status) ? Not(2) : props.status,
+					...(() => {
+						if (props.title) {
+							return { title: Like(`%${props.title}%`) } //%some sting%
+						}
+						return {}
+					})()
 				},
 				order: {
 					order: 'DESC',
