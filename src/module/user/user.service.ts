@@ -1,6 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, IsNull } from 'typeorm'
+import { Repository, IsNull, Not, Like } from 'typeorm'
+import { isEmpty } from 'class-validator'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
 import { JwtAuthService } from '@/module/jwt/jwt.service'
@@ -68,17 +69,7 @@ export class UserService {
 			if (await this.userModel.findOne({ where: { email: props.email } })) {
 				throw new HttpException('邮箱已注册', HttpStatus.BAD_REQUEST)
 			}
-			const newUser = await this.userModel.create({
-				nickname: props.nickname,
-				password: props.password,
-				email: props.email,
-				account: await this.createAccount()
-			})
-			const user = await this.userModel.save(newUser)
-			//注册成功删除redis中的邮箱验证码
-			await this.redisService.delStore(props.email)
 
-			//创建角色
 			const role = await this.roleModel.findOne({
 				where: {
 					parent: IsNull(),
@@ -86,6 +77,19 @@ export class UserService {
 					primary: 'super'
 				}
 			})
+
+			const newUser = await this.userModel.create({
+				nickname: props.nickname,
+				password: props.password,
+				email: props.email,
+				primary: role.primary,
+				account: await this.createAccount()
+			})
+			const user = await this.userModel.save(newUser)
+			//注册成功删除redis中的邮箱验证码
+			await this.redisService.delStore(props.email)
+
+			//创建角色
 			await this.createUserRole(user.uid, role.id)
 
 			//发送账户
@@ -108,8 +112,8 @@ export class UserService {
 				throw new HttpException('手机号已存在', HttpStatus.BAD_REQUEST)
 			}
 
+			const role = await this.roleModel.findOne({ where: { id: props.role } })
 			if (props.role) {
-				const role = await this.roleModel.findOne({ where: { id: props.role } })
 				if (!role) {
 					throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
 				} else if (role.status !== 1) {
@@ -121,6 +125,7 @@ export class UserService {
 				nickname: props.nickname,
 				password: props.password,
 				status: props.status,
+				primary: role.primary,
 				email: props.email || null,
 				mobile: props.mobile || null,
 				avatar: props.avatar || null,
@@ -325,14 +330,71 @@ export class UserService {
 	/**用户列表**/
 	public async nodeUsers(props: DTO.NodeUsersParameter) {
 		try {
+			const combine = (key: 'account' | 'nickname' | 'email' | 'mobile') => {
+				let where = { status: isEmpty(props.status) ? Not(10) : props.status }
+				if (props.keyword) {
+					where = { ...where, [key]: Like(`%${props.keyword}%`) }
+				}
+
+				if (props.primary) {
+					return {
+						...where,
+						primary: props.primary
+					}
+				}
+				return where
+			}
+
 			const [list = [], total = 0] = await this.userModel.findAndCount({
+				relations: ['role'],
+				where: [
+					{ ...(() => combine('account'))() },
+					{ ...(() => combine('email'))() },
+					{ ...(() => combine('mobile'))() },
+					{ ...(() => combine('nickname'))() }
+				],
 				order: {
 					uid: 'ASC'
 				},
-				relations: ['role'],
+
 				skip: (props.page - 1) * props.size,
 				take: props.size
 			})
+
+			// const Model = await this.userModel
+			// 	.createQueryBuilder('user')
+			// 	.leftJoinAndSelect('user.role', 'role', 'role.type = :type', { type: 1 })
+
+			// if (props.keyword) {
+			// 	Model.orWhere('user.account LIKE :account', {
+			// 		account: `%${props.keyword}%`
+			// 	})
+			// 		.orWhere('user.nickname LIKE :nickname', { nickname: `%${props.keyword}%` })
+			// 		.orWhere('user.email LIKE :email', { email: `%${props.keyword}%` })
+			// 		.orWhere('user.mobile LIKE :mobile', { mobile: `%${props.keyword}%` })
+			// }
+
+			// if (props.primary) {
+			// 	Model.andWhere('role.primary = :primary', { primary: props.primary })
+			// }
+
+			// if (!isEmpty(props.status)) {
+			// 	Model.andWhere('user.status = :status', { status: props.status })
+			// }
+
+			// const [list = [], total = 0] = await Model.orderBy({
+			// 	'user.uid': 'ASC'
+			// })
+			// 	.skip((props.page - 1) * props.size)
+			// 	.take(props.size)
+			// 	.getManyAndCount()
+
+			// return {
+			// 	total,
+			// 	size: props.size,
+			// 	page: props.page,
+			// 	list
+			// }
 
 			return {
 				total,

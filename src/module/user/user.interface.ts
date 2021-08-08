@@ -148,7 +148,20 @@ export class NodeUidUserParameter extends PickType(UserParameter, ['uid']) {}
 export class NodeUserResponse extends OmitType(UserInterface, ['total']) {}
 
 /**用户列表-Parameter******************************************************************************/
-export class NodeUsersParameter extends PickType(UserParameter, ['page', 'size']) {}
+export class NodeUsersParameter extends PickType(UserParameter, ['page', 'size']) {
+	@ApiPropertyOptional({ description: '状态', enum: [0, 1, 2] })
+	@IsOptional({}, { string: true, number: true })
+	@Type(type => Number)
+	status: number
+
+	@ApiPropertyOptional({ description: '角色标识' })
+	@IsOptional({}, { string: true, number: true })
+	primary: string
+
+	@ApiPropertyOptional({ description: '关键字' })
+	@IsOptional({}, { string: true })
+	keyword: string
+}
 /**用户列表-Response**/
 export class NodeUsersResponse extends PickType(UserInterface, ['total']) {
 	@ApiProperty({ description: '用户列表', type: [OmitType(UserInterface, ['total'])], example: [] })

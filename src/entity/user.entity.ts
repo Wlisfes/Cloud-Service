@@ -16,6 +16,9 @@ export class UserEntity extends DateEntity {
 	@Column({ type: 'double', comment: 'uid', readonly: true })
 	uid: number
 
+	@Column({ comment: '角色标识', nullable: false, default: 'admin' })
+	primary: string
+
 	@Column({ comment: '账户', type: 'int', readonly: true })
 	account: number
 
@@ -49,13 +52,7 @@ export class UserEntity extends DateEntity {
 	})
 	password: string
 
-	@Column({
-		comment: '状态',
-		type: 'enum',
-		enum: [0, 1],
-		default: 1,
-		nullable: false
-	})
+	@Column({ comment: '状态', default: 1, nullable: false })
 	status: number
 
 	@OneToMany(

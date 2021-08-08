@@ -176,6 +176,7 @@ export class RoleService {
 					comment: props.comment
 				}
 			)
+			await this.userModel.update({ uid: props.uid }, { primary: node.primary })
 			const { losence, resence } = inteRole(role.children, props.role)
 			await this.roleModel.update({ id: In(losence) }, { status: 0 })
 			await this.roleModel.update({ id: In(resence) }, { status: 1 })
