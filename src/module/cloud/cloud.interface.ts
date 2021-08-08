@@ -196,30 +196,15 @@ export class NodeCloudResponse extends IntersectionType(
  *
  * 音视频列表-Parameter
  *************************************************************************************************/
-export class NodeCloudsParameter extends PickType(CloudParameter, ['page', 'size', 'status']) {}
+export class NodeCloudsParameter extends PickType(CloudParameter, ['page', 'size', 'status']) {
+	@ApiPropertyOptional({ description: '媒体类型: 1.单集媒体 2.多集媒体', enum: [1, 2], example: 1 })
+	@IsOptional({}, { string: true, number: true })
+	@Type(type => Number)
+	type: number
+}
 /**音视频列表-Response**/
 export class NodeCloudsResponse extends PickType(CloudResponse, ['page', 'size', 'total']) {
-	@ApiProperty({
-		description: '音视频列表',
-		type: [NodeCloudResponse],
-		example: []
-	})
-	list: CloudResponse[]
-}
-
-/**
- *
- *
- * 多集媒体目录列表-Parameter
- *************************************************************************************************/
-export class NodeMultipleCloudsParameter extends PickType(CloudParameter, ['page', 'size']) {}
-/**多集媒体目录列表-Response**/
-export class NodeMultipleCloudsResponse extends PickType(CloudResponse, ['page', 'size', 'total']) {
-	@ApiProperty({
-		description: '多集媒体目录列表',
-		type: [NodeCloudResponse],
-		example: []
-	})
+	@ApiProperty({ description: '音视频列表', type: [NodeCloudResponse], example: [] })
 	list: CloudResponse[]
 }
 

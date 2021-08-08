@@ -189,6 +189,7 @@ export class CloudService {
 		try {
 			const [list = [], total = 0] = await this.cloudModel.findAndCount({
 				where: {
+					type: isEmpty(props.type) ? Not(10) : props.type,
 					status: isEmpty(props.status) ? Not(2) : props.status
 				},
 				order: {
@@ -198,34 +199,6 @@ export class CloudService {
 				skip: (props.page - 1) * props.size,
 				take: props.size
 			})
-
-			return {
-				size: props.size,
-				page: props.page,
-				total,
-				list
-			}
-		} catch (e) {
-			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	/**多集媒体目录列表**/
-	public async nodeMultipleClouds(props: DTO.NodeMultipleCloudsParameter) {
-		try {
-			const [list = [], total = 0] = await this.cloudModel.findAndCount({
-				where: [
-					{ status: 0, type: 2 },
-					{ status: 1, type: 2 }
-				],
-				order: {
-					order: 'DESC',
-					createTime: 'DESC'
-				},
-				skip: (props.page - 1) * props.size,
-				take: props.size
-			})
-
 			return {
 				size: props.size,
 				page: props.page,
