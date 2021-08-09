@@ -125,7 +125,7 @@ export class UserController {
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeUsersResponse })
-	@Get('list')
+	@Get('list-node')
 	async nodeUsers(@Query() query: DTO.NodeUsersParameter) {
 		return await this.userService.nodeUsers(query)
 	}

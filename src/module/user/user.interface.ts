@@ -149,7 +149,7 @@ export class NodeUserResponse extends OmitType(UserInterface, ['total']) {}
 
 /**用户列表-Parameter******************************************************************************/
 export class NodeUsersParameter extends PickType(UserParameter, ['page', 'size']) {
-	@ApiPropertyOptional({ description: '状态', enum: [0, 1, 2] })
+	@ApiPropertyOptional({ description: '用户状态：0.已禁用 1.已启用', enum: [0, 1] })
 	@IsOptional({}, { string: true, number: true })
 	@Type(type => Number)
 	status: number

@@ -60,7 +60,7 @@ export class MenuController {
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeMenusResponse })
-	@Get('list')
+	@Get('list-node')
 	public async nodeMenus() {
 		return await this.menuService.nodeMenus()
 	}
