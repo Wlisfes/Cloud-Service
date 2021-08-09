@@ -32,6 +32,9 @@ export class CloudEntity extends DateEntity {
 	@Column({ nullable: false, default: 0, comment: '排序号' })
 	order: number
 
+	@Column({ nullable: false, default: 0, comment: '播放量' })
+	browse: number
+
 	@Column({ nullable: false, default: 0, comment: '媒体文件大小' })
 	size: number
 

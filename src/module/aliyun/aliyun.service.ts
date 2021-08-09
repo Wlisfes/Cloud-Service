@@ -1,7 +1,10 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common'
 import { RPCClient, CLIENT, CLIENT_CONFIG, Config } from './aliyun.provider'
 import { OSS_CONST, OSS_STS_CONST, OSS_OPTIONS, OSSOptions } from './aliyun.provider'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 import { UtilsService } from '@/module/utils/utils.service'
+import { CloudEntity } from '@/entity/cloud.entity'
 import * as OSS from 'ali-oss'
 import * as DTO from './aliyun.interface'
 
@@ -13,6 +16,7 @@ export class AliyunService {
 		@Inject(OSS_CONST) protected readonly ossClient: OSS,
 		@Inject(OSS_STS_CONST) protected readonly stsClient: OSS.STS,
 		@Inject(OSS_OPTIONS) protected readonly ossOptions: OSSOptions,
+		@InjectRepository(CloudEntity) private readonly cloudModel: Repository<CloudEntity>,
 		private readonly utilsService: UtilsService
 	) {}
 
@@ -102,14 +106,13 @@ export class AliyunService {
 	/**获取播放信息**/
 	async createPlayInfo(prosp: DTO.CreatePlayInfo) {
 		try {
+			const cloud = await this.cloudModel.findOne({ where: { key: prosp.VideoId } })
+			await this.cloudModel.update({ id: cloud.id }, { browse: cloud.browse + 1 })
 			const { RequestId, VideoBase, PlayInfoList } = await this.client.request(
 				'GetPlayInfo',
 				{
 					VideoId: prosp.VideoId,
 					AuthTimeout: prosp.AuthTimeout,
-					Formats: 'mp4,flv',
-					OutputType: 'cdn',
-					StreamType: 'video,audio',
 					Definition: 'HD,4k',
 					ResultType: 'Multiple'
 				},
@@ -131,7 +134,6 @@ export class AliyunService {
 			return { RequestId, base, list: [] }
 		} catch (e) {
 			return { RequestId: null, base: null, list: [] }
-			//throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 

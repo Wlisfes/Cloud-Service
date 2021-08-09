@@ -9,6 +9,7 @@ import { UserEntity } from '@/entity/user.entity'
 @Module({
 	imports: [TypeOrmModule.forFeature([CloudEntity, CloudSourceEntity, UserEntity])],
 	providers: [CloudService],
-	controllers: [CloudController]
+	controllers: [CloudController],
+	exports: [CloudService]
 })
 export class CloudModule {}
