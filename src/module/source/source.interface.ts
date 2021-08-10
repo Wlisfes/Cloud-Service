@@ -79,7 +79,7 @@ export class SourceParameter {
 /**
  *
  *
- * 创建分类标签-Parameter
+ * 创建标签-Parameter
  *************************************************************************************************/
 export class NodeCreateSourceParameter extends PickType(SourceParameter, [
 	'name',
@@ -88,8 +88,87 @@ export class NodeCreateSourceParameter extends PickType(SourceParameter, [
 	'status',
 	'comment'
 ]) {}
-/**创建分类标签-Response**/
+/**创建标签-Response**/
 export class NodeCreateSourceResponse {
 	@ApiProperty({ description: 'message', example: '创建成功' })
+	message: string
+}
+
+/**
+ *
+ *
+ * 修改标签-Parameter
+ *************************************************************************************************/
+export class NodeUpdateSourceParameter extends PickType(SourceParameter, [
+	'id',
+	'name',
+	'color',
+	'order',
+	'status',
+	'comment'
+]) {}
+/**修改标签-Response**/
+export class NodeUpdateSourceResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
+
+/**
+ *
+ *
+ * 切换标签状态-Parameter
+ *************************************************************************************************/
+export class NodeSourceCutoverParameter extends PickType(SourceParameter, ['id']) {}
+/**切换标签状态-Response**/
+export class NodeSourceCutoverResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
+
+/**
+ *
+ *
+ * 标签信息-Parameter
+ *************************************************************************************************/
+export class NodeSourceParameter extends PickType(SourceParameter, ['id']) {}
+/**标签信息-Response**/
+export class NodeSourceResponse extends PickType(SourceResponse, [
+	'id',
+	'name',
+	'color',
+	'order',
+	'status',
+	'comment'
+]) {}
+
+/**
+ *
+ *
+ * 标签列表-Parameter
+ *************************************************************************************************/
+export class NodeSourcesParameter extends PickType(SourceParameter, ['size', 'page', 'status']) {
+	@ApiPropertyOptional({ description: '分类标签名称' })
+	@IsOptional({}, { string: true, number: true })
+	name: string
+}
+/**标签列表-Response**/
+export class NodeSourcesResponse extends PickType(SourceResponse, ['total', 'page', 'size']) {
+	@ApiProperty({
+		description: '分类标签列表',
+		type: [PickType(SourceResponse, ['id', 'name', 'color', 'status', 'order', 'comment'])],
+		example: []
+	})
+	list: SourceResponse[]
+}
+
+/**
+ *
+ *
+ * 删除分类标签-Parameter
+ *************************************************************************************************/
+export class NodeDeleteSourceParameter extends PickType(SourceParameter, ['id']) {}
+/**删除分类标签-Response**/
+export class NodeDeleteSourceResponse {
+	@ApiProperty({ description: 'message', example: '删除成功' })
 	message: string
 }
