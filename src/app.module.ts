@@ -16,6 +16,8 @@ import { RoleEntity } from '@/entity/role.entity'
 import { MenuEntity } from '@/entity/menu.entity'
 import { CloudEntity } from '@/entity/cloud.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
+import { SourceEntity } from '@/entity/source.entity'
+import { ArticleEntity } from '@/entity/article.entity'
 
 @Module({
 	imports: [
@@ -28,7 +30,15 @@ import { CloudSourceEntity } from '@/entity/cloud.source.entity'
 				pollTimeout: 60 // 连接有效60秒
 			}
 		}),
-		TypeOrmModule.forFeature([UserEntity, RoleEntity, MenuEntity, CloudEntity, CloudSourceEntity]),
+		TypeOrmModule.forFeature([
+			UserEntity,
+			RoleEntity,
+			MenuEntity,
+			CloudEntity,
+			CloudSourceEntity,
+			SourceEntity,
+			ArticleEntity
+		]),
 		InitModule
 	],
 	controllers: [AppController],

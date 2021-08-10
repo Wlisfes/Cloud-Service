@@ -26,5 +26,5 @@ export class CloudSourceEntity extends DateEntity {
 		type => CloudEntity,
 		cloud => cloud.source
 	)
-	cloud: CloudEntity
+	cloud: CloudEntity[]
 }
