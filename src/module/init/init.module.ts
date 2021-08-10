@@ -15,6 +15,8 @@ import { UserModule } from '@/module/user/user.module'
 import { MenuModule } from '@/module/menu/menu.module'
 import { CloudModule } from '@/module/cloud/cloud.module'
 import { CloudSourceModule } from '@/module/cloud-source/cloud-source.module'
+import { SourceModule } from '@/module/source/source.module'
+import { ArticleModule } from '@/module/article/article.module'
 
 @Module({
 	imports: [
@@ -76,7 +78,9 @@ import { CloudSourceModule } from '@/module/cloud-source/cloud-source.module'
 		UserModule,
 		MenuModule,
 		CloudModule,
-		CloudSourceModule
+		CloudSourceModule,
+		SourceModule,
+		ArticleModule
 	],
 	providers: [InitService]
 })
