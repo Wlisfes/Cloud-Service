@@ -17,7 +17,7 @@ export class ArticleEntity extends DateEntity {
 	@Column({ type: 'text', nullable: false, comment: '文章内容' })
 	content: string
 
-	@Column({ nullable: true, default: null, comment: '原文连接' })
+	@Column({ nullable: true, default: null, comment: '跳转链接' })
 	url: string
 
 	@Column({ nullable: false, default: 1, comment: '文章状态: 0.禁用 1.启用 2.删除' })

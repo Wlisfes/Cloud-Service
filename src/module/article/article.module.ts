@@ -4,9 +4,10 @@ import { ArticleController } from './article.controller'
 import { ArticleService } from './article.service'
 import { ArticleEntity } from '@/entity/article.entity'
 import { SourceEntity } from '@/entity/source.entity'
+import { UserEntity } from '@/entity/user.entity'
 
 @Module({
-	imports: [TypeOrmModule.forFeature([SourceEntity, ArticleEntity])],
+	imports: [TypeOrmModule.forFeature([UserEntity, SourceEntity, ArticleEntity])],
 	controllers: [ArticleController],
 	providers: [ArticleService]
 })
