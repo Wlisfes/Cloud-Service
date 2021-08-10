@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Repository, IsNull } from 'typeorm'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
-import { roles, RolesConfig } from '@/config/role.config'
+import { roles as R, RolesConfig, Auth, Action } from '@/config/role.config'
+import * as _ from 'lodash'
 
 @Injectable()
 export class AppService {
@@ -13,14 +14,14 @@ export class AppService {
 	) {}
 
 	onApplicationBootstrap() {
-		this.init()
+		// this.init()
 	}
 
 	private async init() {
 		try {
-			await this.initRole(roles)
+			await this.initRole(_.cloneDeep(R))
 			console.log('角色初始化完毕')
-			await this.initAdminUser(roles.find(k => k.primary === 'admin'))
+			await this.initAdminUser(_.cloneDeep(R.filter(k => k.primary === 'admin')))
 			console.log('管理员初始化成功  账户:88888888  password:88888888')
 		} catch (e) {
 			console.log(e)
@@ -28,49 +29,122 @@ export class AppService {
 	}
 
 	/**初始化角色**/
-	private async initRole(roles: RolesConfig[]) {
-		try {
-			roles.map(async props => {
-				const role = await this.roleModel.findOne({ where: { primary: props.primary } })
-				if (!role) {
-					const newRole = await this.roleModel.create({
-						primary: props.primary,
-						name: props.name,
-						status: props.status,
-						type: props.type
-					})
-					const roleParent = await this.roleModel.save(newRole)
-					props.auth.forEach(async auth => {
-						const newAuth = await this.roleModel.create({
-							primary: auth.primary,
-							name: auth.name,
-							status: auth.status,
-							type: auth.type,
-							parent: roleParent
+	private initRole(roles: RolesConfig[], uid?: number) {
+		return new Promise(async resolve => {
+			try {
+				if (roles.length > 0) {
+					let user = null
+					const props = roles.shift()
+
+					if (uid) {
+						user = await this.userModel.findOne({ where: { uid } })
+					}
+					if (
+						!(await this.roleModel.findOne({
+							where: { primary: props.primary, user: user ? user : IsNull() }
+						}))
+					) {
+						const newRole = await this.roleModel.create({
+							primary: props.primary,
+							name: props.name,
+							status: props.status,
+							type: props.type,
+							user: user ? user : IsNull()
 						})
-						const authParent = await this.roleModel.save(newAuth)
-						auth.action.forEach(async action => {
-							const newAction = await this.roleModel.create({
-								primary: action.primary,
-								name: action.name,
-								status: action.status,
-								type: action.type,
-								parent: authParent
-							})
-							await this.roleModel.save(newAction)
-						})
+						await this.roleModel.save(newRole)
+					}
+
+					const role = await this.roleModel.findOne({
+						where: { primary: props.primary, user: user ? user : IsNull() }
 					})
+					await this.initAuth(role.id, _.cloneDeep(props.auth), uid)
+					await this.initRole(roles, uid)
+
+					resolve(true)
+				} else {
+					resolve(true)
 				}
-			})
-			return true
-		} catch (e) {
-			console.log(e)
-		}
+			} catch (e) {
+				console.log('initRole', e)
+			}
+		})
+	}
+
+	/**初始化权限模块**/
+	private initAuth(parentId: number, auths: Auth[], uid?: number) {
+		return new Promise(async resolve => {
+			try {
+				if (auths.length > 0) {
+					let user = null
+					const props = auths.shift()
+					if (uid) {
+						user = await this.userModel.findOne({ where: { uid } })
+					}
+
+					const parent = await this.roleModel.findOne({ where: { id: parentId } })
+					if (!(await this.roleModel.findOne({ where: { primary: props.primary, parent } }))) {
+						const newAuth = await this.roleModel.create({
+							primary: props.primary,
+							name: props.name,
+							status: props.status,
+							type: props.type,
+							parent,
+							user
+						})
+						await this.roleModel.save(newAuth)
+					}
+					const auth = await this.roleModel.findOne({ where: { primary: props.primary, parent } })
+					await this.initAction(auth.id, _.cloneDeep(props.action), uid)
+					await this.initAuth(parentId, auths, uid)
+
+					resolve(true)
+				} else {
+					resolve(true)
+				}
+			} catch (e) {
+				console.log('initAuth', e)
+			}
+		})
+	}
+
+	/**初始化权限**/
+	private initAction(parentId: number, actions: Action[], uid?: number) {
+		return new Promise(async resolve => {
+			try {
+				if (actions.length > 0) {
+					let user = null
+					const props = actions.shift()
+
+					if (uid) {
+						user = await this.userModel.findOne({ where: { uid } })
+					}
+					const parent = await this.roleModel.findOne({ where: { id: parentId } })
+					if (!(await this.roleModel.findOne({ where: { primary: props.primary, parent } }))) {
+						const newAction = await this.roleModel.create({
+							primary: props.primary,
+							name: props.name,
+							status: props.status,
+							type: props.type,
+							parent,
+							user
+						})
+						await this.roleModel.save(newAction)
+					}
+					await this.initAction(parentId, actions, uid)
+
+					resolve(true)
+				} else {
+					resolve(true)
+				}
+			} catch (e) {
+				console.log('initAction', e)
+			}
+		})
 	}
 
 	/**初始化管理员**/
-	private async initAdminUser(props: RolesConfig) {
-		try {
+	private initAdminUser(props: RolesConfig[]) {
+		return new Promise(async resolve => {
 			if (!(await this.userModel.findOne({ where: { account: 88888888 } }))) {
 				const newUser = await this.userModel.create({
 					account: 88888888,
@@ -81,43 +155,9 @@ export class AppService {
 			}
 
 			const user = await this.userModel.findOne({ where: { account: 88888888 } })
-			const role = await this.roleModel.findOne({ where: { primary: props.primary, user } })
-			if (!role) {
-				const newRole = await this.roleModel.create({
-					primary: props.primary,
-					name: props.name,
-					status: props.status,
-					type: props.type,
-					user
-				})
-				const roleParent = await this.roleModel.save(newRole)
-				props.auth.forEach(async auth => {
-					const newAuth = await this.roleModel.create({
-						primary: auth.primary,
-						name: auth.name,
-						status: auth.status,
-						type: auth.type,
-						parent: roleParent,
-						user
-					})
-					const authParent = await this.roleModel.save(newAuth)
-					auth.action.forEach(async action => {
-						const newAction = await this.roleModel.create({
-							primary: action.primary,
-							name: action.name,
-							status: action.status,
-							type: action.type,
-							parent: authParent,
-							user
-						})
-						await this.roleModel.save(newAction)
-					})
-				})
-			}
+			await this.initRole(props, user.uid)
 
-			return true
-		} catch (e) {
-			console.log(e)
-		}
+			resolve(true)
+		})
 	}
 }

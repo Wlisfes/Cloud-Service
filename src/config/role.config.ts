@@ -1,10 +1,10 @@
-interface Action {
+export interface Action {
 	primary: string
 	name: string
 	status: number
 	type: number
 }
-interface Auth extends Action {
+export interface Auth extends Action {
 	action: Action[]
 }
 export interface RolesConfig extends Action {
@@ -41,19 +41,25 @@ const auth = {
 		{ primary: 'user', name: '用户管理', status: 1, type: 2, action: action.admin },
 		{ primary: 'role', name: '角色管理', status: 1, type: 2, action: action.admin },
 		{ primary: 'menu', name: '菜单管理', status: 1, type: 2, action: action.admin },
-		{ primary: 'cloud', name: '云点播管理', status: 1, type: 2, action: action.admin }
+		{ primary: 'cloud', name: '云点播管理', status: 1, type: 2, action: action.admin },
+		{ primary: 'source', name: '标签管理', status: 1, type: 2, action: action.admin },
+		{ primary: 'article', name: '文章管理', status: 1, type: 2, action: action.admin }
 	],
 	super: [
 		{ primary: 'user', name: '用户管理', status: 1, type: 2, action: action.user },
 		{ primary: 'role', name: '角色管理', status: 1, type: 2, action: action.user },
 		{ primary: 'menu', name: '菜单管理', status: 1, type: 2, action: action.user },
-		{ primary: 'cloud', name: '云点播管理', status: 1, type: 2, action: action.user }
+		{ primary: 'cloud', name: '云点播管理', status: 1, type: 2, action: action.user },
+		{ primary: 'source', name: '标签管理', status: 1, type: 2, action: action.user },
+		{ primary: 'article', name: '文章管理', status: 1, type: 2, action: action.user }
 	],
 	visitor: [
 		{ primary: 'user', name: '用户管理', status: 1, type: 2, action: action.visitor },
 		{ primary: 'role', name: '角色管理', status: 1, type: 2, action: action.visitor },
 		{ primary: 'menu', name: '菜单管理', status: 1, type: 2, action: action.visitor },
-		{ primary: 'cloud', name: '云点播管理', status: 1, type: 2, action: action.visitor }
+		{ primary: 'cloud', name: '云点播管理', status: 1, type: 2, action: action.visitor },
+		{ primary: 'source', name: '标签管理', status: 1, type: 2, action: action.visitor },
+		{ primary: 'article', name: '文章管理', status: 1, type: 2, action: action.visitor }
 	]
 }
 
