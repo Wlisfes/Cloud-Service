@@ -88,6 +88,18 @@ export class MenuController {
 		return await this.menuService.nodeUpdateMenu(body)
 	}
 
+	@ApiOperation({ summary: '切换菜单状态' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin'], module: 'menu', action: 'update' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeMenuCutoverResponse })
+	@Put('cutover')
+	public async nodeMenuCutover(@Body() body: DTO.NodeMenuCutoverParameter) {
+		return await this.menuService.nodeMenuCutover(body)
+	}
+
 	@ApiOperation({ summary: '删除菜单' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })

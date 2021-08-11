@@ -1,6 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { isEmpty } from 'class-validator'
 import { UtilsService } from '@/module/utils/utils.service'
 import { UserEntity } from '@/entity/user.entity'
 import { MenuEntity } from '@/entity/menu.entity'
@@ -33,7 +34,7 @@ export class MenuService {
 				router: props.router || null,
 				path: props.path || null,
 				keepAlive: props.keepAlive || 0,
-				status: props.status || 0,
+				visible: props.visible || 1,
 				icon: props.icon || null,
 				order: props.order || 0,
 				parent
@@ -153,10 +154,32 @@ export class MenuService {
 					router: props.router || null,
 					path: props.path || null,
 					keepAlive: props.keepAlive || 0,
-					status: props.status || 0,
+					visible: isEmpty(props.visible) ? node.id : props.visible,
 					icon: props.icon || null,
 					order: props.order || 0,
 					parent
+				}
+			)
+
+			return { message: '修改成功' }
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**切换菜单状态**/
+	public async nodeMenuCutover(props: DTO.NodeMenuCutoverParameter) {
+		try {
+			const menu = await this.menuModel.findOne({ where: { id: props.id } })
+			if (!menu) {
+				throw new HttpException('菜单节点不存在', HttpStatus.BAD_REQUEST)
+			} else if (menu.status === 2) {
+				throw new HttpException('菜单节点已删除', HttpStatus.BAD_REQUEST)
+			}
+			await this.menuModel.update(
+				{ id: props.id },
+				{
+					status: menu.status ? 0 : 1
 				}
 			)
 
@@ -172,6 +195,8 @@ export class MenuService {
 			const node = await this.menuModel.findOne({ where: { id: props.id } })
 			if (!node) {
 				throw new HttpException('菜单节点不存在', HttpStatus.BAD_REQUEST)
+			} else if (node.status === 2) {
+				throw new HttpException('菜单节点已删除', HttpStatus.BAD_REQUEST)
 			}
 			await this.menuModel.update({ id: props.id }, { status: 2 })
 			return { message: '删除成功' }

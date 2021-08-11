@@ -22,7 +22,10 @@ export class MenuResponse {
 	@ApiPropertyOptional({ description: '路由缓存: 0.关闭 1.开启', enum: [0, 1], example: 1 })
 	keepAlive: number
 
-	@ApiPropertyOptional({ description: '节点状态: 0.隐藏 1.显示', enum: [0, 1], example: 1 })
+	@ApiPropertyOptional({ description: '是否可见: 0.隐藏 1.显示', enum: [0, 1], example: 1 })
+	visible: number
+
+	@ApiPropertyOptional({ description: '节点状态: 0.禁用 1.启用 2.删除', enum: [0, 1, 2], example: 1 })
 	status: number
 
 	@ApiPropertyOptional({ description: '文件路径' })
@@ -67,6 +70,11 @@ export class MenuParameter {
 	@Type(type => Number)
 	keepAlive: number
 
+	@ApiPropertyOptional({ description: '是否可见: 0.隐藏 1.显示', enum: [0, 1], example: 1 })
+	@IsOptional({}, { string: true, number: true })
+	@Type(type => Number)
+	visible: number
+
 	@ApiPropertyOptional({ description: '节点状态: 0.隐藏 1.显示', enum: [0, 1] })
 	@IsOptional({}, { string: true, number: true })
 	@Type(type => Number)
@@ -97,7 +105,7 @@ export class MenuParameter {
  *************************************************************************************************/
 export class NodeCreateMenuParameter extends IntersectionType(
 	PickType(MenuParameter, ['type', 'name', 'parent', 'router']),
-	PickType(MenuParameter, ['keepAlive', 'status', 'path', 'icon', 'order'])
+	PickType(MenuParameter, ['keepAlive', 'visible', 'path', 'icon', 'order'])
 ) {}
 
 /**创建菜单-Response**/
@@ -177,12 +185,23 @@ export class NodeMenuResponse extends MenuResponse {}
  *************************************************************************************************/
 export class NodeUpdateParameter extends IntersectionType(
 	PickType(MenuParameter, ['id', 'type', 'name', 'parent', 'router']),
-	PickType(MenuParameter, ['keepAlive', 'status', 'path', 'icon', 'order'])
+	PickType(MenuParameter, ['keepAlive', 'visible', 'path', 'icon', 'order'])
 ) {}
-{
-}
+
 /** 修改菜单-Response**/
 export class NodeUpdateResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
+
+/**
+ *
+ *
+ * 切换菜单状态-Parameter
+ *************************************************************************************************/
+export class NodeMenuCutoverParameter extends PickType(MenuParameter, ['id']) {}
+/** 切换菜单状态-Response**/
+export class NodeMenuCutoverResponse {
 	@ApiProperty({ description: 'message', example: '修改成功' })
 	message: string
 }
