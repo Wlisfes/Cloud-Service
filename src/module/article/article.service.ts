@@ -55,14 +55,13 @@ export class ArticleService {
 	/**修改文章**/
 	public async nodeUpdateArticle(props: DTO.NodeUpdateArticleParameter) {
 		try {
-			let source = []
 			const article = await this.articleModel.findOne({ where: { id: props.id }, relations: ['source'] })
 			if (!article) {
 				throw new HttpException('文章不存在', HttpStatus.BAD_REQUEST)
 			}
 
 			if (props.source?.length > 0) {
-				source = await this.sourceModel.find({ where: { id: In(props.source) } })
+				const source = await this.sourceModel.find({ where: { id: In(props.source) } })
 				props.source.forEach(id => {
 					const element = source.find(element => element.id === id)
 					if (!element) {
@@ -93,8 +92,7 @@ export class ArticleService {
 					content: props.content,
 					url: props.url || null,
 					status: isEmpty(props.status) ? article.status : props.status,
-					order: props.order || 0,
-					source
+					order: props.order || 0
 				}
 			)
 
