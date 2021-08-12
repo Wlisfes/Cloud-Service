@@ -159,6 +159,11 @@ export class NodeArticlesParameter extends PickType(ArticleParameter, ['page', '
 	@ApiPropertyOptional({ description: '文章标题' })
 	@IsOptional({}, { string: true, number: true })
 	title: string
+
+	@ApiPropertyOptional({ description: '分类标签id' })
+	@IsOptional({}, { string: true, number: true })
+	@Type(type => Number)
+	source: number
 }
 /**文章列表-Response**/
 export class NodeArticlesResponse extends PickType(ArticleResponse, ['page', 'size', 'total']) {

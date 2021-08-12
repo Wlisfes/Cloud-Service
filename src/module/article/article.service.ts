@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, Not, Like } from 'typeorm'
+import { Repository, In, Not, Like, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { ArticleEntity } from '@/entity/article.entity'
 import { SourceEntity } from '@/entity/source.entity'
@@ -143,23 +143,30 @@ export class ArticleService {
 	/**文章列表**/
 	public async nodeArticles(props: DTO.NodeArticlesParameter) {
 		try {
-			const [list = [], total = 0] = await this.articleModel.findAndCount({
-				where: {
-					status: isEmpty(props.status) ? Not(2) : props.status,
-					...(() => {
-						if (props.title) {
-							return { title: Like(`%${props.title}%`) }
+			const [list = [], total = 0] = await this.articleModel
+				.createQueryBuilder('article')
+				.leftJoinAndSelect('article.source', 'source')
+				.where(
+					new Brackets(Q => {
+						if (isEmpty(props.status)) {
+							Q.andWhere('article.status != :status', { status: 2 })
+						} else {
+							Q.andWhere('article.status = :status', { status: props.status })
 						}
-						return {}
-					})()
-				},
-				order: {
-					order: 'DESC',
-					createTime: 'DESC'
-				},
-				skip: (props.page - 1) * props.size,
-				take: props.size
-			})
+
+						if (props.title) {
+							Q.andWhere('article.title LIKE :title', { title: `%${props.title}%` })
+						}
+
+						if (props.source) {
+							Q.andWhere('source.id = :source', { source: props.source })
+						}
+					})
+				)
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.getManyAndCount()
+
 			return {
 				size: props.size,
 				page: props.page,
