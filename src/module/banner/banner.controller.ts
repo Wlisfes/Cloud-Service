@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiHeader } from '@nestjs/swagger'
+import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse } from '@nestjs/swagger'
 import { BannerService } from './banner.service'
+import * as DTO from './banner.interface'
 
 @ApiTags('Banner模块')
 @Controller('banner')
@@ -8,8 +9,11 @@ export class BannerController {
 	constructor(private readonly bannerService: BannerService) {}
 
 	@ApiOperation({ summary: '获取近一周bing壁纸' })
-	@Get('/bing')
-	async getBannerBing() {
-		return await this.bannerService.getBannerBing()
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeBannerResponse })
+	@Get()
+	async nodeBanner() {
+		return await this.bannerService.nodeBanner()
 	}
 }

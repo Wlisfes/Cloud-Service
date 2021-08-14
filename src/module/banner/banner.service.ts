@@ -1,14 +1,16 @@
-import { Injectable, HttpService } from '@nestjs/common'
+import { Injectable, HttpService, HttpException, HttpStatus } from '@nestjs/common'
+import { map } from 'rxjs/operators'
+import * as DTO from './banner.interface'
 
 @Injectable()
 export class BannerService {
 	constructor(private readonly httpService: HttpService) {}
 
 	//代理bing壁纸
-	async getBannerBing() {
+	async nodeBanner() {
 		try {
-			const response = await this.httpService
-				.request({
+			return await this.httpService
+				.request<{ images: Array<DTO.BingResponse> }>({
 					url: `https://cn.bing.com/HPImageArchive.aspx`,
 					method: 'GET',
 					params: {
@@ -18,9 +20,19 @@ export class BannerService {
 						mkt: 'zh-CN'
 					}
 				})
-				.toPromise()
-
-			return response.data.images
-		} catch (error) {}
+				.pipe(
+					map(response => {
+						return (response.data.images || []).map(k => ({
+							start: k.startdate,
+							end: k.enddate,
+							cover: `https://www.bing.com${k.url}`,
+							name: k.copyright,
+							search: k.copyright
+						}))
+					})
+				)
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
 	}
 }
