@@ -27,7 +27,7 @@ export class BannerService {
 							end: k.enddate,
 							cover: `https://www.bing.com${k.url}`,
 							name: k.copyright,
-							search: k.copyright
+							search: k.copyrightlink
 						}))
 					})
 				)
