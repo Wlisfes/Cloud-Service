@@ -85,7 +85,9 @@ export class UserService {
 				primary: role.primary,
 				account: await this.createAccount()
 			})
-			const user = await this.userModel.save(newUser)
+			const { uid } = await this.userModel.save(newUser)
+			const user = await this.nodeUidUser(uid, true)
+
 			//注册成功删除redis中的邮箱验证码
 			await this.redisService.delStore(props.email)
 
@@ -95,7 +97,12 @@ export class UserService {
 			//发送账户
 			await this.nodemailerService.registerSend(user.account, user.email)
 
-			return { message: '注册成功' }
+			const { token } = await this.jwtAuthService.signature({
+				uid: user.uid,
+				password: user.password
+			})
+
+			return { token, message: '注册成功' }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
