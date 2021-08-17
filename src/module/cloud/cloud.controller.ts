@@ -67,6 +67,15 @@ export class CloudController {
 		return await this.cloudService.nodeClouds(query, req.user.uid)
 	}
 
+	@ApiOperation({ summary: '每日推荐' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCloudsResponse })
+	@Get('list-rcmd-node')
+	async nodeRcmdCloud() {
+		return await this.cloudService.nodeRcmdCloud()
+	}
+
 	@ApiOperation({ summary: '删除音视频媒体' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })

@@ -218,6 +218,25 @@ export class CloudService {
 		}
 	}
 
+	/**每日推荐**/
+	public async nodeRcmdCloud() {
+		try {
+			const list = await this.cloudModel.find({
+				relations: ['user'],
+				skip: 1,
+				take: 12
+			})
+			return {
+				size: 12,
+				page: 1,
+				total: list.length,
+				list
+			}
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
 	/**删除音视频媒体**/
 	public async nodeDeleteCloud(props: DTO.NodeDeleteCloudParameter) {
 		try {
