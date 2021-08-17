@@ -185,10 +185,12 @@ export class CloudService {
 	}
 
 	/**音视频列表**/
-	public async nodeClouds(props: DTO.NodeCloudsParameter) {
+	public async nodeClouds(props: DTO.NodeCloudsParameter, uid: number) {
 		try {
+			const user = await this.userModel.findOne({ where: { uid } })
 			const [list = [], total = 0] = await this.cloudModel.findAndCount({
 				where: {
+					user,
 					type: isEmpty(props.type) ? Not(10) : props.type,
 					status: isEmpty(props.status) ? Not(2) : props.status,
 					...(() => {

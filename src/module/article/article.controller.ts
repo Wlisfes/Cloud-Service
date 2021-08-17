@@ -55,12 +55,14 @@ export class ArticleController {
 	}
 
 	@ApiOperation({ summary: '文章列表' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeArticlesResponse })
 	@Get('list-node')
-	async nodeArticles(@Query() query: DTO.NodeArticlesParameter) {
-		return await this.articleService.nodeArticles(query)
+	async nodeArticles(@Query() query: DTO.NodeArticlesParameter, @Req() req: { user: { uid: number } }) {
+		return await this.articleService.nodeArticles(query, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '删除文章' })

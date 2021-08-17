@@ -63,8 +63,8 @@ export class CloudController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCloudsResponse })
 	@Get('list-node')
-	async nodeClouds(@Query() query: DTO.NodeCloudsParameter) {
-		return await this.cloudService.nodeClouds(query)
+	async nodeClouds(@Query() query: DTO.NodeCloudsParameter, @Req() req: { user: { uid: number } }) {
+		return await this.cloudService.nodeClouds(query, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '删除音视频媒体' })

@@ -141,13 +141,16 @@ export class ArticleService {
 	}
 
 	/**文章列表**/
-	public async nodeArticles(props: DTO.NodeArticlesParameter) {
+	public async nodeArticles(props: DTO.NodeArticlesParameter, uid: number) {
 		try {
 			const [list = [], total = 0] = await this.articleModel
 				.createQueryBuilder('article')
 				.leftJoinAndSelect('article.source', 'source')
+				.leftJoinAndSelect('article.user', 'user')
 				.where(
 					new Brackets(Q => {
+						Q.where('user.uid = :uid', { uid })
+
 						if (isEmpty(props.status)) {
 							Q.andWhere('article.status != :status', { status: 2 })
 						} else {
