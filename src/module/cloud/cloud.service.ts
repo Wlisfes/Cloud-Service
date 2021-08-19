@@ -223,6 +223,13 @@ export class CloudService {
 		try {
 			const list = await this.cloudModel.find({
 				relations: ['user'],
+				where: {
+					status: 1
+				},
+				order: {
+					order: 'DESC',
+					createTime: 'DESC'
+				},
 				skip: 1,
 				take: 12
 			})

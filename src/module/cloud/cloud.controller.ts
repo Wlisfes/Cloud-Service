@@ -46,8 +46,6 @@ export class CloudController {
 	}
 
 	@ApiOperation({ summary: '音视频信息' })
-	@ApiBearerAuth(APP_AUTH_TOKEN)
-	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCloudResponse })
