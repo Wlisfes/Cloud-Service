@@ -15,7 +15,7 @@ export class CloudService {
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>
 	) {}
 
-	/**创建音视频**/
+	/**创建音视频-授权管理端**/
 	public async nodeCreateCloud(props: DTO.NodeCreateCloudParameter, uid: number) {
 		try {
 			let parent = null
@@ -73,7 +73,7 @@ export class CloudService {
 		}
 	}
 
-	/**修改音视频媒体**/
+	/**修改音视频媒体-授权管理端**/
 	public async nodeUpdateCloud(props: DTO.NodeUpdateCloudParameter) {
 		try {
 			let parent = null
@@ -143,7 +143,7 @@ export class CloudService {
 		}
 	}
 
-	/**切换音视频媒体状态**/
+	/**切换音视频媒体状态-授权管理端**/
 	public async nodeCloudCutover(props: DTO.NodeCloudCutoverParameter) {
 		try {
 			const cloud = await this.cloudModel.findOne({ where: { id: props.id } })
@@ -165,7 +165,7 @@ export class CloudService {
 		}
 	}
 
-	/**音视频信息**/
+	/**音视频信息-授权管理端**/
 	public async nodeCloud(props: DTO.NodeCloudParameter) {
 		try {
 			const cloud = await this.cloudModel.findOne({
@@ -184,7 +184,30 @@ export class CloudService {
 		}
 	}
 
-	/**音视频列表**/
+	/**音视频信息-客户端**/
+	public async nodeClientCloud(props: DTO.NodeCloudParameter) {
+		try {
+			const cloud = await this.cloudModel.findOne({
+				where: { id: props.id, status: 1 },
+				relations: ['source', 'parent', 'children', 'user']
+			})
+			if (!cloud) {
+				throw new HttpException('音视频媒体不存在', HttpStatus.BAD_REQUEST)
+			} else if (cloud.status === 0) {
+				throw new HttpException('音视频媒体已禁用', HttpStatus.BAD_REQUEST)
+			} else if (cloud.status === 2) {
+				throw new HttpException('音视频媒体已删除', HttpStatus.BAD_REQUEST)
+			}
+			return {
+				...cloud,
+				children: cloud.children.sort((a, b) => a.order - b.order)
+			}
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**音视频列表-授权管理端**/
 	public async nodeClouds(props: DTO.NodeCloudsParameter, uid: number) {
 		try {
 			const user = await this.userModel.findOne({ where: { uid } })
@@ -218,25 +241,31 @@ export class CloudService {
 		}
 	}
 
-	/**每日推荐**/
-	public async nodeRcmdCloud() {
+	/**音视频列表-客户端**/
+	public async nodeClientClouds(props: DTO.NodeClientCloudsParameter) {
 		try {
-			const list = await this.cloudModel.find({
-				relations: ['user'],
+			const [list = [], total = 0] = await this.cloudModel.findAndCount({
 				where: {
-					status: 1
+					type: isEmpty(props.type) ? Not(10) : props.type,
+					status: 1,
+					...(() => {
+						if (props.title) {
+							return { title: Like(`%${props.title}%`) }
+						}
+						return {}
+					})()
 				},
 				order: {
 					order: 'DESC',
 					createTime: 'DESC'
 				},
-				skip: 1,
-				take: 12
+				skip: (props.page - 1) * props.size,
+				take: props.size
 			})
 			return {
-				size: 12,
-				page: 1,
-				total: list.length,
+				size: props.size,
+				page: props.page,
+				total,
 				list
 			}
 		} catch (e) {
@@ -244,7 +273,7 @@ export class CloudService {
 		}
 	}
 
-	/**删除音视频媒体**/
+	/**删除音视频媒体-授权管理端**/
 	public async nodeDeleteCloud(props: DTO.NodeDeleteCloudParameter) {
 		try {
 			const cloud = await this.cloudModel.findOne({ where: { id: props.id } })
