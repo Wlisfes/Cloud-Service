@@ -82,7 +82,7 @@ export class CloudController {
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCloudResponse })
 	@Get('client/info')
 	async nodeClientCloud(@Query() query: DTO.NodeCloudParameter) {
-		return await this.cloudService.nodeCloud(query)
+		return await this.cloudService.nodeClientCloud(query)
 	}
 
 	@ApiOperation({ summary: '删除音视频媒体-授权管理端' })

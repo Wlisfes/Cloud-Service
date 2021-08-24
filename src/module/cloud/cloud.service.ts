@@ -188,7 +188,7 @@ export class CloudService {
 	public async nodeClientCloud(props: DTO.NodeCloudParameter) {
 		try {
 			const cloud = await this.cloudModel.findOne({
-				where: { id: props.id, status: 1 },
+				where: { id: props.id },
 				relations: ['source', 'parent', 'children', 'user']
 			})
 			if (!cloud) {
@@ -198,6 +198,7 @@ export class CloudService {
 			} else if (cloud.status === 2) {
 				throw new HttpException('音视频媒体已删除', HttpStatus.BAD_REQUEST)
 			}
+
 			return {
 				...cloud,
 				children: cloud.children.sort((a, b) => a.order - b.order)
@@ -255,6 +256,7 @@ export class CloudService {
 						return {}
 					})()
 				},
+				relations: ['user'],
 				order: {
 					order: 'DESC',
 					createTime: 'DESC'
