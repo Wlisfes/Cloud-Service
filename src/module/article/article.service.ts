@@ -40,7 +40,7 @@ export class ArticleService {
 				cover: props.cover,
 				content: props.content,
 				html: props.html,
-				description: extractStr(props.content),
+				description: extractStr(props.html),
 				url: props.url || null,
 				status: isEmpty(props.status) ? 1 : props.status,
 				order: props.order || 0,
@@ -94,7 +94,7 @@ export class ArticleService {
 					cover: props.cover,
 					content: props.content,
 					html: props.html,
-					description: extractStr(props.content),
+					description: extractStr(props.html),
 					url: props.url || null,
 					status: isEmpty(props.status) ? article.status : props.status,
 					order: props.order || 0
@@ -215,7 +215,7 @@ export class ArticleService {
 				.leftJoinAndSelect('article.user', 'user')
 				.where(
 					new Brackets(Q => {
-						Q.andWhere('article.status != :status', { status: 1 })
+						Q.andWhere('article.status = :status', { status: 1 })
 
 						if (props.title) {
 							Q.andWhere('article.title LIKE :title', { title: `%${props.title}%` })
