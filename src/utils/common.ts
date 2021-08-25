@@ -32,6 +32,7 @@ export function extractStr(value: string): string {
 	} else {
 		const str = value
 			.replace(/(\*\*|__)(.*?)(\*\*|__)/g, '') //全局匹配内粗体
+			.replace(/(\**\**|__)(.*?)(\**\**|__)/g, '') //全局匹配内粗体
 			.replace(/\!\[[\s\S]*?\]\([\s\S]*?\)/g, '') //全局匹配图片
 			.replace(/\[[\s\S]*?\]\([\s\S]*?\)/g, '') //全局匹配连接
 			.replace(/<\/?.+?\/?>/g, '') //全局匹配内html标签
