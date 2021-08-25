@@ -9,7 +9,7 @@ import * as DTO from './article.interface'
 export class ArticleController {
 	constructor(private readonly articleService: ArticleService) {}
 
-	@ApiOperation({ summary: '创建文章' })
+	@ApiOperation({ summary: '创建文章-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
 	@AuthRole({ role: ['admin', 'super'], module: 'article', action: 'create' })
@@ -21,7 +21,7 @@ export class ArticleController {
 		return await this.articleService.nodeCreateArticle(body, req.user.uid)
 	}
 
-	@ApiOperation({ summary: '修改文章' })
+	@ApiOperation({ summary: '修改文章-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
 	@AuthRole({ role: ['admin', 'super'], module: 'article', action: 'update' })
@@ -33,7 +33,7 @@ export class ArticleController {
 		return await this.articleService.nodeUpdateArticle(body)
 	}
 
-	@ApiOperation({ summary: '切换文章状态' })
+	@ApiOperation({ summary: '切换文章状态-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
 	@AuthRole({ role: ['admin', 'super'], module: 'article', action: 'update' })
@@ -45,7 +45,10 @@ export class ArticleController {
 		return await this.articleService.nodeArticleCutover(body)
 	}
 
-	@ApiOperation({ summary: '文章信息' })
+	@ApiOperation({ summary: '文章信息-授权管理端' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super'], module: 'article', action: 'params' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeArticleResponse })
@@ -54,9 +57,10 @@ export class ArticleController {
 		return await this.articleService.nodeArticle(query)
 	}
 
-	@ApiOperation({ summary: '文章列表' })
+	@ApiOperation({ summary: '文章列表-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super'], module: 'article', action: 'params' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeArticlesResponse })
@@ -65,7 +69,25 @@ export class ArticleController {
 		return await this.articleService.nodeArticles(query, req.user.uid)
 	}
 
-	@ApiOperation({ summary: '删除文章' })
+	@ApiOperation({ summary: '文章信息-客户端' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeArticleResponse })
+	@Get('client/info')
+	async nodeClientArticle(@Query() query: DTO.NodeArticleParameter) {
+		return await this.articleService.nodeClientArticle(query)
+	}
+
+	@ApiOperation({ summary: '文章列表-客户端' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeArticlesResponse })
+	@Get('client/list-node')
+	async nodeClientArticles(@Query() query: DTO.NodeClientArticlesParameter) {
+		return await this.articleService.nodeClientArticles(query)
+	}
+
+	@ApiOperation({ summary: '删除文章-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
 	@AuthRole({ role: ['admin', 'super'], module: 'article', action: 'delete' })

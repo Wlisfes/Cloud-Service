@@ -17,6 +17,12 @@ export class ArticleEntity extends DateEntity {
 	@Column({ type: 'text', nullable: false, comment: '文章内容' })
 	content: string
 
+	@Column({ type: 'text', nullable: false, default: null, comment: '文章内容 html格式' })
+	html: string
+
+	@Column({ nullable: true, default: null, comment: '文章描述' })
+	description: string
+
 	@Column({ nullable: true, default: null, comment: '跳转链接' })
 	url: string
 

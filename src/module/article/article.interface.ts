@@ -18,6 +18,12 @@ export class ArticleResponse {
 	@ApiProperty({ description: '文章内容' })
 	content: string
 
+	@ApiProperty({ description: '文章内容 html格式' })
+	html: string
+
+	@ApiProperty({ description: '文章描述' })
+	description: string
+
 	@ApiProperty({ description: '跳转链接' })
 	url: string
 
@@ -61,6 +67,10 @@ export class ArticleParameter {
 	@IsNotEmpty({ message: '文章内容 必填' })
 	content: string
 
+	@ApiProperty({ description: '文章内容 html格式' })
+	@IsNotEmpty({ message: '文章内容html格式 必填' })
+	html: string
+
 	@ApiPropertyOptional({ description: '跳转链接' })
 	@IsOptional({}, { string: true, number: true })
 	url: string
@@ -102,7 +112,7 @@ export class ArticleParameter {
  * 创建文章-Parameter
  *************************************************************************************************/
 export class NodeCreateArticleParameter extends IntersectionType(
-	PickType(ArticleParameter, ['title', 'cover', 'content', 'url', 'status']),
+	PickType(ArticleParameter, ['title', 'cover', 'content', 'html', 'url', 'status']),
 	PickType(ArticleParameter, ['order', 'source'])
 ) {}
 /**创建文章-Response**/
@@ -117,7 +127,7 @@ export class NodeCreateArticleResponse {
  * 修改文章-Parameter
  *************************************************************************************************/
 export class NodeUpdateArticleParameter extends IntersectionType(
-	PickType(ArticleParameter, ['id', 'title', 'cover', 'content', 'url', 'status']),
+	PickType(ArticleParameter, ['id', 'title', 'cover', 'content', 'html', 'url', 'status']),
 	PickType(ArticleParameter, ['order', 'source'])
 ) {}
 /**修改文章-Response**/
@@ -146,8 +156,8 @@ export class NodeArticleCutoverResponse {
 export class NodeArticleParameter extends PickType(ArticleParameter, ['id']) {}
 /**文章信息-Response**/
 export class NodeArticleResponse extends IntersectionType(
-	PickType(ArticleResponse, ['id', 'title', 'cover', 'content', 'url', 'status']),
-	PickType(ArticleResponse, ['order', 'browse', 'source'])
+	PickType(ArticleResponse, ['id', 'title', 'cover', 'content', 'html', 'description']),
+	PickType(ArticleResponse, ['order', 'browse', 'source', 'url', 'status'])
 ) {}
 
 /**
@@ -155,6 +165,16 @@ export class NodeArticleResponse extends IntersectionType(
  *
  * 文章列表-Parameter
  *************************************************************************************************/
+export class NodeClientArticlesParameter extends PickType(ArticleParameter, ['page', 'size']) {
+	@ApiPropertyOptional({ description: '文章标题' })
+	@IsOptional({}, { string: true, number: true })
+	title: string
+
+	@ApiPropertyOptional({ description: '分类标签id' })
+	@IsOptional({}, { string: true, number: true })
+	@Type(type => Number)
+	source: number
+}
 export class NodeArticlesParameter extends PickType(ArticleParameter, ['page', 'size', 'status']) {
 	@ApiPropertyOptional({ description: '文章标题' })
 	@IsOptional({}, { string: true, number: true })
@@ -165,6 +185,7 @@ export class NodeArticlesParameter extends PickType(ArticleParameter, ['page', '
 	@Type(type => Number)
 	source: number
 }
+
 /**文章列表-Response**/
 export class NodeArticlesResponse extends PickType(ArticleResponse, ['page', 'size', 'total']) {
 	@ApiProperty({ description: '文章列表', type: [NodeArticleResponse], example: [] })
