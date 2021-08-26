@@ -1,12 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm'
-import { DateEntity } from '@/entity/common.entity'
+import { Entity, Column, ManyToMany } from 'typeorm'
+import { BaseEntity } from '@/entity/common.entity'
 import { CloudEntity } from '@/entity/cloud.entity'
 
 @Entity('cloud_source')
-export class CloudSourceEntity extends DateEntity {
-	@PrimaryGeneratedColumn({ comment: '自增长主键' })
-	id: number
-
+export class CloudSourceEntity extends BaseEntity {
 	@Column({ nullable: false, comment: '标签名称' })
 	name: string
 

@@ -159,6 +159,10 @@ export class ArticleService {
 			} else if (article.status === 2) {
 				throw new HttpException('文章已删除', HttpStatus.BAD_REQUEST)
 			}
+
+			//浏览量加1
+			await this.articleModel.update({ id: props.id }, { browse: article.browse + 1 })
+
 			return article
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)

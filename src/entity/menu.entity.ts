@@ -1,11 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm'
-import { DateEntity } from '@/entity/common.entity'
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm'
+import { BaseEntity } from '@/entity/common.entity'
 
 @Entity('menu')
-export class MenuEntity extends DateEntity {
-	@PrimaryGeneratedColumn({ comment: '自增长主键' })
-	id: number
-
+export class MenuEntity extends BaseEntity {
 	@Column({ comment: '节点类型: 1.目录 2.菜单', default: 1, nullable: false })
 	type: number
 

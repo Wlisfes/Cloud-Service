@@ -1,7 +1,10 @@
-import { UpdateDateColumn, CreateDateColumn } from 'typeorm'
+import { PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn } from 'typeorm'
 import * as day from 'dayjs'
 
-export class DateEntity {
+export class BaseEntity {
+	@PrimaryGeneratedColumn({ comment: '自增长主键' })
+	id: number
+
 	@CreateDateColumn({
 		comment: '创建时间',
 		readonly: true,

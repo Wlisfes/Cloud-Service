@@ -1,17 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToOne, OneToMany } from 'typeorm'
-import { DateEntity } from '@/entity/common.entity'
+import { Entity, Column, BeforeInsert, OneToMany } from 'typeorm'
+import { BaseEntity } from '@/entity/common.entity'
 import { RoleEntity } from '@/entity/role.entity'
 import { hashSync } from 'bcryptjs'
 
 @Entity('user')
-export class UserEntity extends DateEntity {
+export class UserEntity extends BaseEntity {
 	@BeforeInsert()
 	BeforeCreate() {
 		this.uid = Date.now()
 	}
-
-	@PrimaryGeneratedColumn({ comment: '自增长主键' })
-	id: number
 
 	@Column({ type: 'double', comment: 'uid', readonly: true })
 	uid: number

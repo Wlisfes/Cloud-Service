@@ -1,12 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm'
-import { DateEntity } from '@/entity/common.entity'
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm'
+import { BaseEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
 
 @Entity('role')
-export class RoleEntity extends DateEntity {
-	@PrimaryGeneratedColumn({ comment: '自增长主键' })
-	id: number
-
+export class RoleEntity extends BaseEntity {
 	@Column({ comment: '角色唯一标识', nullable: false })
 	primary: string
 

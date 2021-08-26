@@ -1,13 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm'
-import { DateEntity } from '@/entity/common.entity'
+import { Entity, Column, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm'
+import { BaseEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
 import { SourceEntity } from '@/entity/source.entity'
 
 @Entity('article')
-export class ArticleEntity extends DateEntity {
-	@PrimaryGeneratedColumn({ comment: '自增长主键' })
-	id: number
-
+export class ArticleEntity extends BaseEntity {
 	@Column({ nullable: false, comment: '文章标题' })
 	title: string
 

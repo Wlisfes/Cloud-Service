@@ -1,13 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm'
-import { DateEntity } from '@/entity/common.entity'
+import { Entity, Column, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm'
+import { BaseEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
 
 @Entity('cloud')
-export class CloudEntity extends DateEntity {
-	@PrimaryGeneratedColumn({ comment: '自增长主键' })
-	id: number
-
+export class CloudEntity extends BaseEntity {
 	@Column({ nullable: false, default: 1, comment: '类型: 1.单集媒体 2.多集媒体' })
 	type: number
 
