@@ -217,6 +217,13 @@ export class ArticleService {
 				.createQueryBuilder('article')
 				.leftJoinAndSelect('article.source', 'source')
 				.leftJoinAndSelect('article.user', 'user')
+				// .leftJoinAndMapMany('article.star', 'article.source', 'star', 'star.name = :name', { name: 'Git' })
+				.loadRelationCountAndMap(
+					'article.star',
+					'article.source'
+					// 'star', qb =>
+					// qb.andWhere('star.name = :name', { name: 'Git' })
+				)
 				.where(
 					new Brackets(Q => {
 						Q.andWhere('article.status = :status', { status: 1 })
