@@ -39,6 +39,8 @@ export class MinuteService {
 				cover: props.cover,
 				description: props.description,
 				url: props.url || null,
+				npm: props.npm || null,
+				github: props.github || null,
 				status: isEmpty(props.status) ? 1 : props.status,
 				order: props.order || 0,
 				source,
@@ -91,6 +93,8 @@ export class MinuteService {
 					cover: props.cover,
 					description: props.description,
 					url: props.url || null,
+					npm: props.npm || null,
+					github: props.github || null,
 					status: isEmpty(props.status) ? minute.status : props.status,
 					order: props.order || 0
 				}

@@ -16,6 +16,12 @@ export class MinuteResponse {
 	@ApiProperty({ description: '跳转链接' })
 	url: string
 
+	@ApiProperty({ description: 'npm链接' })
+	npm: string
+
+	@ApiProperty({ description: 'github链接' })
+	github: string
+
 	@ApiProperty({ description: '收录描述' })
 	description: string
 
@@ -57,6 +63,14 @@ export class MinuteParameter {
 	@ApiPropertyOptional({ description: '跳转链接' })
 	@IsOptional({}, { string: true, number: true })
 	url: string
+
+	@ApiPropertyOptional({ description: 'npm链接' })
+	@IsOptional({}, { string: true, number: true })
+	npm: string
+
+	@ApiPropertyOptional({ description: 'github链接' })
+	@IsOptional({}, { string: true, number: true })
+	github: string
 
 	@ApiPropertyOptional({ description: '收录描述' })
 	@IsOptional({}, { string: true, number: true })
@@ -104,7 +118,7 @@ export class MinuteParameter {
  *************************************************************************************************/
 export class NodeCreateMinuteParameter extends IntersectionType(
 	PickType(MinuteParameter, ['name', 'cover', 'description', 'url', 'status']),
-	PickType(MinuteParameter, ['order', 'source'])
+	PickType(MinuteParameter, ['order', 'source', 'npm', 'github'])
 ) {}
 /**创建收录-Response**/
 export class NodeCreateMinuteResponse {
@@ -119,7 +133,7 @@ export class NodeCreateMinuteResponse {
  *************************************************************************************************/
 export class NodeUpdateMinuteParameter extends IntersectionType(
 	PickType(MinuteParameter, ['id', 'name', 'cover', 'description', 'url', 'status']),
-	PickType(MinuteParameter, ['order', 'source'])
+	PickType(MinuteParameter, ['order', 'source', 'npm', 'github'])
 ) {}
 /**修改收录-Response**/
 export class NodeUpdateMinuteResponse {
@@ -147,7 +161,7 @@ export class NodeMinuteCutoverResponse {
 export class NodeMinuteParameter extends PickType(MinuteParameter, ['id']) {}
 /**收录信息-Response**/
 export class NodeMinuteResponse extends IntersectionType(
-	PickType(MinuteResponse, ['id', 'name', 'cover', 'description']),
+	PickType(MinuteResponse, ['id', 'name', 'cover', 'description', 'npm', 'github']),
 	PickType(MinuteResponse, ['order', 'user', 'source', 'url', 'status'])
 ) {}
 

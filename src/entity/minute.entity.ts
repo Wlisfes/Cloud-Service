@@ -17,6 +17,12 @@ export class MinuteEntity extends BaseEntity {
 	@Column({ nullable: true, default: null, comment: '跳转链接' })
 	url: string
 
+	@Column({ nullable: true, default: null, comment: 'npm链接' })
+	npm: string
+
+	@Column({ nullable: true, default: null, comment: 'github链接' })
+	github: string
+
 	@Column({ nullable: false, default: 1, comment: '收录状态: 0.禁用 1.启用 2.删除' })
 	status: number
 
