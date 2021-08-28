@@ -18,6 +18,7 @@ import { CloudEntity } from '@/entity/cloud.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
 import { SourceEntity } from '@/entity/source.entity'
 import { ArticleEntity } from '@/entity/article.entity'
+import { MinuteEntity } from '@/entity/minute.entity'
 
 @Module({
 	imports: [
@@ -37,7 +38,8 @@ import { ArticleEntity } from '@/entity/article.entity'
 			CloudEntity,
 			CloudSourceEntity,
 			SourceEntity,
-			ArticleEntity
+			ArticleEntity,
+			MinuteEntity
 		]),
 		InitModule
 	],
