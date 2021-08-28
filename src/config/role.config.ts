@@ -12,7 +12,7 @@ export interface RolesConfig extends Action {
 }
 
 export type RoleEnum = 'admin' | 'super' | 'visitor'
-export type RoleModuleEnum = 'user' | 'role' | 'menu' | 'cloud' | 'source' | 'article'
+export type RoleModuleEnum = 'user' | 'role' | 'menu' | 'cloud' | 'source' | 'article' | 'minute'
 export type RoleActionEnum = 'create' | 'update' | 'delete' | 'params'
 
 const action = {
@@ -43,7 +43,8 @@ const auth = {
 		{ primary: 'menu', name: '菜单管理', status: 1, type: 2, action: action.admin },
 		{ primary: 'cloud', name: '云点播管理', status: 1, type: 2, action: action.admin },
 		{ primary: 'source', name: '标签管理', status: 1, type: 2, action: action.admin },
-		{ primary: 'article', name: '文章管理', status: 1, type: 2, action: action.admin }
+		{ primary: 'article', name: '文章管理', status: 1, type: 2, action: action.admin },
+		{ primary: 'minute', name: '收录管理', status: 1, type: 2, action: action.admin }
 	],
 	super: [
 		{ primary: 'user', name: '用户管理', status: 1, type: 2, action: action.user },
@@ -51,7 +52,8 @@ const auth = {
 		{ primary: 'menu', name: '菜单管理', status: 1, type: 2, action: action.user },
 		{ primary: 'cloud', name: '云点播管理', status: 1, type: 2, action: action.user },
 		{ primary: 'source', name: '标签管理', status: 1, type: 2, action: action.user },
-		{ primary: 'article', name: '文章管理', status: 1, type: 2, action: action.user }
+		{ primary: 'article', name: '文章管理', status: 1, type: 2, action: action.user },
+		{ primary: 'minute', name: '收录管理', status: 1, type: 2, action: action.user }
 	],
 	visitor: [
 		{ primary: 'user', name: '用户管理', status: 1, type: 2, action: action.visitor },
@@ -59,7 +61,8 @@ const auth = {
 		{ primary: 'menu', name: '菜单管理', status: 1, type: 2, action: action.visitor },
 		{ primary: 'cloud', name: '云点播管理', status: 1, type: 2, action: action.visitor },
 		{ primary: 'source', name: '标签管理', status: 1, type: 2, action: action.visitor },
-		{ primary: 'article', name: '文章管理', status: 1, type: 2, action: action.visitor }
+		{ primary: 'article', name: '文章管理', status: 1, type: 2, action: action.visitor },
+		{ primary: 'minute', name: '收录管理', status: 1, type: 2, action: action.visitor }
 	]
 }
 
