@@ -5,6 +5,7 @@ import { isEmpty } from 'class-validator'
 import { UtilsService } from '@/module/utils/utils.service'
 import { UserEntity } from '@/entity/user.entity'
 import { MenuEntity } from '@/entity/menu.entity'
+import { RoleEntity } from '@/entity/role.entity'
 import * as DTO from './menu.interface'
 
 @Injectable()
@@ -12,6 +13,7 @@ export class MenuService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
 		@InjectRepository(MenuEntity) private readonly menuModel: Repository<MenuEntity>,
+		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>,
 		private readonly utilsService: UtilsService
 	) {}
 

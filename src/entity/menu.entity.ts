@@ -1,5 +1,6 @@
 import { Entity, Column, ManyToOne, OneToMany } from 'typeorm'
 import { BaseEntity } from '@/entity/common.entity'
+import { RoleEntity } from '@/entity/role.entity'
 
 @Entity('menu')
 export class MenuEntity extends BaseEntity {
@@ -32,16 +33,20 @@ export class MenuEntity extends BaseEntity {
 
 	@ManyToOne(
 		type => MenuEntity,
-		role => role.children
+		type => type.children
 	)
 	parent: MenuEntity
 
 	@OneToMany(
 		type => MenuEntity,
-		role => role.parent
+		type => type.parent
 	)
 	children: MenuEntity[]
 
-	// @Column({ comment: '权限' })
-	// permission: string
+	@OneToMany(
+		type => RoleEntity,
+		type => type.menu,
+		{ cascade: true }
+	)
+	role: RoleEntity[]
 }
