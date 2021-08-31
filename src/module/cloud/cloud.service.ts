@@ -199,6 +199,9 @@ export class CloudService {
 				throw new HttpException('音视频媒体已删除', HttpStatus.BAD_REQUEST)
 			}
 
+			//播放量加1
+			await this.cloudModel.update({ id: props.id }, { browse: cloud.browse + 1 })
+
 			return {
 				...cloud,
 				children: cloud.children.sort((a, b) => a.order - b.order)
