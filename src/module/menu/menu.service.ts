@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Repository, In, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { UtilsService } from '@/module/utils/utils.service'
 import { UserEntity } from '@/entity/user.entity'
@@ -30,6 +30,21 @@ export class MenuService {
 				}
 			}
 
+			let role = []
+			if (props.role?.length > 0) {
+				role = await this.roleModel.find({ where: { id: In(props.role) } })
+				props.role.forEach(id => {
+					const element = role.find(element => element.id === id)
+					if (!element) {
+						throw new HttpException(`角色id ${id} 不存在`, HttpStatus.BAD_REQUEST)
+					} else if (element?.status === 0) {
+						throw new HttpException(`角色 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
+					} else if (element?.status === 2) {
+						throw new HttpException(`角色 ${element.name} 已删除`, HttpStatus.BAD_REQUEST)
+					}
+				})
+			}
+
 			const newMenu = await this.menuModel.create({
 				type: props.type,
 				name: props.name,
@@ -39,7 +54,8 @@ export class MenuService {
 				visible: props.visible || 1,
 				icon: props.icon || null,
 				order: props.order || 0,
-				parent
+				parent,
+				role
 			})
 			await this.menuModel.save(newMenu)
 
@@ -67,29 +83,42 @@ export class MenuService {
 	}
 
 	/**动态路由节点**/
-	public async nodeRouter() {
+	public async nodeRouter(uid: number) {
 		try {
-			return await this.menuModel.find({
-				where: { type: 2, status: 1 }
-			})
+			const user = await this.userModel.findOne({ where: { uid } })
+			return await this.menuModel
+				.createQueryBuilder('menu')
+				.leftJoinAndSelect('menu.role', 'role')
+				.where(
+					new Brackets(Q => {
+						Q.andWhere('menu.type = :type', { type: 2 })
+						Q.andWhere('menu.status = :status', { status: 1 })
+						Q.andWhere('role.primary = :primary', { primary: user.primary })
+					})
+				)
+				.getMany()
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 
 	/**角色菜单**/
-	public async nodeRoleMenus() {
+	public async nodeRoleMenus(uid: number) {
 		try {
-			const menu = await this.menuModel.find({
-				where: {
-					status: 1
-				},
-				relations: ['parent'],
-				order: {
-					order: 'DESC',
-					createTime: 'DESC'
-				}
-			})
+			const user = await this.userModel.findOne({ where: { uid } })
+			const menu = await this.menuModel
+				.createQueryBuilder('menu')
+				.leftJoinAndSelect('menu.parent', 'parent')
+				.leftJoinAndSelect('menu.role', 'role')
+				.where(
+					new Brackets(Q => {
+						Q.andWhere('menu.status = :status', { status: 1 })
+						Q.andWhere('role.primary = :primary', { primary: user.primary })
+					})
+				)
+				.addOrderBy('menu.order', 'DESC')
+				.addOrderBy('menu.createTime', 'DESC')
+				.getMany()
 			const node = menu.map(k => ({ ...k, parent: k.parent?.id || null }))
 			return this.utilsService.listToTree(node)
 		} catch (e) {
@@ -124,7 +153,7 @@ export class MenuService {
 		try {
 			return await this.menuModel.findOne({
 				where: { id },
-				relations: ['parent']
+				relations: ['parent', 'role']
 			})
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
@@ -134,7 +163,7 @@ export class MenuService {
 	/**修改菜单**/
 	public async nodeUpdateMenu(props: DTO.NodeUpdateParameter) {
 		try {
-			const node = await this.menuModel.findOne({ where: { id: props.id } })
+			const node = await this.menuModel.findOne({ where: { id: props.id }, relations: ['role'] })
 			if (!node) {
 				throw new HttpException('菜单节点不存在', HttpStatus.BAD_REQUEST)
 			}
@@ -148,6 +177,30 @@ export class MenuService {
 					throw new HttpException('上级节点已禁用', HttpStatus.BAD_REQUEST)
 				}
 			}
+
+			if (props.role?.length > 0) {
+				const role = await this.roleModel.find({ where: { id: In(props.role) } })
+				props.role.forEach(id => {
+					const element = role.find(element => element.id === id)
+					if (!element) {
+						throw new HttpException(`角色id ${id} 不存在`, HttpStatus.BAD_REQUEST)
+					} else if (element?.status === 0) {
+						throw new HttpException(`角色 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
+					} else if (element?.status === 2) {
+						throw new HttpException(`角色 ${element.name} 已删除`, HttpStatus.BAD_REQUEST)
+					}
+				})
+			}
+
+			//删除已有的权限
+			await this.menuModel
+				.createQueryBuilder()
+				.relation('role')
+				.of(node)
+				.addAndRemove(
+					props.role,
+					node.role.map(k => k.id)
+				)
 
 			await this.menuModel.update(
 				{ id: props.id },

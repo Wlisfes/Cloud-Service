@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, OneToMany } from 'typeorm'
+import { Entity, Column, ManyToOne, OneToMany, ManyToMany } from 'typeorm'
 import { BaseEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
 import { MenuEntity } from '@/entity/menu.entity'
@@ -50,9 +50,9 @@ export class RoleEntity extends BaseEntity {
 	)
 	user: UserEntity
 
-	@ManyToOne(
+	@ManyToMany(
 		type => MenuEntity,
 		role => role.role
 	)
-	menu: MenuEntity
+	menu: MenuEntity[]
 }

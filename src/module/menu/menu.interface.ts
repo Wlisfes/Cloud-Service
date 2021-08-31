@@ -1,7 +1,9 @@
 import { ApiProperty, ApiPropertyOptional, PickType, IntersectionType } from '@nestjs/swagger'
-import { IsNotEmpty } from 'class-validator'
+import { IsNotEmpty, IsNumber } from 'class-validator'
 import { IsOptional } from '@/decorator/common.decorator'
-import { Type } from 'class-transformer'
+import { Type, Transform } from 'class-transformer'
+import { NodeRoleResponse } from '@/module/role/role.interface'
+import { toArrayNumber } from '@/utils/validate'
 
 export class MenuResponse {
 	@ApiProperty({ description: '节点id', example: 1 })
@@ -36,6 +38,9 @@ export class MenuResponse {
 
 	@ApiPropertyOptional({ description: '排序号', example: 0 })
 	order: number
+
+	@ApiPropertyOptional({ description: '节点权限', type: [NodeRoleResponse], example: [] })
+	role: NodeRoleResponse[]
 
 	@ApiProperty({ description: '节点子集', type: [MenuResponse], example: [] })
 	children: MenuResponse[]
@@ -93,6 +98,11 @@ export class MenuParameter {
 	@Type(type => Number)
 	order: number
 
+	@ApiProperty({ description: '节点权限' })
+	@Transform(type => toArrayNumber(type), { toClassOnly: true })
+	@IsNumber({}, { each: true, message: '权限id 必须为Array<number>' })
+	role: number[]
+
 	@ApiPropertyOptional({ description: '权限' })
 	@IsOptional({}, { string: true, number: true })
 	permission: string
@@ -104,7 +114,7 @@ export class MenuParameter {
  * 创建菜单-Parameter
  *************************************************************************************************/
 export class NodeCreateMenuParameter extends IntersectionType(
-	PickType(MenuParameter, ['type', 'name', 'parent', 'router']),
+	PickType(MenuParameter, ['type', 'name', 'parent', 'router', 'role']),
 	PickType(MenuParameter, ['keepAlive', 'visible', 'path', 'icon', 'order'])
 ) {}
 
@@ -120,11 +130,7 @@ export class NodeCreateMenuResponse {
  * 获取节点目录-Response
  *************************************************************************************************/
 export class NodeMenuConterResponse {
-	@ApiProperty({
-		description: '节点目录列表',
-		type: [MenuResponse],
-		example: []
-	})
+	@ApiProperty({ description: '节点目录列表', type: [MenuResponse], example: [] })
 	list: MenuResponse[]
 }
 
@@ -134,11 +140,7 @@ export class NodeMenuConterResponse {
  * 动态路由节点-Response
  *************************************************************************************************/
 export class NodeRouterResponse {
-	@ApiProperty({
-		description: '动态路由节点列表',
-		type: [MenuResponse],
-		example: []
-	})
+	@ApiProperty({ description: '动态路由节点列表', type: [MenuResponse], example: [] })
 	list: MenuResponse[]
 }
 
@@ -148,11 +150,7 @@ export class NodeRouterResponse {
  * 角色菜单-Response
  *************************************************************************************************/
 export class NodeRoleMenusResponse {
-	@ApiProperty({
-		description: '角色菜单列表',
-		type: [MenuResponse],
-		example: []
-	})
+	@ApiProperty({ description: '角色菜单列表', type: [MenuResponse], example: [] })
 	list: MenuResponse[]
 }
 
@@ -162,11 +160,7 @@ export class NodeRoleMenusResponse {
  * 菜单列表-Response
  *************************************************************************************************/
 export class NodeMenusResponse {
-	@ApiProperty({
-		description: '菜单列表',
-		type: [MenuResponse],
-		example: []
-	})
+	@ApiProperty({ description: '菜单列表', type: [MenuResponse], example: [] })
 	list: MenuResponse[]
 }
 
@@ -184,7 +178,7 @@ export class NodeMenuResponse extends MenuResponse {}
  * 修改菜单-Parameter
  *************************************************************************************************/
 export class NodeUpdateParameter extends IntersectionType(
-	PickType(MenuParameter, ['id', 'type', 'name', 'parent', 'router']),
+	PickType(MenuParameter, ['id', 'type', 'name', 'parent', 'router', 'role']),
 	PickType(MenuParameter, ['keepAlive', 'visible', 'path', 'icon', 'order'])
 ) {}
 

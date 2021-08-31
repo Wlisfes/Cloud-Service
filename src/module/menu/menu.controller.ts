@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Query } from '@nestjs/common'
+import { Controller, Get, Post, Put, Delete, Req, Body, Query } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiProduces, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { MenuService } from './menu.service'
 import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
@@ -39,8 +39,8 @@ export class MenuController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRouterResponse })
 	@Get('router')
-	public async nodeRouter() {
-		return await this.menuService.nodeRouter()
+	public async nodeRouter(@Req() req: { user: { uid: number } }) {
+		return await this.menuService.nodeRouter(req.user.uid)
 	}
 
 	@ApiOperation({ summary: '角色菜单' })
@@ -50,8 +50,8 @@ export class MenuController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeRoleMenusResponse })
 	@Get('role')
-	public async nodeRoleMenus() {
-		return await this.menuService.nodeRoleMenus()
+	public async nodeRoleMenus(@Req() req: { user: { uid: number } }) {
+		return await this.menuService.nodeRoleMenus(req.user.uid)
 	}
 
 	@ApiOperation({ summary: '菜单列表' })
