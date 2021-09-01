@@ -12,7 +12,7 @@ export interface RolesConfig extends Action {
 }
 
 export type RoleEnum = 'admin' | 'super' | 'visitor'
-export type RoleModuleEnum = 'user' | 'role' | 'menu' | 'cloud' | 'source' | 'article' | 'minute'
+export type RoleModuleEnum = 'module' | 'user' | 'role' | 'menu' | 'cloud' | 'source' | 'article' | 'minute'
 export type RoleActionEnum = 'create' | 'update' | 'delete' | 'params'
 
 const action = {
