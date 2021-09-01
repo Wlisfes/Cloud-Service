@@ -55,15 +55,12 @@ export class ModuleService {
 				throw new HttpException('模块不存在', HttpStatus.BAD_REQUEST)
 			}
 
-			let action = []
 			if (props.action?.length > 0) {
-				action = await this.moduleActionModel.find({ where: { id: In(props.action) } })
+				const action = await this.moduleActionModel.find({ where: { id: In(props.action) } })
 				props.action.forEach(id => {
 					const element = action.find(element => element.id === id)
 					if (!element) {
 						throw new HttpException(`权限id ${id} 不存在`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 0) {
-						throw new HttpException(`权限 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
 					}
 				})
 			}
@@ -84,8 +81,7 @@ export class ModuleService {
 					name: props.name,
 					primary: props.primary,
 					comment: props.comment || null,
-					status: props.status || 0,
-					action
+					status: props.status || 0
 				}
 			)
 
@@ -108,7 +104,7 @@ export class ModuleService {
 	/**模块信息-授权管理端**/
 	public async nodeModule(props: DTO.NodeModuleParameter) {
 		try {
-			const model = await this.moduleModel.findOne({ where: { id: props.id } })
+			const model = await this.moduleModel.findOne({ where: { id: props.id }, relations: ['action'] })
 			if (!model) {
 				throw new HttpException('模块不存在', HttpStatus.BAD_REQUEST)
 			}
