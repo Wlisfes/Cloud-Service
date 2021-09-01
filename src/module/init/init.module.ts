@@ -13,6 +13,7 @@ import { BannerModule } from '@/module/banner/banner.module'
 import { RoleModule } from '@/module/role/role.module'
 import { PosterModule } from '@/module/poster/poster.module'
 import { UserModule } from '@/module/user/user.module'
+import { ModuleModule } from '@/module/module/module.module'
 import { MenuModule } from '@/module/menu/menu.module'
 import { CloudModule } from '@/module/cloud/cloud.module'
 import { CloudSourceModule } from '@/module/cloud-source/cloud-source.module'
@@ -79,6 +80,7 @@ import { MinuteModule } from '@/module/minute/minute.module'
 		RoleModule,
 		PosterModule,
 		UserModule,
+		ModuleModule,
 		MenuModule,
 		CloudModule,
 		CloudSourceModule,
