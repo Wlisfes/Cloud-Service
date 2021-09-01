@@ -11,6 +11,7 @@ import { AliyunModule } from '@/module/aliyun/aliyun.module'
 import { NodemailerModule } from '@/module/nodemailer/nodemailer.module'
 import { BannerModule } from '@/module/banner/banner.module'
 import { RoleModule } from '@/module/role/role.module'
+import { PosterModule } from '@/module/poster/poster.module'
 import { UserModule } from '@/module/user/user.module'
 import { MenuModule } from '@/module/menu/menu.module'
 import { CloudModule } from '@/module/cloud/cloud.module'
@@ -76,6 +77,7 @@ import { MinuteModule } from '@/module/minute/minute.module'
 		JwtAuthModule,
 		BannerModule,
 		RoleModule,
+		PosterModule,
 		UserModule,
 		MenuModule,
 		CloudModule,
