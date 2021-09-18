@@ -2,7 +2,6 @@ import { ApiProperty, ApiPropertyOptional, PickType, IntersectionType } from '@n
 import { IsNotEmpty, IsNumber } from 'class-validator'
 import { IsOptional } from '@/decorator/common.decorator'
 import { Type, Transform } from 'class-transformer'
-import { NodeRoleResponse } from '@/module/role/role.interface'
 import { toArrayNumber } from '@/utils/validate'
 
 export class MenuResponse {
@@ -39,8 +38,8 @@ export class MenuResponse {
 	@ApiPropertyOptional({ description: '排序号', example: 0 })
 	order: number
 
-	@ApiPropertyOptional({ description: '节点权限', type: [NodeRoleResponse], example: [] })
-	role: NodeRoleResponse[]
+	@ApiPropertyOptional({ description: '节点权限', type: [], example: [] })
+	role: any[]
 
 	@ApiProperty({ description: '节点子集', type: [MenuResponse], example: [] })
 	children: MenuResponse[]

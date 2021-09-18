@@ -157,36 +157,36 @@ export class UserService {
 				relations: ['children', 'children.children']
 			})
 
-			const newRole = await this.roleModel.create({
-				primary: role.primary,
-				name: role.name,
-				status: role.status,
-				type: role.type,
-				user
-			})
-			const roleParent = await this.roleModel.save(newRole)
-			role.children.forEach(async auth => {
-				const newAuth = await this.roleModel.create({
-					primary: auth.primary,
-					name: auth.name,
-					status: auth.status,
-					type: auth.type,
-					parent: roleParent,
-					user
-				})
-				const authParent = await this.roleModel.save(newAuth)
-				auth.children.forEach(async action => {
-					const newAction = await this.roleModel.create({
-						primary: action.primary,
-						name: action.name,
-						status: action.status,
-						type: action.type,
-						parent: authParent,
-						user
-					})
-					await this.roleModel.save(newAction)
-				})
-			})
+			// const newRole = await this.roleModel.create({
+			// 	primary: role.primary,
+			// 	name: role.name,
+			// 	status: role.status,
+			// 	type: role.type,
+			// 	user
+			// })
+			// const roleParent = await this.roleModel.save(newRole)
+			// role.children.forEach(async auth => {
+			// 	const newAuth = await this.roleModel.create({
+			// 		primary: auth.primary,
+			// 		name: auth.name,
+			// 		status: auth.status,
+			// 		type: auth.type,
+			// 		parent: roleParent,
+			// 		user
+			// 	})
+			// 	const authParent = await this.roleModel.save(newAuth)
+			// 	auth.children.forEach(async action => {
+			// 		const newAction = await this.roleModel.create({
+			// 			primary: action.primary,
+			// 			name: action.name,
+			// 			status: action.status,
+			// 			type: action.type,
+			// 			parent: authParent,
+			// 			user
+			// 		})
+			// 		await this.roleModel.save(newAction)
+			// 	})
+			// })
 
 			return true
 		} catch (e) {
@@ -403,12 +403,12 @@ export class UserService {
 			// 	list
 			// }
 
-			return {
-				total,
-				size: props.size,
-				page: props.page,
-				list: list.map(k => ({ ...k, role: k.role.find(v => v.type === 1) }))
-			}
+			// return {
+			// 	total,
+			// 	size: props.size,
+			// 	page: props.page,
+			// 	list: list.map(k => ({ ...k, role: k.role.find(v => v.type === 1) }))
+			// }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

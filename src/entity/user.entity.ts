@@ -52,10 +52,10 @@ export class UserEntity extends BaseEntity {
 	@Column({ comment: '状态', default: 1, nullable: false })
 	status: number
 
-	@OneToMany(
-		type => RoleEntity,
-		role => role.user,
-		{ cascade: true }
-	)
-	role: RoleEntity[]
+	// @OneToMany(
+	// 	type => RoleEntity,
+	// 	role => role.user,
+	// 	{ cascade: true }
+	// )
+	// role: RoleEntity[]
 }

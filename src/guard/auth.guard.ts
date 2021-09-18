@@ -66,26 +66,26 @@ export class AuthGuard implements CanActivate {
 		if (petence?.role?.length > 0) {
 			//验证用户权限
 			return true
-			const role = await this.roleService.nodeUserRole(request.user.uid)
-			if (!petence.role.includes(role.primary as RoleEnum)) {
-				return useThrow('角色不符', HttpStatus.FORBIDDEN, petence.error)
-			} else if (role.status === 0) {
-				return useThrow('角色已禁用', HttpStatus.FORBIDDEN, petence.error)
-			} else if (!role.children.find(k => k.primary === petence.module)) {
-				return useThrow('角色功能不足', HttpStatus.FORBIDDEN, petence.error)
-			} else if (!role.children.find(k => k.primary === petence.module).status) {
-				return useThrow('角色功能已禁用', HttpStatus.FORBIDDEN, petence.error)
-			} else {
-				const { children } = role.children.find(k => k.primary === petence.module)
-				if (!children.find(k => k.primary === petence.action)) {
-					return useThrow('角色功能已权限不足', HttpStatus.FORBIDDEN, petence.error)
-				} else if (!children.find(k => k.primary === petence.action).status) {
-					return useThrow('角色功能已权限已禁用', HttpStatus.FORBIDDEN, petence.error)
-				} else {
-					//验证通过
-					return true
-				}
-			}
+			// const role = await this.roleService.nodeUserRole(request.user.uid)
+			// if (!petence.role.includes(role.primary as RoleEnum)) {
+			// 	return useThrow('角色不符', HttpStatus.FORBIDDEN, petence.error)
+			// } else if (role.status === 0) {
+			// 	return useThrow('角色已禁用', HttpStatus.FORBIDDEN, petence.error)
+			// } else if (!role.children.find(k => k.primary === petence.module)) {
+			// 	return useThrow('角色功能不足', HttpStatus.FORBIDDEN, petence.error)
+			// } else if (!role.children.find(k => k.primary === petence.module).status) {
+			// 	return useThrow('角色功能已禁用', HttpStatus.FORBIDDEN, petence.error)
+			// } else {
+			// 	const { children } = role.children.find(k => k.primary === petence.module)
+			// 	if (!children.find(k => k.primary === petence.action)) {
+			// 		return useThrow('角色功能已权限不足', HttpStatus.FORBIDDEN, petence.error)
+			// 	} else if (!children.find(k => k.primary === petence.action).status) {
+			// 		return useThrow('角色功能已权限已禁用', HttpStatus.FORBIDDEN, petence.error)
+			// 	} else {
+			// 		//验证通过
+			// 		return true
+			// 	}
+			// }
 		}
 
 		return true

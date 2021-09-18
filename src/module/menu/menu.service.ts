@@ -54,8 +54,8 @@ export class MenuService {
 				visible: props.visible || 1,
 				icon: props.icon || null,
 				order: props.order || 0,
-				parent,
-				role
+				parent
+				// role
 			})
 			await this.menuModel.save(newMenu)
 
@@ -88,12 +88,12 @@ export class MenuService {
 			const user = await this.userModel.findOne({ where: { uid } })
 			return await this.menuModel
 				.createQueryBuilder('menu')
-				.leftJoinAndSelect('menu.role', 'role')
+				// .leftJoinAndSelect('menu.role', 'role')
 				.where(
 					new Brackets(Q => {
 						Q.andWhere('menu.type = :type', { type: 2 })
 						Q.andWhere('menu.status = :status', { status: 1 })
-						Q.andWhere('role.primary = :primary', { primary: user.primary })
+						// Q.andWhere('role.primary = :primary', { primary: user.primary })
 					})
 				)
 				.getMany()
@@ -109,11 +109,11 @@ export class MenuService {
 			const menu = await this.menuModel
 				.createQueryBuilder('menu')
 				.leftJoinAndSelect('menu.parent', 'parent')
-				.leftJoinAndSelect('menu.role', 'role')
+				// .leftJoinAndSelect('menu.role', 'role')
 				.where(
 					new Brackets(Q => {
 						Q.andWhere('menu.status = :status', { status: 1 })
-						Q.andWhere('role.primary = :primary', { primary: user.primary })
+						// Q.andWhere('role.primary = :primary', { primary: user.primary })
 					})
 				)
 				.addOrderBy('menu.order', 'DESC')
@@ -193,14 +193,14 @@ export class MenuService {
 			}
 
 			//删除已有的权限
-			await this.menuModel
-				.createQueryBuilder()
-				.relation('role')
-				.of(node)
-				.addAndRemove(
-					props.role,
-					node.role.map(k => k.id)
-				)
+			// await this.menuModel
+			// 	.createQueryBuilder()
+			// 	.relation('role')
+			// 	.of(node)
+			// 	.addAndRemove(
+			// 		props.role,
+			// 		node.role.map(k => k.id)
+			// 	)
 
 			await this.menuModel.update(
 				{ id: props.id },
