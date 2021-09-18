@@ -1,4 +1,4 @@
-import { Entity, Column, BeforeInsert, OneToMany } from 'typeorm'
+import { Entity, Column, BeforeInsert, ManyToOne } from 'typeorm'
 import { BaseEntity } from '@/entity/common.entity'
 import { RoleEntity } from '@/entity/role.entity'
 import { hashSync } from 'bcryptjs'
@@ -49,13 +49,13 @@ export class UserEntity extends BaseEntity {
 	})
 	password: string
 
-	@Column({ comment: '状态', default: 1, nullable: false })
+	@Column({ nullable: false, default: 1, comment: '状态: 0.禁用 1.启用 2.删除' })
 	status: number
 
-	// @OneToMany(
-	// 	type => RoleEntity,
-	// 	role => role.user,
-	// 	{ cascade: true }
-	// )
-	// role: RoleEntity[]
+	@ManyToOne(
+		type => RoleEntity,
+		type => type.user,
+		{ cascade: true }
+	)
+	role: RoleEntity
 }

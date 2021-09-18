@@ -170,8 +170,8 @@ export class NodeUsersResponse extends PickType(UserInterface, ['total']) {
 
 /**修改用户信息-Parameter******************************************************************************/
 export class NodeUpdateUserParameter extends IntersectionType(
-	PickType(UserParameter, ['uid', 'nickname', 'status']),
-	PickType(UserInterface, ['avatar', 'email', 'mobile', 'comment', 'password'])
+	PickType(UserParameter, ['uid', 'role', 'nickname', 'status']),
+	PickType(UserInterface, ['avatar', 'email', 'mobile', 'comment'])
 ) {}
 /**修改用户信息-Response**/
 export class NodeUpdateUserResponse {

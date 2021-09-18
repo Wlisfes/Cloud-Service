@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, IsNull, Not, Like } from 'typeorm'
+import { Repository, IsNull, Not, Like, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
@@ -243,8 +243,9 @@ export class UserService {
 				}
 			}
 
-			if (props.password) {
-				await this.userModel.update({ uid: props.uid }, { password: props.password })
+			const role = await this.roleModel.findOne({ where: { id: props.role } })
+			if (!role) {
+				throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
 			}
 
 			await this.userModel.update(
@@ -255,7 +256,8 @@ export class UserService {
 					email: props.email || null,
 					mobile: props.mobile || null,
 					avatar: props.avatar || null,
-					comment: props.comment || null
+					comment: props.comment || null,
+					role
 				}
 			)
 			return { message: '修改成功' }
@@ -315,16 +317,16 @@ export class UserService {
 	/**uid获取用户信息**/
 	public async nodeUidUser(uid: number, password?: boolean): Promise<UserEntity> {
 		try {
-			let user = null
+			const Model = await this.userModel
+				.createQueryBuilder('user')
+				.leftJoinAndSelect('user.role', 'role')
+				.where('user.uid = :uid', { uid })
+
 			if (password) {
-				user = await this.userModel
-					.createQueryBuilder('user')
-					.where('user.uid = :uid', { uid })
-					.addSelect('user.password')
-					.getOne()
-			} else {
-				user = await this.userModel.findOne({ where: { uid } })
+				Model.addSelect('user.password')
 			}
+
+			const user = Model.getOne()
 			if (user) {
 				return user
 			}
@@ -337,78 +339,32 @@ export class UserService {
 	/**用户列表**/
 	public async nodeUsers(props: DTO.NodeUsersParameter) {
 		try {
-			const combine = (key: 'account' | 'nickname' | 'email' | 'mobile') => {
-				let where = { status: isEmpty(props.status) ? Not(10) : props.status }
-				if (props.keyword) {
-					where = { ...where, [key]: Like(`%${props.keyword}%`) }
-				}
+			const [list = [], total = 0] = await this.userModel
+				.createQueryBuilder('user')
+				.leftJoinAndSelect('user.role', 'role')
+				.where(
+					new Brackets(Q => {
+						if (!isEmpty(props.status)) {
+							Q.andWhere('user.status = :status', { status: props.status })
+						}
+						if (props.keyword) {
+							Q.orWhere('user.account LIKE :account', { account: `%${props.keyword}%` })
+							Q.orWhere('user.nickname LIKE :nickname', { nickname: `%${props.keyword}%` })
+							Q.orWhere('user.email LIKE :email', { email: `%${props.keyword}%` })
+							Q.orWhere('user.mobile LIKE :mobile', { mobile: `%${props.keyword}%` })
+						}
+					})
+				)
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.getManyAndCount()
 
-				if (props.primary) {
-					return {
-						...where,
-						primary: props.primary
-					}
-				}
-				return where
+			return {
+				total,
+				size: props.size,
+				page: props.page,
+				list
 			}
-
-			const [list = [], total = 0] = await this.userModel.findAndCount({
-				relations: ['role'],
-				where: [
-					{ ...(() => combine('account'))() },
-					{ ...(() => combine('email'))() },
-					{ ...(() => combine('mobile'))() },
-					{ ...(() => combine('nickname'))() }
-				],
-				order: {
-					uid: 'ASC'
-				},
-
-				skip: (props.page - 1) * props.size,
-				take: props.size
-			})
-
-			// const Model = await this.userModel
-			// 	.createQueryBuilder('user')
-			// 	.leftJoinAndSelect('user.role', 'role', 'role.type = :type', { type: 1 })
-
-			// if (props.keyword) {
-			// 	Model.orWhere('user.account LIKE :account', {
-			// 		account: `%${props.keyword}%`
-			// 	})
-			// 		.orWhere('user.nickname LIKE :nickname', { nickname: `%${props.keyword}%` })
-			// 		.orWhere('user.email LIKE :email', { email: `%${props.keyword}%` })
-			// 		.orWhere('user.mobile LIKE :mobile', { mobile: `%${props.keyword}%` })
-			// }
-
-			// if (props.primary) {
-			// 	Model.andWhere('role.primary = :primary', { primary: props.primary })
-			// }
-
-			// if (!isEmpty(props.status)) {
-			// 	Model.andWhere('user.status = :status', { status: props.status })
-			// }
-
-			// const [list = [], total = 0] = await Model.orderBy({
-			// 	'user.uid': 'ASC'
-			// })
-			// 	.skip((props.page - 1) * props.size)
-			// 	.take(props.size)
-			// 	.getManyAndCount()
-
-			// return {
-			// 	total,
-			// 	size: props.size,
-			// 	page: props.page,
-			// 	list
-			// }
-
-			// return {
-			// 	total,
-			// 	size: props.size,
-			// 	page: props.page,
-			// 	list: list.map(k => ({ ...k, role: k.role.find(v => v.type === 1) }))
-			// }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
