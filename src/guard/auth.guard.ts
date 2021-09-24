@@ -1,5 +1,6 @@
 import { CanActivate, SetMetadata, ExecutionContext, Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
+import { Brackets } from 'typeorm'
 import { JwtAuthService } from '@/module/jwt/jwt.service'
 import { RedisService } from '@/module/redis/redis.service'
 import { UserService } from '@/module/user/user.service'
@@ -42,7 +43,7 @@ export class AuthGuard implements CanActivate {
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest()
 		const props = this.reflector.get<AuthTokenInterface>(APP_AUTH, context.getHandler())
-		const petence = this.reflector.get<AuthRoleInterface>(APP_AUTH_ROLE, context.getHandler())
+		const node = this.reflector.get<AuthRoleInterface>(APP_AUTH_ROLE, context.getHandler())
 
 		if (props?.login) {
 			//验证是否需要登录
@@ -63,9 +64,41 @@ export class AuthGuard implements CanActivate {
 			request.user = user
 		}
 
-		if (petence?.role?.length > 0) {
+		if (node?.role?.length > 0) {
 			//验证用户权限
-			return true
+			// const user = await this.userService.userModel.findOne({
+			// 	where: { uid: request.user.uid },
+			// 	relations: ['role', 'role.module', 'role.module.action']
+			// })
+			// if
+			const role = await this.roleService.roleModel
+				.createQueryBuilder('role')
+				.leftJoinAndSelect('role.user', 'user')
+				.leftJoinAndSelect('role.module', 'module')
+				.leftJoinAndSelect('module.action', 'action')
+				.leftJoinAndMapOne('role.star', 'role.module', 'star', 'star.primary = :primary', { primary: 'role' })
+				// .leftJoinAndMapOne('role.star', 'role.module', 'star', 'star.primary = :primary', {
+				// 	primary: node.module
+				// })
+
+				// .leftJoinAndMapOne('role.star', 'role.module', 'star', qb => {
+				// 	return qb.andWhere('star.primary = :primary', { primary: node.module })
+				// })
+				.where(
+					new Brackets(Q => {
+						Q.where('user.uid = :uid', { uid: request.user.uid })
+					})
+				)
+				.getMany()
+			console.log(node, role)
+			if (!node.role.some(k => role.some(v => v.primary === k))) {
+				return true // useThrow('角色不符', HttpStatus.FORBIDDEN, petence.error)
+			} else {
+			}
+
+			// if (!petence.role.includes()) {
+			// 		return useThrow('角色不符', HttpStatus.FORBIDDEN, petence.error)
+			// 	}
 			// const role = await this.roleService.nodeUserRole(request.user.uid)
 			// if (!petence.role.includes(role.primary as RoleEnum)) {
 			// 	return useThrow('角色不符', HttpStatus.FORBIDDEN, petence.error)
@@ -86,6 +119,7 @@ export class AuthGuard implements CanActivate {
 			// 		return true
 			// 	}
 			// }
+			return true
 		}
 
 		return true

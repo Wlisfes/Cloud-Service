@@ -1,4 +1,4 @@
-import { Entity, Column, BeforeInsert, ManyToOne } from 'typeorm'
+import { Entity, Column, BeforeInsert, ManyToOne, ManyToMany, JoinTable } from 'typeorm'
 import { BaseEntity } from '@/entity/common.entity'
 import { RoleEntity } from '@/entity/role.entity'
 import { hashSync } from 'bcryptjs'
@@ -12,9 +12,6 @@ export class UserEntity extends BaseEntity {
 
 	@Column({ type: 'double', comment: 'uid', readonly: true })
 	uid: number
-
-	@Column({ comment: '角色标识', nullable: false, default: 'admin' })
-	primary: string
 
 	@Column({ comment: '账户', type: 'int', readonly: true })
 	account: number
@@ -52,10 +49,11 @@ export class UserEntity extends BaseEntity {
 	@Column({ nullable: false, default: 1, comment: '状态: 0.禁用 1.启用 2.删除' })
 	status: number
 
-	@ManyToOne(
+	@ManyToMany(
 		type => RoleEntity,
 		type => type.user,
 		{ cascade: true }
 	)
-	role: RoleEntity
+	@JoinTable({ name: 'user_role_join' })
+	role: RoleEntity[]
 }

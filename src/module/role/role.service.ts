@@ -12,7 +12,7 @@ import * as DTO from './role.interface'
 export class RoleService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
-		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>,
+		@InjectRepository(RoleEntity) public readonly roleModel: Repository<RoleEntity>,
 		@InjectRepository(ModuleEntity) private readonly moduleModel: Repository<ModuleEntity>,
 		private readonly utilsService: UtilsService
 	) {}

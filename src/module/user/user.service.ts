@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, IsNull, Not, Like, Brackets } from 'typeorm'
+import { Repository, IsNull, Not, Like, In, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
@@ -14,7 +14,7 @@ import * as DTO from './user.interface'
 @Injectable()
 export class UserService {
 	constructor(
-		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
+		@InjectRepository(UserEntity) public readonly userModel: Repository<UserEntity>,
 		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>,
 		private readonly jwtAuthService: JwtAuthService,
 		private readonly redisService: RedisService,
@@ -70,19 +70,10 @@ export class UserService {
 				throw new HttpException('邮箱已注册', HttpStatus.BAD_REQUEST)
 			}
 
-			const role = await this.roleModel.findOne({
-				where: {
-					parent: IsNull(),
-					user: IsNull(),
-					primary: 'super'
-				}
-			})
-
 			const newUser = await this.userModel.create({
 				nickname: props.nickname,
 				password: props.password,
 				email: props.email,
-				primary: role.primary,
 				account: await this.createAccount()
 			})
 			const { uid } = await this.userModel.save(newUser)
@@ -90,9 +81,6 @@ export class UserService {
 
 			//注册成功删除redis中的邮箱验证码
 			await this.redisService.delStore(props.email)
-
-			//创建角色
-			await this.createUserRole(user.uid, role.id)
 
 			//发送账户
 			await this.nodemailerService.registerSend(user.account, user.email)
@@ -119,76 +107,33 @@ export class UserService {
 				throw new HttpException('手机号已存在', HttpStatus.BAD_REQUEST)
 			}
 
-			const role = await this.roleModel.findOne({ where: { id: props.role } })
-			if (props.role) {
-				if (!role) {
-					throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
-				} else if (role.status !== 1) {
-					throw new HttpException('角色已禁用', HttpStatus.BAD_REQUEST)
-				}
+			let role = []
+			if (props.role?.length > 0) {
+				role = await this.roleModel.find({ where: { id: In(props.role) } })
+				props.role.forEach(id => {
+					const element = role.find(element => element.id === id)
+					if (!element) {
+						throw new HttpException(`角色id ${id} 不存在`, HttpStatus.BAD_REQUEST)
+					} else if (element?.status === 0) {
+						throw new HttpException(`角色 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
+					}
+				})
 			}
 
 			const newUser = await this.userModel.create({
 				nickname: props.nickname,
 				password: props.password,
 				status: props.status,
-				primary: role.primary,
 				email: props.email || null,
 				mobile: props.mobile || null,
 				avatar: props.avatar || null,
 				comment: props.comment || null,
-				account: await this.createAccount()
+				account: await this.createAccount(),
+				role
 			})
-			const user = await this.userModel.save(newUser)
-			await this.createUserRole(user.uid, props.role)
+			await this.userModel.save(newUser)
 
 			return { message: '创建成功' }
-		} catch (e) {
-			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	/**创建用户角色**/
-	public async createUserRole(uid: number, id: number) {
-		try {
-			const user = await this.userModel.findOne({ where: { uid } })
-			const role = await this.roleModel.findOne({
-				where: { id },
-				relations: ['children', 'children.children']
-			})
-
-			// const newRole = await this.roleModel.create({
-			// 	primary: role.primary,
-			// 	name: role.name,
-			// 	status: role.status,
-			// 	type: role.type,
-			// 	user
-			// })
-			// const roleParent = await this.roleModel.save(newRole)
-			// role.children.forEach(async auth => {
-			// 	const newAuth = await this.roleModel.create({
-			// 		primary: auth.primary,
-			// 		name: auth.name,
-			// 		status: auth.status,
-			// 		type: auth.type,
-			// 		parent: roleParent,
-			// 		user
-			// 	})
-			// 	const authParent = await this.roleModel.save(newAuth)
-			// 	auth.children.forEach(async action => {
-			// 		const newAction = await this.roleModel.create({
-			// 			primary: action.primary,
-			// 			name: action.name,
-			// 			status: action.status,
-			// 			type: action.type,
-			// 			parent: authParent,
-			// 			user
-			// 		})
-			// 		await this.roleModel.save(newAction)
-			// 	})
-			// })
-
-			return true
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -243,10 +188,31 @@ export class UserService {
 				}
 			}
 
-			const role = await this.roleModel.findOne({ where: { id: props.role } })
-			if (!role) {
-				throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
+			const user = await this.userModel.findOne({
+				where: { uid: props.uid },
+				relations: ['role']
+			})
+
+			if (props.role?.length > 0) {
+				const role = await this.roleModel.find({ where: { id: In(props.role) } })
+				props.role.forEach(id => {
+					const element = role.find(element => element.id === id)
+					if (!element) {
+						throw new HttpException(`角色id ${id} 不存在`, HttpStatus.BAD_REQUEST)
+					} else if (element?.status === 0) {
+						throw new HttpException(`角色 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
+					}
+				})
 			}
+
+			await this.userModel
+				.createQueryBuilder()
+				.relation('role')
+				.of(user)
+				.addAndRemove(
+					props.role,
+					user.role.map(k => k.id)
+				)
 
 			await this.userModel.update(
 				{ uid: props.uid },
@@ -256,8 +222,7 @@ export class UserService {
 					email: props.email || null,
 					mobile: props.mobile || null,
 					avatar: props.avatar || null,
-					comment: props.comment || null,
-					role
+					comment: props.comment || null
 				}
 			)
 			return { message: '修改成功' }

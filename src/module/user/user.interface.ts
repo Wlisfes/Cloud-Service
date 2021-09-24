@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional, PickType, OmitType, IntersectionType } from '@nestjs/swagger'
 import { IsNotEmpty, IsEmail, Length, IsNumber, Min } from 'class-validator'
 import { IsOptional, IsMobile } from '@/decorator/common.decorator'
-import { Type } from 'class-transformer'
+import { Type, Transform } from 'class-transformer'
+import { toArrayNumber } from '@/utils/validate'
 import { JwtInterface } from '@/module/jwt/jwt.interface'
 
 export class UserInterface {
@@ -100,10 +101,11 @@ class UserParameter {
 	@Type(type => Number)
 	size: number
 
-	@ApiProperty({ description: '角色', example: 1 })
-	@IsNotEmpty({ message: '角色 必填' })
-	@Type(type => Number)
-	role: number
+	@ApiPropertyOptional({ description: '角色id', type: [Number], example: [] })
+	@IsOptional({}, { string: true, number: true })
+	@Transform(type => toArrayNumber(type), { toClassOnly: true })
+	@IsNumber({}, { each: true, message: '角色id 必须为Array<number>' })
+	role: number[]
 }
 
 export class CreateCode {

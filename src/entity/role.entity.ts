@@ -26,7 +26,7 @@ export class RoleEntity extends BaseEntity {
 	@JoinTable({ name: 'role_module_join' })
 	module: ModuleEntity[]
 
-	@OneToMany(
+	@ManyToMany(
 		type => UserEntity,
 		type => type.role
 	)
