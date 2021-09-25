@@ -4,8 +4,6 @@ import { Brackets, getRepository } from 'typeorm'
 import { JwtAuthService } from '@/module/jwt/jwt.service'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
-import { ModuleEntity } from '@/entity/module.entity'
-import { ModuleActionEntity } from '@/entity/module.action.entity'
 import { RoleEnum, RoleModuleEnum, RoleActionEnum } from '@/config/role.config'
 
 export const APP_AUTH = Symbol('APP_AUTH')
@@ -62,7 +60,6 @@ export class AuthGuard implements CanActivate {
 
 	/**验证角色权限**/
 	private async nodeAuthRole(props: AuthRoleInterface, uid: number) {
-		console.log(props)
 		const role = await getRepository(RoleEntity)
 			.createQueryBuilder('role')
 			.leftJoinAndSelect('role.user', 'user')
@@ -73,28 +70,22 @@ export class AuthGuard implements CanActivate {
 				})
 			)
 			.getMany()
-		// if (!role) {
-		// 	return this.HttpException('角色不符', HttpStatus.FORBIDDEN, props.error)
-		// } else if (!role.some(k => k.status === 1)) {
-		// 	return this.HttpException('角色已禁用', HttpStatus.FORBIDDEN, props.error)
-		// }
 
-		const module = await getRepository(ModuleEntity)
-			.createQueryBuilder('module')
-			.leftJoinAndSelect('module.role', 'role')
-			.where(
-				new Brackets(Q => {
-					Q.andWhere('role.primary IN (:...primary)', { primary: props.role })
-					Q.andWhere('module.primary = :primary', { primary: props.module })
-				})
-			)
-			.getMany()
-		if (!module) {
-			return this.HttpException('角色功能不足', HttpStatus.FORBIDDEN, props.error)
+		if (role.length === 0) {
+			return this.HttpException('角色不符', HttpStatus.FORBIDDEN, props.error)
+		} else if (role.some(k => k.primary === 'admin')) {
+			return true /**admin角色直接通行**/
+		} else if (!role.some(k => k.status === 1)) {
+			return this.HttpException('角色已禁用', HttpStatus.FORBIDDEN, props.error)
+		} else {
+			const action = role.some(k => {
+				return k.status === 1 && k.action.includes(`${props.module}:${props.action}`)
+			})
+			if (action) {
+				return true
+			}
+			return this.HttpException('角色action功能权限不足', HttpStatus.FORBIDDEN, props.error)
 		}
-		console.log(module)
-
-		return true
 	}
 
 	public async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -110,62 +101,7 @@ export class AuthGuard implements CanActivate {
 
 		if (node?.role?.length > 0) {
 			//验证用户权限
-			// const user = await this.userService.userModel.findOne({
-			// 	where: { uid: request.user.uid },
-			// 	relations: ['role', 'role.module', 'role.module.action']
-			// })
-			// if
-			console.log(node)
-			// this.nodeAuthRole(node, request.user.uid)
-			// const role = await getRepository(RoleEntity) //this.roleService.roleModel
-			// 	.createQueryBuilder('role')
-			// 	.leftJoinAndSelect('role.user', 'user')
-			// 	.leftJoinAndSelect('role.module', 'module')
-			// 	.leftJoinAndSelect('module.action', 'action')
-			// 	.leftJoinAndMapOne('role.star', 'role.module', 'star', 'star.primary = :primary', { primary: 'role' })
-			// .leftJoinAndMapOne('role.star', 'role.module', 'star', 'star.primary = :primary', {
-			// 	primary: node.module
-			// })
-
-			// .leftJoinAndMapOne('role.star', 'role.module', 'star', qb => {
-			// 	return qb.andWhere('star.primary = :primary', { primary: node.module })
-			// })
-			// .where(
-			// 	new Brackets(Q => {
-			// 		Q.where('user.uid = :uid', { uid: request.user.uid })
-			// 	})
-			// )
-			// .getMany()
-
-			// if (!node.role.some(k => role.some(v => v.primary === k))) {
-			// 	return true // useThrow('角色不符', HttpStatus.FORBIDDEN, petence.error)
-			// } else {
-			// }
-
-			// if (!petence.role.includes()) {
-			// 		return useThrow('角色不符', HttpStatus.FORBIDDEN, petence.error)
-			// 	}
-			// const role = await this.roleService.nodeUserRole(request.user.uid)
-			// if (!petence.role.includes(role.primary as RoleEnum)) {
-			// 	return useThrow('角色不符', HttpStatus.FORBIDDEN, petence.error)
-			// } else if (role.status === 0) {
-			// 	return useThrow('角色已禁用', HttpStatus.FORBIDDEN, petence.error)
-			// } else if (!role.children.find(k => k.primary === petence.module)) {
-			// 	return useThrow('角色功能不足', HttpStatus.FORBIDDEN, petence.error)
-			// } else if (!role.children.find(k => k.primary === petence.module).status) {
-			// 	return useThrow('角色功能已禁用', HttpStatus.FORBIDDEN, petence.error)
-			// } else {
-			// 	const { children } = role.children.find(k => k.primary === petence.module)
-			// 	if (!children.find(k => k.primary === petence.action)) {
-			// 		return useThrow('角色功能已权限不足', HttpStatus.FORBIDDEN, petence.error)
-			// 	} else if (!children.find(k => k.primary === petence.action).status) {
-			// 		return useThrow('角色功能已权限已禁用', HttpStatus.FORBIDDEN, petence.error)
-			// 	} else {
-			// 		//验证通过
-			// 		return true
-			// 	}
-			// }
-			return true
+			return await this.nodeAuthRole(node, request.user.uid)
 		}
 
 		return true
