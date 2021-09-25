@@ -1,8 +1,6 @@
-import { Entity, Column, ManyToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm'
+import { Entity, Column, ManyToMany } from 'typeorm'
 import { BaseEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
-import { MenuEntity } from '@/entity/menu.entity'
-import { ModuleEntity } from '@/entity/module.entity'
 
 @Entity('role')
 export class RoleEntity extends BaseEntity {
@@ -18,13 +16,8 @@ export class RoleEntity extends BaseEntity {
 	@Column({ nullable: false, default: 1, comment: '状态: 0.禁用 1.启用' })
 	status: number
 
-	@ManyToMany(
-		type => ModuleEntity,
-		type => type.role,
-		{ cascade: true }
-	)
-	@JoinTable({ name: 'role_module_join' })
-	module: ModuleEntity[]
+	@Column('simple-array', { nullable: true, default: null, comment: '权限列表' })
+	action: string[]
 
 	@ManyToMany(
 		type => UserEntity,

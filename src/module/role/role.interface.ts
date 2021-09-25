@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PickType, OmitType, IntersectionType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, Min } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator'
 import { Type, Transform } from 'class-transformer'
 import { IsOptional } from '@/decorator/common.decorator'
 import { toArrayNumber } from '@/utils/validate'
@@ -53,11 +53,10 @@ export class RoleParameter {
 	@Type(type => Number)
 	status: number
 
-	@ApiPropertyOptional({ description: '权限模块id', type: [Number], example: [] })
+	@ApiPropertyOptional({ description: '组合权限key', type: [String], example: [] })
 	@IsOptional({}, { string: true, number: true })
-	@Transform(type => toArrayNumber(type), { toClassOnly: true })
-	@IsNumber({}, { each: true, message: '权限模块id 必须为Array<number>' })
-	module: number[]
+	@IsString({ each: true, message: '组合权限key 必须为Array<string>' })
+	action: string[]
 
 	@ApiProperty({ description: '分页', example: 1 })
 	@IsNotEmpty({ message: 'page 必填' })
@@ -81,7 +80,7 @@ export class RoleParameter {
  *************************************************************************************************/
 export class NodeCreateRoleParameter extends IntersectionType(
 	PickType(RoleParameter, ['primary', 'name']),
-	PickType(RoleParameter, ['comment', 'status', 'module'])
+	PickType(RoleParameter, ['comment', 'status', 'action'])
 ) {}
 /**创建角色-Response**/
 export class NodeCreateRoleResponse {
@@ -96,7 +95,7 @@ export class NodeCreateRoleResponse {
  *************************************************************************************************/
 export class NodeUpdateRoleParameter extends IntersectionType(
 	PickType(RoleParameter, ['id', 'primary', 'name']),
-	PickType(RoleParameter, ['comment', 'status', 'module'])
+	PickType(RoleParameter, ['comment', 'status', 'action'])
 ) {}
 /**修改角色-Response**/
 export class NodeUpdateRoleResponse {
@@ -125,7 +124,7 @@ export class NodeRoleParameter extends PickType(RoleParameter, ['id']) {}
 /**角色信息-Response**/
 export class NodeRoleResponse extends IntersectionType(
 	PickType(RoleParameter, ['primary', 'name']),
-	PickType(RoleParameter, ['comment', 'status', 'module'])
+	PickType(RoleParameter, ['comment', 'status', 'action'])
 ) {}
 
 /**

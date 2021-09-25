@@ -1,7 +1,6 @@
 import { Entity, Column, ManyToMany, JoinTable } from 'typeorm'
 import { BaseEntity } from '@/entity/common.entity'
 import { ModuleActionEntity } from '@/entity/module.action.entity'
-import { RoleEntity } from '@/entity/role.entity'
 
 @Entity('module')
 export class ModuleEntity extends BaseEntity {
@@ -24,10 +23,4 @@ export class ModuleEntity extends BaseEntity {
 	)
 	@JoinTable({ name: 'module_action_join' })
 	action: ModuleActionEntity[]
-
-	@ManyToMany(
-		type => RoleEntity,
-		type => type.module
-	)
-	role: RoleEntity[]
 }

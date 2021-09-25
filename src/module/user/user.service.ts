@@ -14,7 +14,7 @@ import * as DTO from './user.interface'
 @Injectable()
 export class UserService {
 	constructor(
-		@InjectRepository(UserEntity) public readonly userModel: Repository<UserEntity>,
+		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
 		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>,
 		private readonly jwtAuthService: JwtAuthService,
 		private readonly redisService: RedisService,

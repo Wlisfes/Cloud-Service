@@ -20,30 +20,16 @@ export class RoleService {
 	/**创建角色-授权管理端**/
 	public async nodeCreateRole(props: DTO.NodeCreateRoleParameter) {
 		try {
-			let module = []
-
 			if (await this.roleModel.findOne({ where: { primary: props.primary } })) {
 				throw new HttpException('角色已存在', HttpStatus.BAD_REQUEST)
-			}
-
-			if (props.module?.length > 0) {
-				module = await this.moduleModel.find({ where: { id: In(props.module) } })
-				props.module.forEach(id => {
-					const element = module.find(element => element.id === id)
-					if (!element) {
-						throw new HttpException(`权限模块id ${id} 不存在`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 0) {
-						throw new HttpException(`权限模块 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
-					}
-				})
 			}
 
 			const newRole = await this.roleModel.create({
 				primary: props.primary,
 				name: props.name,
 				status: props.status || 0,
-				comment: props.comment || null,
-				module
+				action: props.action || null,
+				comment: props.comment || null
 			})
 			await this.roleModel.save(newRole)
 
@@ -56,38 +42,17 @@ export class RoleService {
 	/**修改角色-授权管理端**/
 	public async nodeUpdateRole(props: DTO.NodeUpdateRoleParameter) {
 		try {
-			let module = []
-			const role = await this.roleModel.findOne({ where: { id: props.id }, relations: ['module'] })
+			const role = await this.roleModel.findOne({ where: { id: props.id } })
 			if (!role) {
 				throw new HttpException('角色不存在', HttpStatus.BAD_REQUEST)
 			}
 
-			if (props.module?.length > 0) {
-				module = await this.moduleModel.find({ where: { id: In(props.module) } })
-				props.module.forEach(id => {
-					const element = module.find(element => element.id === id)
-					if (!element) {
-						throw new HttpException(`权限模块id ${id} 不存在`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 0) {
-						throw new HttpException(`权限模块 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
-					}
-				})
-			}
-
-			/**更新权限模块**/
-			await this.roleModel
-				.createQueryBuilder()
-				.relation('module')
-				.of(role)
-				.addAndRemove(
-					props.module,
-					role.module.map(k => k.id)
-				)
 			await this.roleModel.update(
 				{ id: props.id },
 				{
 					primary: props.primary,
 					name: props.name,
+					action: props.action || null,
 					comment: props.comment || null,
 					status: isEmpty(props.status) ? role.status : props.status
 				}
@@ -123,8 +88,8 @@ export class RoleService {
 	public async nodeRole(props: DTO.NodeRoleParameter) {
 		try {
 			const role = await this.roleModel.findOne({
-				where: { id: props.id },
-				relations: ['module']
+				where: { id: props.id }
+				// relations: ['module']
 			})
 
 			if (!role) {
