@@ -1,15 +1,3 @@
-// export interface NodeAction {
-// 	primary: string
-// 	name: string
-// 	status: number
-// }
-// export interface Module extends NodeAction {
-// 	action: Action[]
-// }
-// export interface RolesConfig extends NodeAction {
-// 	auth: Module[]
-// }
-
 export type RoleEnum = 'admin' | 'super' | 'visitor'
 export type RoleModuleEnum = 'module' | 'user' | 'role' | 'menu' | 'cloud' | 'source' | 'article' | 'minute'
 export type RoleActionEnum = 'create' | 'update' | 'delete' | 'params' | 'list'
