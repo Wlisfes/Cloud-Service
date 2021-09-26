@@ -43,11 +43,11 @@ export class MenuEntity extends BaseEntity {
 	)
 	children: MenuEntity[]
 
-	// @ManyToMany(
-	// 	type => RoleEntity,
-	// 	type => type.menu,
-	// 	{ cascade: true }
-	// )
-	// @JoinTable({ name: 'menu_role_join' })
-	// role: RoleEntity[]
+	@ManyToMany(
+		type => RoleEntity,
+		type => type.menu,
+		{ cascade: true }
+	)
+	@JoinTable({ name: 'menu_role_join' })
+	role: RoleEntity[]
 }

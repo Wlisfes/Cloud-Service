@@ -51,11 +51,11 @@ export class MenuService {
 				router: props.router || null,
 				path: props.path || null,
 				keepAlive: props.keepAlive || 0,
-				visible: props.visible || 1,
+				visible: props.visible || 0,
 				icon: props.icon || null,
 				order: props.order || 0,
-				parent
-				// role
+				parent,
+				role
 			})
 			await this.menuModel.save(newMenu)
 
