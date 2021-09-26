@@ -4,7 +4,7 @@ import { IsOptional } from '@/decorator/common.decorator'
 import { Type } from 'class-transformer'
 
 export class PosterResponse {
-	@ApiProperty({ description: '图片id', example: 1 })
+	@ApiProperty({ description: '图床id', example: 1 })
 	id: number
 
 	@ApiProperty({ description: '类型 1、avatar 2、upload 3、cover', enum: [1, 2, 3] })
@@ -30,8 +30,8 @@ export class PosterResponse {
 }
 
 export class PosterParameter {
-	@ApiProperty({ description: '图片id', example: 1 })
-	@IsNotEmpty({ message: '图片id 必填' })
+	@ApiProperty({ description: '图床id', example: 1 })
+	@IsNotEmpty({ message: '图床id 必填' })
 	@Type(type => Number)
 	id: number
 
@@ -71,10 +71,10 @@ export class PosterParameter {
 /**
  *
  *
- * 创建图片-Parameter
+ * 创建图床-Parameter
  *************************************************************************************************/
 export class NodeCreatePosterParameter extends PickType(PosterParameter, ['url', 'path', 'type']) {}
-/**创建图片-Response**/
+/**创建图床-Response**/
 export class NodeCreatePosterResponse {
 	@ApiProperty({ description: 'message', example: '创建成功' })
 	message: string
@@ -83,10 +83,10 @@ export class NodeCreatePosterResponse {
 /**
  *
  *
- * 切换图片状态-Parameter
+ * 切换图床状态-Parameter
  *************************************************************************************************/
 export class NodePosterCutoverParameter extends PickType(PosterParameter, ['id']) {}
-/**切换图片状态-Response**/
+/**切换图床状态-Response**/
 export class NodePosterCutoverResponse {
 	@ApiProperty({ description: 'message', example: '修改成功' })
 	message: string
@@ -95,10 +95,10 @@ export class NodePosterCutoverResponse {
 /**
  *
  *
- * 删除图片-Parameter
+ * 删除图床-Parameter
  *************************************************************************************************/
 export class NodeDeletePosterParameter extends PickType(PosterParameter, ['id']) {}
-/**删除图片-Response**/
+/**删除图床-Response**/
 export class NodeDeletePosterResponse {
 	@ApiProperty({ description: 'message', example: '删除成功' })
 	message: string
@@ -107,10 +107,10 @@ export class NodeDeletePosterResponse {
 /**
  *
  *
- * 图片信息-Parameter
+ * 图床信息-Parameter
  *************************************************************************************************/
 export class NodePosterParameter extends PickType(PosterParameter, ['id']) {}
-/**图片信息-Response**/
+/**图床信息-Response**/
 export class NodePosterResponse extends IntersectionType(
 	PickType(PosterParameter, ['id', 'type', 'url', 'path']),
 	PickType(PosterParameter, ['status'])
@@ -119,11 +119,11 @@ export class NodePosterResponse extends IntersectionType(
 /**
  *
  *
- * 图片列表-Parameter
+ * 图床列表-Parameter
  *************************************************************************************************/
 export class NodePostersParameter extends PickType(PosterParameter, ['size', 'page', 'status']) {}
-/**图片列表-Response**/
+/**图床列表-Response**/
 export class NodePostersResponse extends PickType(PosterResponse, ['size', 'page', 'total']) {
-	@ApiProperty({ description: '图片列表', type: [NodePosterResponse], example: [] })
+	@ApiProperty({ description: '图床列表', type: [NodePosterResponse], example: [] })
 	list: NodePosterResponse[]
 }

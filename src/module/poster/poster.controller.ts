@@ -21,7 +21,7 @@ export class PosterController {
 		return await this.posterService.nodeCreatePoster(body, req.user.uid)
 	}
 
-	@ApiOperation({ summary: '切换图片状态-授权管理端' })
+	@ApiOperation({ summary: '切换图床状态-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
 	@AuthRole({ role: ['admin', 'super', 'dev'], module: 'poster', action: 'update' })
@@ -33,7 +33,7 @@ export class PosterController {
 		return await this.posterService.nodePosterCutover(body, req.user.uid)
 	}
 
-	@ApiOperation({ summary: '图片信息-授权管理端' })
+	@ApiOperation({ summary: '图床信息-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
 	@AuthRole({ role: ['admin', 'super', 'dev'], module: 'poster', action: 'params' })
@@ -45,7 +45,7 @@ export class PosterController {
 		return await this.posterService.nodePoster(query, req.user.uid)
 	}
 
-	@ApiOperation({ summary: '图片列表-授权管理端' })
+	@ApiOperation({ summary: '图床列表-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
 	@AuthRole({ role: ['admin', 'super', 'dev'], module: 'poster', action: 'list' })
@@ -57,7 +57,7 @@ export class PosterController {
 		return await this.posterService.nodePosters(query, req.user.uid)
 	}
 
-	@ApiOperation({ summary: '删除图片-授权管理端' })
+	@ApiOperation({ summary: '删除图床-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
 	@AuthRole({ role: ['admin', 'super'], module: 'poster', action: 'delete' })

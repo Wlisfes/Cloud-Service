@@ -13,7 +13,7 @@ export class PosterService {
 		@InjectRepository(PosterEntity) private readonly posterModel: Repository<PosterEntity>
 	) {}
 
-	/**创建图片-授权管理端**/
+	/**创建图床-授权管理端**/
 	public async nodeCreatePoster(props: DTO.NodeCreatePosterParameter, uid: number) {
 		try {
 			const user = await this.userModel.findOne({ where: { uid } })
@@ -24,7 +24,7 @@ export class PosterService {
 				status: 1,
 				user
 			})
-			await this.userModel.save(node)
+			await this.posterModel.save(node)
 
 			return { message: '创建成功' }
 		} catch (e) {
@@ -32,15 +32,15 @@ export class PosterService {
 		}
 	}
 
-	/**切换图片状态-授权管理端**/
+	/**切换图床状态-授权管理端**/
 	public async nodePosterCutover(props: DTO.NodePosterCutoverParameter, uid: number) {
 		try {
 			const user = await this.userModel.findOne({ where: { uid } })
 			const node = await this.posterModel.findOne({ where: { id: props.id, user } })
 			if (!node) {
-				throw new HttpException('图片不存在', HttpStatus.BAD_REQUEST)
+				throw new HttpException('图床不存在', HttpStatus.BAD_REQUEST)
 			} else if (node.status === 2) {
-				throw new HttpException('图片已删除', HttpStatus.BAD_REQUEST)
+				throw new HttpException('图床已删除', HttpStatus.BAD_REQUEST)
 			}
 			await this.posterModel.update(
 				{ id: props.id },
@@ -55,13 +55,13 @@ export class PosterService {
 		}
 	}
 
-	/**图片信息-授权管理端**/
+	/**图床信息-授权管理端**/
 	public async nodePoster(props: DTO.NodePosterParameter, uid: number) {
 		try {
 			const user = await this.userModel.findOne({ where: { uid } })
 			const node = await this.posterModel.findOne({ where: { id: props.id, user } })
 			if (!node) {
-				throw new HttpException('图片不存在', HttpStatus.BAD_REQUEST)
+				throw new HttpException('图床不存在', HttpStatus.BAD_REQUEST)
 			}
 
 			return node
@@ -70,7 +70,7 @@ export class PosterService {
 		}
 	}
 
-	/**图片列表-授权管理端**/
+	/**图床列表-授权管理端**/
 	public async nodePosters(props: DTO.NodePostersParameter, uid: number) {
 		try {
 			const [list = [], total = 0] = await this.posterModel
@@ -102,15 +102,15 @@ export class PosterService {
 		}
 	}
 
-	/**删除图片-授权管理端**/
+	/**删除图床-授权管理端**/
 	public async nodeDeletePoster(props: DTO.NodeDeletePosterParameter, uid: number) {
 		try {
 			const user = await this.userModel.findOne({ where: { uid } })
 			const node = await this.posterModel.findOne({ where: { id: props.id, user } })
 			if (!node) {
-				throw new HttpException('图片不存在', HttpStatus.BAD_REQUEST)
+				throw new HttpException('图床不存在', HttpStatus.BAD_REQUEST)
 			} else if (node.status === 2) {
-				throw new HttpException('图片已删除', HttpStatus.BAD_REQUEST)
+				throw new HttpException('图床已删除', HttpStatus.BAD_REQUEST)
 			}
 			await this.posterModel.update(
 				{ id: props.id },
