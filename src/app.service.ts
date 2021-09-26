@@ -3,161 +3,112 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, IsNull } from 'typeorm'
 import { UserEntity } from '@/entity/user.entity'
 import { RoleEntity } from '@/entity/role.entity'
-import { roles as R, RolesConfig, Auth, Action } from '@/config/role.config'
+import { ModuleEntity } from '@/entity/module.entity'
+import { ModuleActionEntity } from '@/entity/module.action.entity'
+import { nodeRole, nodeModule, nodeAction } from '@/config/role.config'
 import * as _ from 'lodash'
 
 @Injectable()
 export class AppService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
-		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>
+		@InjectRepository(RoleEntity) private readonly roleModel: Repository<RoleEntity>,
+		@InjectRepository(ModuleEntity) private readonly moduleModel: Repository<ModuleEntity>,
+		@InjectRepository(ModuleActionEntity) private readonly actionModel: Repository<ModuleActionEntity>
 	) {}
 
 	onApplicationBootstrap() {
 		// this.init()
 	}
 
-	// 	private async init() {
-	// 		try {
-	// 			await this.initRole(_.cloneDeep(R))
-	// 			console.log('角色初始化完毕')
-	// 			await this.initAdminUser(_.cloneDeep(R.filter(k => k.primary === 'admin')))
-	// 			console.log('管理员初始化成功  账户:88888888  password:88888888')
-	// 		} catch (e) {
-	// 			console.log(e)
-	// 		}
-	// 	}
+	private init() {
+		this.initAction().finally(() => {
+			this.initModule().finally(() => {
+				this.inirRole().then(async next => {
+					await this.initUser()
+					console.log(next)
+				})
+			})
+		})
+	}
 
-	// 	/**初始化角色**/
-	// 	private initRole(roles: RolesConfig[], uid?: number) {
-	// 		return new Promise(async resolve => {
-	// 			try {
-	// 				if (roles.length > 0) {
-	// 					let user = null
-	// 					const props = roles.shift()
+	/**初始化用户**/
+	private initUser() {
+		return new Promise(async resolve => {
+			if (!(await this.userModel.findOne({ where: { account: 88888888 } }))) {
+				const role = await this.roleModel.find()
+				const newUser = await this.userModel.create({
+					account: 88888888,
+					nickname: '妖雨纯',
+					password: '123456',
+					role
+				})
+				await this.userModel.save(newUser)
+				resolve(true)
+			} else {
+				resolve(true)
+			}
+		})
+	}
 
-	// 					if (uid) {
-	// 						user = await this.userModel.findOne({ where: { uid } })
-	// 					}
-	// 					if (
-	// 						!(await this.roleModel.findOne({
-	// 							where: { primary: props.primary, user: user ? user : IsNull() }
-	// 						}))
-	// 					) {
-	// 						const newRole = await this.roleModel.create({
-	// 							primary: props.primary,
-	// 							name: props.name,
-	// 							status: props.status,
-	// 							type: props.type,
-	// 							user: user ? user : IsNull()
-	// 						})
-	// 						await this.roleModel.save(newRole)
-	// 					}
+	/**初始化role角色**/
+	private inirRole() {
+		return new Promise(async resove => {
+			const params = await this.roleModel.findOne({ where: { primary: nodeRole.primary } })
+			if (!params) {
+				const action = nodeModule.reduce((next, k) => {
+					return next.concat(nodeAction.map(v => `${k.primary}:${v.primary}`))
+				}, [])
+				const node = await this.roleModel.create({
+					primary: nodeRole.primary,
+					name: nodeRole.name,
+					status: nodeRole.status,
+					comment: '超级管理员、适用于所有权限',
+					action
+				})
+				await this.roleModel.save(node)
+			}
+			resove('初始化role角色完毕')
+		})
+	}
 
-	// 					const role = await this.roleModel.findOne({
-	// 						where: { primary: props.primary, user: user ? user : IsNull() }
-	// 					})
-	// 					await this.initAuth(role.id, _.cloneDeep(props.auth), uid)
-	// 					await this.initRole(roles, uid)
+	/**初始化action权限**/
+	private initAction() {
+		return new Promise(async resolve => {
+			for (const props of nodeAction) {
+				const params = await this.actionModel.findOne({ where: { primary: props.primary } })
+				if (!params) {
+					const node = await this.actionModel.create({
+						primary: props.primary,
+						name: props.name,
+						status: props.status,
+						comment: null
+					})
+					await this.moduleModel.save(node)
+				}
+			}
+			resolve('初始化action权限完毕')
+		})
+	}
 
-	// 					resolve(true)
-	// 				} else {
-	// 					resolve(true)
-	// 				}
-	// 			} catch (e) {
-	// 				console.log('initRole', e)
-	// 			}
-	// 		})
-	// 	}
-
-	// 	/**初始化权限模块**/
-	// 	private initAuth(parentId: number, auths: Auth[], uid?: number) {
-	// 		return new Promise(async resolve => {
-	// 			try {
-	// 				if (auths.length > 0) {
-	// 					let user = null
-	// 					const props = auths.shift()
-	// 					if (uid) {
-	// 						user = await this.userModel.findOne({ where: { uid } })
-	// 					}
-
-	// 					const parent = await this.roleModel.findOne({ where: { id: parentId } })
-	// 					if (!(await this.roleModel.findOne({ where: { primary: props.primary, parent } }))) {
-	// 						const newAuth = await this.roleModel.create({
-	// 							primary: props.primary,
-	// 							name: props.name,
-	// 							status: props.status,
-	// 							type: props.type,
-	// 							parent,
-	// 							user
-	// 						})
-	// 						await this.roleModel.save(newAuth)
-	// 					}
-	// 					const auth = await this.roleModel.findOne({ where: { primary: props.primary, parent } })
-	// 					await this.initAction(auth.id, _.cloneDeep(props.action), uid)
-	// 					await this.initAuth(parentId, auths, uid)
-
-	// 					resolve(true)
-	// 				} else {
-	// 					resolve(true)
-	// 				}
-	// 			} catch (e) {
-	// 				console.log('initAuth', e)
-	// 			}
-	// 		})
-	// 	}
-
-	// 	/**初始化权限**/
-	// 	private initAction(parentId: number, actions: Action[], uid?: number) {
-	// 		return new Promise(async resolve => {
-	// 			try {
-	// 				if (actions.length > 0) {
-	// 					let user = null
-	// 					const props = actions.shift()
-
-	// 					if (uid) {
-	// 						user = await this.userModel.findOne({ where: { uid } })
-	// 					}
-	// 					const parent = await this.roleModel.findOne({ where: { id: parentId } })
-	// 					if (!(await this.roleModel.findOne({ where: { primary: props.primary, parent } }))) {
-	// 						const newAction = await this.roleModel.create({
-	// 							primary: props.primary,
-	// 							name: props.name,
-	// 							status: props.status,
-	// 							type: props.type,
-	// 							parent,
-	// 							user
-	// 						})
-	// 						await this.roleModel.save(newAction)
-	// 					}
-	// 					await this.initAction(parentId, actions, uid)
-
-	// 					resolve(true)
-	// 				} else {
-	// 					resolve(true)
-	// 				}
-	// 			} catch (e) {
-	// 				console.log('initAction', e)
-	// 			}
-	// 		})
-	// 	}
-
-	// 	/**初始化管理员**/
-	// 	private initAdminUser(props: RolesConfig[]) {
-	// 		return new Promise(async resolve => {
-	// 			if (!(await this.userModel.findOne({ where: { account: 88888888 } }))) {
-	// 				const newUser = await this.userModel.create({
-	// 					account: 88888888,
-	// 					nickname: '妖雨纯',
-	// 					password: '88888888'
-	// 				})
-	// 				await this.userModel.save(newUser)
-	// 			}
-
-	// 			const user = await this.userModel.findOne({ where: { account: 88888888 } })
-	// 			await this.initRole(props, user.uid)
-
-	// 			resolve(true)
-	// 		})
-	// 	}
+	/**初始化module模块**/
+	private initModule() {
+		return new Promise(async resolve => {
+			for (const props of nodeModule) {
+				const params = await this.moduleModel.findOne({ where: { primary: props.primary } })
+				if (!params) {
+					const action = await this.actionModel.find()
+					const node = await this.moduleModel.create({
+						primary: props.primary,
+						name: props.name,
+						status: props.status,
+						comment: null,
+						action
+					})
+					await this.moduleModel.save(node)
+				}
+			}
+			resolve('初始化module模块完毕')
+		})
+	}
 }
