@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm'
+import { Entity, Column, ManyToOne } from 'typeorm'
 import { BaseEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
 
@@ -7,7 +7,7 @@ export class PosterEntity extends BaseEntity {
 	@Column({ nullable: false, default: 1, comment: '图片类型 1、avatar 2、upload 3、cover' })
 	type: number
 
-	@Column({ nullable: false, comment: '文件oss路径' })
+	@Column({ nullable: false, comment: '文件oss地址' })
 	url: string
 
 	@Column({ nullable: false, comment: '文件oss路径' })

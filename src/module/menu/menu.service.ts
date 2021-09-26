@@ -193,14 +193,14 @@ export class MenuService {
 			}
 
 			//删除已有的权限
-			// await this.menuModel
-			// 	.createQueryBuilder()
-			// 	.relation('role')
-			// 	.of(node)
-			// 	.addAndRemove(
-			// 		props.role,
-			// 		node.role.map(k => k.id)
-			// 	)
+			await this.menuModel
+				.createQueryBuilder()
+				.relation('role')
+				.of(node)
+				.addAndRemove(
+					props.role,
+					node.role.map(k => k.id)
+				)
 
 			await this.menuModel.update(
 				{ id: props.id },
