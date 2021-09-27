@@ -80,6 +80,10 @@ export class PosterService {
 					new Brackets(Q => {
 						Q.andWhere('user.uid = :uid', { uid })
 
+						if (props.type) {
+							Q.andWhere('poster.type = :type', { type: props.type })
+						}
+
 						if (isEmpty(props.status)) {
 							Q.andWhere('poster.status != :status', { status: 2 })
 						} else {
@@ -87,6 +91,7 @@ export class PosterService {
 						}
 					})
 				)
+				.orderBy({ 'poster.id': 'DESC' })
 				.skip((props.page - 1) * props.size)
 				.take(props.size)
 				.getManyAndCount()

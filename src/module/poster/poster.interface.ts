@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PickType, IntersectionType } from '@nestjs/swagger'
-import { IsNotEmpty, IsHexColor, IsNumber, Min } from 'class-validator'
+import { IsNotEmpty, IsNumber, Min } from 'class-validator'
 import { IsOptional } from '@/decorator/common.decorator'
 import { Type } from 'class-transformer'
 
@@ -7,7 +7,7 @@ export class PosterResponse {
 	@ApiProperty({ description: '图床id', example: 1 })
 	id: number
 
-	@ApiProperty({ description: '类型 1、avatar 2、upload 3、cover', enum: [1, 2, 3] })
+	@ApiProperty({ description: '类型 1、avatar 2、upload 3、cover 4、Photo', enum: [1, 2, 3, 4] })
 	type: number
 
 	@ApiProperty({ description: '文件oss地址', example: 'https://oss.lisfes.cn/upload/1592634450167.jpg' })
@@ -35,7 +35,7 @@ export class PosterParameter {
 	@Type(type => Number)
 	id: number
 
-	@ApiProperty({ description: '类型 1、avatar 2、upload 3、cover', enum: [1, 2, 3] })
+	@ApiProperty({ description: '类型 1、avatar 2、upload 3、cover 4、Photo', enum: [1, 2, 3, 4] })
 	@IsNotEmpty({ message: '类型 必填' })
 	@Type(type => Number)
 	type: number
@@ -121,7 +121,12 @@ export class NodePosterResponse extends IntersectionType(
  *
  * 图床列表-Parameter
  *************************************************************************************************/
-export class NodePostersParameter extends PickType(PosterParameter, ['size', 'page', 'status']) {}
+export class NodePostersParameter extends PickType(PosterParameter, ['size', 'page', 'status']) {
+	@ApiPropertyOptional({ description: '类型 1、avatar 2、upload 3、cover 4、Photo', enum: [1, 2, 3, 4] })
+	@IsOptional({}, { string: true, number: true })
+	@Type(type => Number)
+	type: number
+}
 /**图床列表-Response**/
 export class NodePostersResponse extends PickType(PosterResponse, ['size', 'page', 'total']) {
 	@ApiProperty({ description: '图床列表', type: [NodePosterResponse], example: [] })
