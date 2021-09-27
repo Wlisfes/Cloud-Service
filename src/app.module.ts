@@ -21,6 +21,8 @@ import { ArticleEntity } from '@/entity/article.entity'
 import { MinuteEntity } from '@/entity/minute.entity'
 import { ModuleEntity } from '@/entity/module.entity'
 import { ModuleActionEntity } from '@/entity/module.action.entity'
+import { PosterEntity } from '@/entity/poster.entity'
+import { PartnerEntity } from '@/entity/partner.entity'
 
 @Module({
 	imports: [
@@ -43,7 +45,9 @@ import { ModuleActionEntity } from '@/entity/module.action.entity'
 			ArticleEntity,
 			MinuteEntity,
 			ModuleEntity,
-			ModuleActionEntity
+			ModuleActionEntity,
+			PosterEntity,
+			PartnerEntity
 		]),
 		InitModule
 	],

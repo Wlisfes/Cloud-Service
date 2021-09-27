@@ -4,7 +4,7 @@ import { PosterService } from './poster.service'
 import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as DTO from './poster.interface'
 
-@ApiTags('云点播管理-图床模块')
+@ApiTags('资源管理-图床模块')
 @Controller('poster')
 export class PosterController {
 	constructor(private readonly posterService: PosterService) {}

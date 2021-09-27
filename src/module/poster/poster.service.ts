@@ -24,9 +24,9 @@ export class PosterService {
 				status: 1,
 				user
 			})
-			await this.posterModel.save(node)
+			const poster = await this.posterModel.save(node)
 
-			return { message: '创建成功' }
+			return { message: '创建成功', ...poster }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

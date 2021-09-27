@@ -1,5 +1,15 @@
 export type RoleEnum = 'admin' | 'super' | 'visitor' | 'dev'
-export type RoleModuleEnum = 'module' | 'user' | 'role' | 'menu' | 'cloud' | 'source' | 'article' | 'minute' | 'poster'
+export type RoleModuleEnum =
+	| 'module'
+	| 'user'
+	| 'role'
+	| 'menu'
+	| 'cloud'
+	| 'source'
+	| 'article'
+	| 'minute'
+	| 'poster'
+	| 'partner'
 export type RoleActionEnum = 'create' | 'update' | 'delete' | 'params' | 'list'
 
 export const nodeAction = [
@@ -18,7 +28,8 @@ export const nodeModule = [
 	{ primary: 'source', name: '标签管理', status: 1 },
 	{ primary: 'article', name: '文章管理', status: 1 },
 	{ primary: 'minute', name: '收录管理', status: 1 },
-	{ primary: 'poster', name: '图床管理', status: 1 }
+	{ primary: 'poster', name: '图床管理', status: 1 },
+	{ primary: 'partner', name: '更新日志管理', status: 1 }
 ]
 
 export const nodeRole = { primary: 'admin', name: '超级管理员', status: 1 }

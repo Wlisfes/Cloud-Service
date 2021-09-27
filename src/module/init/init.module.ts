@@ -20,6 +20,7 @@ import { CloudSourceModule } from '@/module/cloud-source/cloud-source.module'
 import { SourceModule } from '@/module/source/source.module'
 import { ArticleModule } from '@/module/article/article.module'
 import { MinuteModule } from '@/module/minute/minute.module'
+import { PartnerModule } from '@/module/partner/partner.module'
 
 @Module({
 	imports: [
@@ -86,7 +87,8 @@ import { MinuteModule } from '@/module/minute/minute.module'
 		CloudSourceModule,
 		SourceModule,
 		ArticleModule,
-		MinuteModule
+		MinuteModule,
+		PartnerModule
 	],
 	providers: [InitService]
 })
