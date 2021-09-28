@@ -4,19 +4,22 @@ import { Repository, In, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { PartnerEntity } from '@/entity/partner.entity'
 import { PosterEntity } from '@/entity/poster.entity'
+import { UserEntity } from '@/entity/user.entity'
 import { extractStr } from '@/utils/common'
 import * as DTO from './partner.interface'
 
 @Injectable()
 export class PartnerService {
 	constructor(
+		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
 		@InjectRepository(PosterEntity) private readonly posterModel: Repository<PosterEntity>,
 		@InjectRepository(PartnerEntity) private readonly partnerModel: Repository<PartnerEntity>
 	) {}
 
 	/**创建日志-授权管理端**/
-	public async nodeCreatePartner(props: DTO.NodeCreatePartnerParameter) {
+	public async nodeCreatePartner(props: DTO.NodeCreatePartnerParameter, uid: number) {
 		try {
+			const user = await this.userModel.findOne({ where: { uid } })
 			const cover = await this.posterModel.find({
 				where: {
 					id: In(props.cover)
@@ -29,7 +32,8 @@ export class PartnerService {
 				html: props.html,
 				description: extractStr(props.html),
 				status: props.status || 1,
-				cover
+				cover,
+				user
 			})
 			await this.partnerModel.save(node)
 
@@ -124,6 +128,33 @@ export class PartnerService {
 						} else {
 							Q.andWhere('partner.status = :status', { status: props.status })
 						}
+					})
+				)
+				.orderBy({ 'partner.id': 'DESC' })
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.getManyAndCount()
+
+			return {
+				size: props.size,
+				page: props.page,
+				total,
+				list
+			}
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**日志列表-客户端**/
+	public async nodeClientPartners(props: DTO.NodeClientPartnersParameter) {
+		try {
+			const [list = [], total = 0] = await this.partnerModel
+				.createQueryBuilder('partner')
+				.leftJoinAndSelect('partner.user', 'user')
+				.where(
+					new Brackets(Q => {
+						Q.andWhere('partner.status = :status', { status: 1 })
 					})
 				)
 				.orderBy({ 'partner.id': 'DESC' })

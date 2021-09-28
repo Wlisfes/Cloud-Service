@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Delete, Body, Query } from '@nestjs/common'
+import { Controller, Post, Get, Put, Delete, Body, Query, Req } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiConsumes, ApiProduces, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { PartnerService } from './partner.service'
 import { AuthToken, AuthRole, APP_AUTH_TOKEN } from '@/guard/auth.guard'
@@ -17,8 +17,8 @@ export class PartnerController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCreatePartnerResponse })
 	@Post('create')
-	async nodeCreatePartner(@Body() body: DTO.NodeCreatePartnerParameter) {
-		return await this.partnerService.nodeCreatePartner(body)
+	async nodeCreatePartner(@Body() body: DTO.NodeCreatePartnerParameter, @Req() req: { user: { uid: number } }) {
+		return await this.partnerService.nodeCreatePartner(body, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '修改日志-授权管理端' })
@@ -67,6 +67,15 @@ export class PartnerController {
 	@Get('list-node')
 	async nodePartners(@Query() query: DTO.NodePartnersParameter) {
 		return await this.partnerService.nodePartners(query)
+	}
+
+	@ApiOperation({ summary: '日志列表-客户端' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodePartnersResponse })
+	@Get('client/list-node')
+	async nodeClientPartners(@Query() query: DTO.NodeClientPartnersParameter) {
+		return await this.partnerService.nodeClientPartners(query)
 	}
 
 	@ApiOperation({ summary: '删除日志-授权管理端' })

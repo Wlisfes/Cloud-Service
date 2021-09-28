@@ -151,6 +151,7 @@ export class NodePartnerResponse extends IntersectionType(
  * 日志列表-Parameter
  *************************************************************************************************/
 export class NodePartnersParameter extends PickType(PartnerParameter, ['page', 'size', 'status']) {}
+export class NodeClientPartnersParameter extends PickType(PartnerParameter, ['page', 'size']) {}
 /**日志列表-Response**/
 export class NodePartnersResponse extends PickType(PartnerResponse, ['page', 'size', 'total']) {
 	@ApiProperty({ description: '日志列表', type: [NodePartnerResponse], example: [] })
