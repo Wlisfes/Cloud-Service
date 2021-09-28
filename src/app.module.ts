@@ -23,6 +23,7 @@ import { ModuleEntity } from '@/entity/module.entity'
 import { ModuleActionEntity } from '@/entity/module.action.entity'
 import { PosterEntity } from '@/entity/poster.entity'
 import { PartnerEntity } from '@/entity/partner.entity'
+import { LoggerEntity } from '@/entity/logger.entity'
 
 @Module({
 	imports: [
@@ -47,7 +48,8 @@ import { PartnerEntity } from '@/entity/partner.entity'
 			ModuleEntity,
 			ModuleActionEntity,
 			PosterEntity,
-			PartnerEntity
+			PartnerEntity,
+			LoggerEntity
 		]),
 		InitModule
 	],

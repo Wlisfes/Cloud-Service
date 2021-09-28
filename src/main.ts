@@ -1,11 +1,13 @@
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
+import { LoggerMiddleware } from '@/middleware/logger/logger.middleware'
 import { ValidationPipe } from '@nestjs/common'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { HttpExceptionFilter } from '@/filters/http-exception.filter'
 import { TransformInterceptor } from '@/interceptor/transform.interceptor'
 import { AppModule } from '@/app.module'
 import { APP_AUTH_TOKEN } from '@/guard/auth.guard'
+import * as express from 'express'
 
 export async function webSwagger(app) {
 	const options = new DocumentBuilder()
@@ -24,6 +26,10 @@ async function bootstrap() {
 		cors: true
 	})
 
+	//解析body参数
+	app.use(express.json()) // For parsing application/json
+	app.use(express.urlencoded({ extended: true }))
+
 	//接口前缀
 	app.setGlobalPrefix('/api')
 
@@ -37,6 +43,9 @@ async function bootstrap() {
 			whitelist: true
 		})
 	)
+
+	//注册全局中间件
+	app.use(new LoggerMiddleware().use)
 
 	//全局注册错误的过滤器
 	app.useGlobalFilters(new HttpExceptionFilter())
