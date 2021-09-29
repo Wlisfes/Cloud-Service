@@ -121,14 +121,62 @@ export class LoggerParameter {
 /**
  *
  *
- * 创建日志-Parameter
+ * 创建Logger-Parameter
  *************************************************************************************************/
 export class NodeCreateLoggerParameter extends IntersectionType(
 	PickType(LoggerParameter, ['referer', 'ip', 'path', 'method', 'type']),
 	PickType(LoggerParameter, ['body', 'query', 'params', 'code', 'message', 'status'])
 ) {}
-/**创建日志-Response**/
+/**创建Logger-Response**/
 export class NodeCreateLoggerResponse {
 	@ApiProperty({ description: 'message', example: '创建成功' })
+	message: string
+}
+
+/**
+ *
+ *
+ * 切换Logger状态-Parameter
+ *************************************************************************************************/
+export class NodeLoggerCutoverParameter extends PickType(LoggerParameter, ['id']) {}
+/**切换Logger状态-Response**/
+export class NodeLoggerCutoverResponse {
+	@ApiProperty({ description: 'message', example: '修改成功' })
+	message: string
+}
+
+/**
+ *
+ *
+ * Logger信息-Parameter
+ *************************************************************************************************/
+export class NodeLoggerParameter extends PickType(LoggerParameter, ['id']) {}
+/**Logger信息-Response**/
+export class NodeLoggerResponse extends IntersectionType(
+	PickType(LoggerParameter, ['id', 'referer', 'ip', 'path', 'method', 'type']),
+	PickType(LoggerParameter, ['body', 'query', 'params', 'code', 'message', 'status'])
+) {}
+
+/**
+ *
+ *
+ * Logger列表-Parameter
+ *************************************************************************************************/
+export class NodeLoggersParameter extends PickType(LoggerParameter, ['page', 'size', 'type', 'status']) {}
+/**Logger列表-Response**/
+export class NodeLoggersResponse extends PickType(LoggerResponse, ['page', 'size', 'total']) {
+	@ApiProperty({ description: 'Logger列表', type: [NodeLoggerResponse], example: [] })
+	list: NodeLoggerResponse[]
+}
+
+/**
+ *
+ *
+ * 删除Logger-Parameter
+ *************************************************************************************************/
+export class NodeDeleteLoggerParameter extends PickType(LoggerParameter, ['id']) {}
+/**删除Logger-Response**/
+export class NodeDeleteLoggerResponse {
+	@ApiProperty({ description: 'message', example: '删除成功' })
 	message: string
 }
