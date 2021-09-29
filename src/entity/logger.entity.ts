@@ -16,17 +16,17 @@ export class LoggerEntity extends BaseEntity {
 	@Column({ nullable: true, comment: '请求类型' })
 	method: string
 
-	@Column({ nullable: false, default: 1, comment: '存储类型：1、中间件存储 2、拦截器存储 3、过滤器存储' })
+	@Column({ nullable: false, default: 1, comment: '请求状态 1、成功 2、错误' })
 	type: number
 
 	@Column('simple-json', { nullable: true, comment: 'body参数' })
-	body: never
+	body: Object
 
 	@Column('simple-json', { nullable: true, comment: 'query参数' })
-	query: never
+	query: Object
 
 	@Column('simple-json', { nullable: true, comment: 'params参数' })
-	params: never
+	params: Object
 
 	@Column({ nullable: true, comment: '状态码' })
 	code: number

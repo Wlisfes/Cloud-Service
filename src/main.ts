@@ -2,8 +2,6 @@ import { NestFactory } from '@nestjs/core'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ValidationPipe } from '@nestjs/common'
 import { NestExpressApplication } from '@nestjs/platform-express'
-import { HttpExceptionFilter } from '@/filters/http-exception.filter'
-import { TransformInterceptor } from '@/interceptor/transform.interceptor'
 import { AppModule } from '@/app.module'
 import { APP_AUTH_TOKEN } from '@/guard/auth.guard'
 import * as express from 'express'
@@ -42,12 +40,6 @@ async function bootstrap() {
 			whitelist: true
 		})
 	)
-
-	//全局注册错误的过滤器
-	app.useGlobalFilters(new HttpExceptionFilter())
-
-	//全局注册拦截器更改返回数据格式
-	app.useGlobalInterceptors(new TransformInterceptor())
 
 	const port = process.env.PORT || 3005
 	await app.listen(port)

@@ -4,6 +4,7 @@ import { InitService } from './init.service'
 import { SessionModule } from 'nestjs-session'
 
 //依赖模块挂载
+import { LoggerModule } from '@/module/logger/logger.module'
 import { UtilsModule } from '@/module/utils/utils.module'
 import { RedisModule } from '@/module/redis/redis.module'
 import { JwtAuthModule } from '@/module/jwt/jwt.module'
@@ -75,6 +76,7 @@ import { PartnerModule } from '@/module/partner/partner.module'
 				pass: process.env.NODEMAILER_AUTH_PASS
 			}
 		}),
+		LoggerModule,
 		UtilsModule,
 		JwtAuthModule,
 		BannerModule,

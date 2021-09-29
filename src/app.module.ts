@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common'
 import { AppController } from '@/app.controller'
 import { AppService } from '@/app.service'
+import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core'
+import { TransformInterceptor } from '@/interceptor/transform.interceptor'
+import { HttpExceptionFilter } from '@/filters/http-exception.filter'
 
 //守卫
 import { APP_GUARD } from '@nestjs/core'
@@ -54,6 +57,17 @@ import { LoggerEntity } from '@/entity/logger.entity'
 		InitModule
 	],
 	controllers: [AppController],
-	providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }]
+	providers: [
+		AppService,
+		{ provide: APP_GUARD, useClass: AuthGuard },
+		{
+			provide: APP_INTERCEPTOR,
+			useClass: TransformInterceptor
+		},
+		{
+			provide: APP_FILTER,
+			useClass: HttpExceptionFilter
+		}
+	]
 })
 export class AppModule {}

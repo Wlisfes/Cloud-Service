@@ -1,9 +1,12 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common'
+import { LoggerService } from '@/module/logger/logger.service'
 import * as day from 'dayjs'
 
 @Catch(HttpException)
 export class HttpExceptionFilter<T> implements ExceptionFilter {
-	catch(exception: T, host: ArgumentsHost) {
+	constructor(private readonly loggerService: LoggerService) {}
+
+	async catch(exception: T, host: ArgumentsHost) {
 		const ctx = host.switchToHttp()
 		const response = ctx.getResponse()
 		const request = ctx.getRequest()
@@ -22,7 +25,42 @@ export class HttpExceptionFilter<T> implements ExceptionFilter {
 			}
 		})(exception)
 
-		Logger.warn('错误提示', JSON.stringify(error))
+		try {
+			await this.loggerService.nodeCreateLogger(
+				{
+					referer: request.headers.referer,
+					ip: request.ipv4,
+					path: request.url,
+					method: request.method,
+					body: request.body,
+					query: request.query,
+					params: request.params,
+					code: (exception as any).response.statusCode || (exception as any).status,
+					type: 2,
+					status: 1,
+					message: message,
+					id: 0,
+					page: 0,
+					size: 0
+				},
+				request.user?.uid
+			)
+		} catch (e) {}
+
+		Logger.warn(
+			'错误提示',
+			JSON.stringify({
+				referer: request.headers.referer,
+				ip: request.ip,
+				path: request.url,
+				method: request.method,
+				body: request.body,
+				query: request.query,
+				params: request.params,
+				code: (exception as any).response.statusCode || (exception as any).status,
+				message: message
+			})
+		)
 
 		const errorResponse = {
 			data: {

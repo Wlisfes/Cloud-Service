@@ -93,6 +93,9 @@ export class AuthGuard implements CanActivate {
 		const props = this.reflector.get<AuthTokenInterface>(APP_AUTH, context.getHandler())
 		const node = this.reflector.get<AuthRoleInterface>(APP_AUTH_ROLE, context.getHandler())
 
+		//ipv4挂载
+		request.ipv4 = request.headers['x-forwarded-for'] || request.headers['x-real-ip'] || '127.0.0.1'
+
 		if (props?.login) {
 			//验证是否需要登录
 			const token = request.headers[APP_AUTH_TOKEN]
