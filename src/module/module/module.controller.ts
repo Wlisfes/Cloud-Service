@@ -10,9 +10,9 @@ export class ModuleController {
 	constructor(private readonly moduleService: ModuleService) {}
 
 	@ApiOperation({ summary: '创建模块权限-授权管理端' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
-	// @AuthRole({ role: ['admin'], module: 'module', action: 'create' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'dev'], module: 'module', action: 'create' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCreateModuleResponse })
@@ -22,9 +22,9 @@ export class ModuleController {
 	}
 
 	@ApiOperation({ summary: '修改模块权限-授权管理端' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
-	// @AuthRole({ role: ['admin'], module: 'module', action: 'update' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'dev'], module: 'module', action: 'update' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeUpdateModuleResponse })
@@ -34,8 +34,9 @@ export class ModuleController {
 	}
 
 	@ApiOperation({ summary: '模块列表-授权管理端' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super', 'visitor', 'dev'], module: 'module', action: 'list' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK' })
@@ -45,8 +46,9 @@ export class ModuleController {
 	}
 
 	@ApiOperation({ summary: '模块信息-授权管理端' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super', 'visitor', 'dev'], module: 'module', action: 'params' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeModuleResponse })
@@ -56,9 +58,9 @@ export class ModuleController {
 	}
 
 	@ApiOperation({ summary: '创建接口权限-授权管理端' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
-	// @AuthRole({ role: ['admin'], module: 'module', action: 'create' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'dev'], module: 'module', action: 'create' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCreateModuleActionResponse })
@@ -68,9 +70,9 @@ export class ModuleController {
 	}
 
 	@ApiOperation({ summary: '修改接口权限-授权管理端' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
-	// @AuthRole({ role: ['admin'], module: 'module', action: 'update' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'dev'], module: 'module', action: 'update' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeUpdateModuleActionResponse })
@@ -80,8 +82,9 @@ export class ModuleController {
 	}
 
 	@ApiOperation({ summary: '接口权限列表-授权管理端' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super', 'visitor', 'dev'], module: 'module', action: 'list' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK' })
@@ -91,8 +94,9 @@ export class ModuleController {
 	}
 
 	@ApiOperation({ summary: '接口权限信息-授权管理端' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@AuthRole({ role: ['admin', 'super', 'visitor', 'dev'], module: 'module', action: 'params' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeModuleActionResponse })
