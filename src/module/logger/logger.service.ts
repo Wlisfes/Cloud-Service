@@ -16,20 +16,23 @@ export class LoggerService {
 	/**创建Logger**/
 	public async nodeCreateLogger(props: DTO.NodeCreateLoggerParameter, uid?: number) {
 		try {
-			const node = await this.loggerModel.create({
-				referer: props.referer,
-				ip: props.ip,
-				path: props.path,
-				method: props.method,
-				body: props.body,
-				query: props.query,
-				params: props.params,
-				code: props.code,
-				message: props.message,
-				status: props.status,
-				user: await this.userModel.findOne({ where: { uid } })
-			})
-			await this.loggerModel.save(node)
+			if (!props.path.includes('logger')) {
+				const node = await this.loggerModel.create({
+					referer: props.referer,
+					ip: props.ip,
+					path: props.path,
+					method: props.method,
+					body: props.body,
+					query: props.query,
+					params: props.params,
+					code: props.code,
+					message: props.message,
+					type: props.type,
+					status: props.status,
+					user: await this.userModel.findOne({ where: { uid } })
+				})
+				await this.loggerModel.save(node)
+			}
 
 			return { message: '创建成功' }
 		} catch (e) {
@@ -62,7 +65,7 @@ export class LoggerService {
 	/**Logger信息-授权管理端**/
 	public async nodeLogger(props: DTO.NodeLoggerParameter) {
 		try {
-			const node = await this.loggerModel.findOne({ where: { id: props.id } })
+			const node = await this.loggerModel.findOne({ where: { id: props.id }, relations: ['user'] })
 			if (!node) {
 				throw new HttpException('logger不存在', HttpStatus.BAD_REQUEST)
 			} else if (node.status === 2) {
@@ -83,8 +86,8 @@ export class LoggerService {
 				.leftJoinAndSelect('logger.user', 'user')
 				.where(
 					new Brackets(Q => {
-						if (isEmpty(props.type)) {
-							Q.andWhere('type.type = :type', { status: props.type })
+						if (!isEmpty(props.type)) {
+							Q.andWhere('logger.type = :type', { type: props.type })
 						}
 
 						if (isEmpty(props.status)) {
@@ -94,7 +97,7 @@ export class LoggerService {
 						}
 					})
 				)
-				.orderBy({ 'logger.id': 'DESC' })
+				.orderBy({ 'logger.createTime': 'DESC' })
 				.skip((props.page - 1) * props.size)
 				.take(props.size)
 				.getManyAndCount()
@@ -110,7 +113,7 @@ export class LoggerService {
 		}
 	}
 
-	/**切换Logger状态-授权管理端**/
+	/**删除Logger-授权管理端**/
 	public async nodeDeleteLogger(props: DTO.NodeDeleteLoggerParameter) {
 		try {
 			const node = await this.loggerModel.findOne({ where: { id: props.id } })
