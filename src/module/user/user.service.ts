@@ -70,11 +70,13 @@ export class UserService {
 				throw new HttpException('邮箱已注册', HttpStatus.BAD_REQUEST)
 			}
 
+			const role = await this.roleModel.find({ where: { primary: 'super' } })
 			const newUser = await this.userModel.create({
 				nickname: props.nickname,
 				password: props.password,
 				email: props.email,
-				account: await this.createAccount()
+				account: await this.createAccount(),
+				role
 			})
 			const { uid } = await this.userModel.save(newUser)
 			const user = await this.nodeUidUser(uid, true)
