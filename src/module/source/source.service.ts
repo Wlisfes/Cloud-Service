@@ -23,6 +23,7 @@ export class SourceService {
 			}
 			const newSource = await this.sourceModel.create({
 				name: props.name,
+				icon: props.icon,
 				color: props.color,
 				status: props.status || 0,
 				order: props.order || 0,
@@ -47,6 +48,7 @@ export class SourceService {
 				{ id: props.id },
 				{
 					name: props.name,
+					icon: props.icon,
 					color: props.color,
 					status: props.status || 0,
 					order: props.order || 0,

@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional, PickType, IntersectionType } from '@nestjs/swagger'
 import { IsNotEmpty, IsHexColor, IsNumber, Min } from 'class-validator'
 import { IsOptional } from '@/decorator/common.decorator'
 import { Type } from 'class-transformer'
@@ -9,6 +9,9 @@ export class SourceResponse {
 
 	@ApiProperty({ description: '标签名称', example: '鬼畜' })
 	name: number
+
+	@ApiProperty({ description: '标签图标' })
+	icon: string
 
 	@ApiProperty({ description: '标签颜色', example: '#f93e3e' })
 	color: number
@@ -41,6 +44,10 @@ export class SourceParameter {
 	@ApiProperty({ description: '标签名称', example: '鬼畜' })
 	@IsNotEmpty({ message: '标签名称 必填' })
 	name: string
+
+	@ApiProperty({ description: '标签图标' })
+	@IsNotEmpty({ message: '标签图标 必填' })
+	icon: string
 
 	@ApiProperty({ description: '标签颜色', example: '#f93e3e' })
 	@IsNotEmpty({ message: '标签颜色 必填' })
@@ -81,13 +88,10 @@ export class SourceParameter {
  *
  * 创建标签-Parameter
  *************************************************************************************************/
-export class NodeCreateSourceParameter extends PickType(SourceParameter, [
-	'name',
-	'color',
-	'order',
-	'status',
-	'comment'
-]) {}
+export class NodeCreateSourceParameter extends IntersectionType(
+	PickType(SourceParameter, ['icon', 'name', 'color']),
+	PickType(SourceParameter, ['order', 'status', 'comment'])
+) {}
 /**创建标签-Response**/
 export class NodeCreateSourceResponse {
 	@ApiProperty({ description: 'message', example: '创建成功' })
@@ -99,14 +103,10 @@ export class NodeCreateSourceResponse {
  *
  * 修改标签-Parameter
  *************************************************************************************************/
-export class NodeUpdateSourceParameter extends PickType(SourceParameter, [
-	'id',
-	'name',
-	'color',
-	'order',
-	'status',
-	'comment'
-]) {}
+export class NodeUpdateSourceParameter extends IntersectionType(
+	PickType(SourceParameter, ['id', 'icon', 'name', 'color']),
+	PickType(SourceParameter, ['order', 'status', 'comment'])
+) {}
 /**修改标签-Response**/
 export class NodeUpdateSourceResponse {
 	@ApiProperty({ description: 'message', example: '修改成功' })

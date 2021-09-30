@@ -4,6 +4,9 @@ import { ArticleEntity } from '@/entity/article.entity'
 
 @Entity('source')
 export class SourceEntity extends BaseEntity {
+	@Column({ nullable: true, default: null, comment: '标签图标' })
+	icon: string
+
 	@Column({ nullable: false, comment: '标签名称' })
 	name: string
 
