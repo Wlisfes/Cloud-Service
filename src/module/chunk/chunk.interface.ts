@@ -13,6 +13,9 @@ export class ChunkResponse {
 	@ApiProperty({ description: '文件oss路径' })
 	path: string
 
+	@ApiProperty({ description: '原始文件名称' })
+	name: string
+
 	@ApiProperty({ description: '版本号', example: 1 })
 	version: number
 
@@ -42,6 +45,10 @@ export class ChunkParameter {
 	@ApiProperty({ description: '文件oss路径' })
 	@IsNotEmpty({ message: '文件oss路径 必填' })
 	path: string
+
+	@ApiProperty({ description: '原始文件名称' })
+	@IsNotEmpty({ message: '原始文件名称 必填' })
+	name: string
 
 	@ApiProperty({ description: '版本号' })
 	@IsNotEmpty({ message: '版本号 必填' })
@@ -75,7 +82,7 @@ export class ChunkParameter {
  *
  * 创建版本资源-Parameter
  *************************************************************************************************/
-export class NodeCreateChunkParameter extends PickType(ChunkParameter, ['url', 'path', 'version']) {}
+export class NodeCreateChunkParameter extends PickType(ChunkParameter, ['url', 'path', 'name', 'version']) {}
 /**创建版本资源-Response**/
 export class NodeCreateChunkResponse {
 	@ApiProperty({ description: 'message', example: '创建成功' })
@@ -90,7 +97,7 @@ export class NodeCreateChunkResponse {
 export class NodeChunkParameter extends PickType(ChunkParameter, ['id']) {}
 /**版本资源信息-Response**/
 export class NodeChunkResponse extends IntersectionType(
-	PickType(ChunkParameter, ['id', 'url', 'path', 'version']),
+	PickType(ChunkParameter, ['id', 'url', 'path', 'name', 'version']),
 	PickType(ChunkParameter, ['status'])
 ) {}
 

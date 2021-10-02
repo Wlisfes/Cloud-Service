@@ -10,6 +10,9 @@ export class ChunkEntity extends BaseEntity {
 	@Column({ nullable: false, comment: '文件oss路径' })
 	path: string
 
+	@Column({ nullable: false, comment: '原始文件名称' })
+	name: string
+
 	@Column({ nullable: false, default: 1, comment: '版本号' })
 	version: number
 

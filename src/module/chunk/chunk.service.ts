@@ -21,6 +21,7 @@ export class ChunkService {
 			const node = await this.chunkModel.create({
 				url: props.url,
 				path: props.path,
+				name: props.name,
 				version: props.version,
 				status: 1,
 				user
