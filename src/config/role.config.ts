@@ -11,6 +11,7 @@ export type RoleModuleEnum =
 	| 'poster'
 	| 'partner'
 	| 'logger'
+	| 'chunk'
 export type RoleActionEnum = 'create' | 'update' | 'delete' | 'params' | 'list'
 
 export const nodeAction = [
@@ -31,7 +32,8 @@ export const nodeModule = [
 	{ primary: 'minute', name: '收录管理', status: 1 },
 	{ primary: 'poster', name: '图床管理', status: 1 },
 	{ primary: 'partner', name: '更新日志管理', status: 1 },
-	{ primary: 'logger', name: 'Logger管理', status: 1 }
+	{ primary: 'logger', name: 'Logger管理', status: 1 },
+	{ primary: 'chunk', name: '版本资源管理', status: 1 }
 ]
 
 export const nodeRole = { primary: 'admin', name: '超级管理员', status: 1 }

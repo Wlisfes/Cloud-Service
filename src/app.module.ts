@@ -27,6 +27,7 @@ import { ModuleActionEntity } from '@/entity/module.action.entity'
 import { PosterEntity } from '@/entity/poster.entity'
 import { PartnerEntity } from '@/entity/partner.entity'
 import { LoggerEntity } from '@/entity/logger.entity'
+import { ChunkEntity } from '@/entity/chunk.entity'
 
 @Module({
 	imports: [
@@ -52,7 +53,8 @@ import { LoggerEntity } from '@/entity/logger.entity'
 			ModuleActionEntity,
 			PosterEntity,
 			PartnerEntity,
-			LoggerEntity
+			LoggerEntity,
+			ChunkEntity
 		]),
 		InitModule
 	],
