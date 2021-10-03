@@ -195,6 +195,7 @@ export class ArticleService {
 						}
 					})
 				)
+				.orderBy({ 'article.id': 'DESC', 'article.order': 'DESC' })
 				.skip((props.page - 1) * props.size)
 				.take(props.size)
 				.getManyAndCount()
@@ -237,6 +238,7 @@ export class ArticleService {
 						}
 					})
 				)
+				.orderBy({ 'article.id': 'DESC' })
 				.skip((props.page - 1) * props.size)
 				.take(props.size)
 				.getManyAndCount()
