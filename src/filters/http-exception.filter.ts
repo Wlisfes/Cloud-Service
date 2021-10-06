@@ -26,7 +26,6 @@ export class HttpExceptionFilter<T> implements ExceptionFilter {
 		})(exception)
 
 		try {
-			console.log('ssssssssssssssss')
 			await this.loggerService.nodeCreateLogger(
 				{
 					referer: request.headers.referer,
