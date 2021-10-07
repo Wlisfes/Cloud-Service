@@ -188,6 +188,7 @@ export class ArticleService {
 
 						if (props.title) {
 							Q.andWhere('article.title LIKE :title', { title: `%${props.title}%` })
+							Q.orWhere('article.description LIKE :description', { description: `%${props.title}%` })
 						}
 
 						if (props.source) {
@@ -231,6 +232,7 @@ export class ArticleService {
 
 						if (props.title) {
 							Q.andWhere('article.title LIKE :title', { title: `%${props.title}%` })
+							Q.orWhere('article.description LIKE :description', { description: `%${props.title}%` })
 						}
 
 						if (props.source) {
