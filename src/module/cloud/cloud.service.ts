@@ -220,8 +220,8 @@ export class CloudService {
 				.where(
 					new Brackets(Q => {
 						Q.where('user.uid = :uid', { uid })
-						if (isEmpty(props.type)) {
-							Q.andWhere('cloud.type != :type', { type: props.type })
+						if (!isEmpty(props.type)) {
+							Q.andWhere('cloud.type = :type', { type: props.type })
 						}
 
 						if (isEmpty(props.status)) {
@@ -260,10 +260,6 @@ export class CloudService {
 				.where(
 					new Brackets(Q => {
 						Q.andWhere('cloud.status = :status', { status: 1 })
-
-						if (isEmpty(props.type)) {
-							Q.andWhere('cloud.type != :type', { type: props.type })
-						}
 
 						if (props.title) {
 							Q.andWhere('cloud.title LIKE :title', { title: `%${props.title}%` })
