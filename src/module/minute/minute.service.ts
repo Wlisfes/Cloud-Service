@@ -191,6 +191,7 @@ export class MinuteService {
 						}
 					})
 				)
+				.orderBy({ 'minute.id': 'DESC' })
 				.skip((props.page - 1) * props.size)
 				.take(props.size)
 				.getManyAndCount()
@@ -226,6 +227,7 @@ export class MinuteService {
 						}
 					})
 				)
+				.orderBy({ 'minute.id': 'DESC' })
 				.skip((props.page - 1) * props.size)
 				.take(props.size)
 				.getManyAndCount()
