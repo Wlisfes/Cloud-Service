@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, Not, Like } from 'typeorm'
+import { Repository, In, Not, Like, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { CloudEntity } from '@/entity/cloud.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
@@ -214,26 +214,32 @@ export class CloudService {
 	/**音视频列表-授权管理端**/
 	public async nodeClouds(props: DTO.NodeCloudsParameter, uid: number) {
 		try {
-			const user = await this.userModel.findOne({ where: { uid } })
-			const [list = [], total = 0] = await this.cloudModel.findAndCount({
-				where: {
-					user,
-					type: isEmpty(props.type) ? Not(10) : props.type,
-					status: isEmpty(props.status) ? Not(2) : props.status,
-					...(() => {
-						if (props.title) {
-							return { title: Like(`%${props.title}%`) } //%some sting%
+			const [list = [], total = 0] = await this.cloudModel
+				.createQueryBuilder('cloud')
+				.leftJoinAndSelect('cloud.user', 'user')
+				.where(
+					new Brackets(Q => {
+						Q.where('user.uid = :uid', { uid })
+						if (isEmpty(props.type)) {
+							Q.andWhere('cloud.type != :type', { type: props.type })
 						}
-						return {}
-					})()
-				},
-				order: {
-					order: 'DESC',
-					createTime: 'DESC'
-				},
-				skip: (props.page - 1) * props.size,
-				take: props.size
-			})
+
+						if (isEmpty(props.status)) {
+							Q.andWhere('cloud.status != :status', { status: 2 })
+						} else {
+							Q.andWhere('cloud.status = :status', { status: props.status })
+						}
+
+						if (props.title) {
+							Q.andWhere('cloud.title LIKE :title', { title: `%${props.title}%` })
+							Q.orWhere('cloud.description LIKE :description', { description: `%${props.title}%` })
+						}
+					})
+				)
+				.orderBy({ 'cloud.id': 'DESC' })
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.getManyAndCount()
 			return {
 				size: props.size,
 				page: props.page,
@@ -248,25 +254,28 @@ export class CloudService {
 	/**音视频列表-客户端**/
 	public async nodeClientClouds(props: DTO.NodeClientCloudsParameter) {
 		try {
-			const [list = [], total = 0] = await this.cloudModel.findAndCount({
-				where: {
-					type: isEmpty(props.type) ? Not(10) : props.type,
-					status: 1,
-					...(() => {
-						if (props.title) {
-							return { title: Like(`%${props.title}%`) }
+			const [list = [], total = 0] = await this.cloudModel
+				.createQueryBuilder('cloud')
+				.leftJoinAndSelect('cloud.user', 'user')
+				.where(
+					new Brackets(Q => {
+						Q.andWhere('cloud.status = :status', { status: 1 })
+
+						if (isEmpty(props.type)) {
+							Q.andWhere('cloud.type != :type', { type: props.type })
 						}
-						return {}
-					})()
-				},
-				relations: ['user'],
-				order: {
-					order: 'DESC',
-					createTime: 'DESC'
-				},
-				skip: (props.page - 1) * props.size,
-				take: props.size
-			})
+
+						if (props.title) {
+							Q.andWhere('cloud.title LIKE :title', { title: `%${props.title}%` })
+							Q.orWhere('cloud.description LIKE :description', { description: `%${props.title}%` })
+						}
+					})
+				)
+				.orderBy({ 'cloud.id': 'DESC' })
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.getManyAndCount()
+
 			return {
 				size: props.size,
 				page: props.page,

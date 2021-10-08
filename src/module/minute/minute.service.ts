@@ -184,6 +184,7 @@ export class MinuteService {
 
 						if (props.name) {
 							Q.andWhere('minute.name LIKE :name', { name: `%${props.name}%` })
+							Q.orWhere('minute.description LIKE :description', { description: `%${props.name}%` })
 						}
 
 						if (props.source) {
@@ -220,6 +221,7 @@ export class MinuteService {
 
 						if (props.name) {
 							Q.andWhere('minute.name LIKE :name', { name: `%${props.name}%` })
+							Q.orWhere('minute.description LIKE :description', { description: `%${props.name}%` })
 						}
 
 						if (props.source) {
