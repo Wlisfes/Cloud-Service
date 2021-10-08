@@ -13,7 +13,7 @@ export class ChunkEntity extends BaseEntity {
 	@Column({ nullable: false, comment: '原始文件名称' })
 	name: string
 
-	@Column({ type: 'bigint', nullable: false, default: 1, comment: '版本号' })
+	@Column({ type: 'double', nullable: false, default: 1, comment: '版本号' })
 	version: number
 
 	@Column({ comment: '状态: 1.当前版本 2.历史版本', default: 1, nullable: false })
