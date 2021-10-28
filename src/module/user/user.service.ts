@@ -147,11 +147,16 @@ export class UserService {
 			if (!code || code !== props.code.toUpperCase()) {
 				throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST)
 			}
+
 			const user = await this.userModel
 				.createQueryBuilder('user')
-				.orWhere('user.account = :account', { account: props.account })
-				.orWhere('user.email = :email', { email: props.account })
-				.orWhere('user.mobile = :mobile', { mobile: props.account })
+				.where(
+					new Brackets(Q => {
+						Q.orWhere('user.account = :account', { account: props.account })
+						Q.orWhere('user.email = :email', { email: props.account })
+						Q.orWhere('user.mobile = :mobile', { mobile: props.account })
+					})
+				)
 				.addSelect('user.password')
 				.getOne()
 

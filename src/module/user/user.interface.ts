@@ -61,7 +61,7 @@ class UserParameter {
 
 	@ApiProperty({ description: '账户', example: 88888888 })
 	@IsNotEmpty({ message: '账户 必填' })
-	@Type(type => Number)
+	// @Type(type => Number)
 	account: number
 
 	@ApiProperty({ description: '昵称', example: '妖雨纯' })
