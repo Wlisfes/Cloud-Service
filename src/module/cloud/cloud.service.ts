@@ -260,6 +260,7 @@ export class CloudService {
 				.where(
 					new Brackets(Q => {
 						Q.andWhere('cloud.status = :status', { status: 1 })
+						Q.andWhere('cloud.parent IS :parent', { parent: null })
 
 						if (props.title) {
 							Q.andWhere('cloud.title LIKE :title', { title: `%${props.title}%` })
