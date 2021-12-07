@@ -84,7 +84,7 @@ export class AuthGuard implements CanActivate {
 			if (action) {
 				return true
 			}
-			console.log(role)
+
 			return this.HttpException('角色action功能权限不足', HttpStatus.FORBIDDEN, props.error)
 		}
 	}
