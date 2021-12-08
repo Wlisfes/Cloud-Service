@@ -12,7 +12,7 @@ export const APP_AUTH_TOKEN = 'app-token'
 
 export class AuthTokenInterface {
 	login: boolean /**是否验证登录**/
-	error?: boolean /**未登录是否抛出异常**/
+	error?: boolean /**未登录是不否抛出异常**/
 }
 
 export class AuthRoleInterface {

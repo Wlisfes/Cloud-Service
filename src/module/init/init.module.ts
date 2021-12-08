@@ -23,6 +23,7 @@ import { ArticleModule } from '@/module/article/article.module'
 import { MinuteModule } from '@/module/minute/minute.module'
 import { PartnerModule } from '@/module/partner/partner.module'
 import { ChunkModule } from '@/module/chunk/chunk.module'
+import { ComputeModule } from '@/module/compute/compute.module'
 
 @Module({
 	imports: [
@@ -92,7 +93,8 @@ import { ChunkModule } from '@/module/chunk/chunk.module'
 		ArticleModule,
 		MinuteModule,
 		PartnerModule,
-		ChunkModule
+		ChunkModule,
+		ComputeModule
 	],
 	providers: [InitService]
 })
