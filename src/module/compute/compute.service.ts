@@ -52,7 +52,7 @@ export class ComputeService {
 			})
 
 			const list: Array<{ month: string; total: string }> = await getManager().query(
-				`SELECT DATE_FORMAT(t.createTime,'%Y/%m') AS month,
+				`SELECT DATE_FORMAT(t.createTime,'%Y-%m') AS month,
 			    count(1) AS total FROM ${table[props.current]} AS t
 			    WHERE createTime >= '${prevTime}' AND createTime <= '${currTime}'
 			    GROUP BY month`
