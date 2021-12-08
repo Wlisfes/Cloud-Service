@@ -45,11 +45,13 @@ export class ComputeService {
 				.add(-1, 'year')
 				.format('YYYY-MM-DD HH:mm:ss')
 
-			const month = Object.keys([...Array(12)]).map((_, index) => {
-				return day()
-					.add(-index, 'month')
-					.format('YYYY-MM')
-			})
+			const month = Object.keys([...Array(12)])
+				.sort((a: any, b: any) => Number(b) - Number(a))
+				.map(index => {
+					return day()
+						.add(-index, 'month')
+						.format('YYYY-MM')
+				})
 
 			const list: Array<{ month: string; total: string }> = await getManager().query(
 				`SELECT DATE_FORMAT(t.createTime,'%Y-%m') AS month,
