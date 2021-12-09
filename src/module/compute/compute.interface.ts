@@ -9,21 +9,35 @@ export class ComputeParameter {
 	current: number
 }
 
+export class MonthTotal {
+	@ApiProperty({ description: '总数数量', example: 1 })
+	total: number
+	@ApiProperty({ description: '当月数量', example: 1 })
+	count: number
+}
+
+export class MonthGroupTotal {
+	@ApiProperty({ description: '月份', example: 'YYYY-MM' })
+	month: string
+	@ApiProperty({ description: '当月数量', example: 1 })
+	total: number
+}
+
 export class ComputeResponse {
-	@ApiProperty({ description: '用户数量', example: 1 })
-	user: number
+	@ApiProperty({ description: '用户数量', type: [MonthTotal], example: { total: 1, count: 0 } })
+	user: MonthTotal
 
-	@ApiProperty({ description: '媒体数量', example: 0 })
-	cloud: number
+	@ApiProperty({ description: '媒体数量', type: [MonthTotal], example: { total: 1, count: 0 } })
+	cloud: MonthTotal
 
-	@ApiProperty({ description: '文章数量', example: 0 })
-	article: number
+	@ApiProperty({ description: '文章数量', type: [MonthTotal], example: { total: 1, count: 0 } })
+	article: MonthTotal
 
-	@ApiProperty({ description: '收录数量', example: 0 })
-	minute: number
+	@ApiProperty({ description: '收录数量', type: [MonthTotal], example: { total: 1, count: 0 } })
+	minute: MonthTotal
 
-	@ApiProperty({ description: '标签数量', example: 0 })
-	source: number
+	@ApiProperty({ description: '标签数量', type: [MonthTotal], example: { total: 1, count: 0 } })
+	source: MonthTotal
 }
 
 /**
@@ -42,6 +56,6 @@ export class NodeComputeTotalResponse extends IntersectionType(
 export class NodeComputeGroupParameter extends PickType(ComputeParameter, ['current']) {}
 /**查询各类时间段数据-Response**/
 export class NodeComputeGroupResponse {
-	@ApiProperty({ description: '时间段数据列表', type: [], example: [] })
-	list: Array<{ month: string; total: string }>
+	@ApiProperty({ description: '时间段数据列表', type: [MonthGroupTotal], example: [] })
+	list: MonthGroupTotal[]
 }

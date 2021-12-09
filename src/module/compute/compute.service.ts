@@ -24,13 +24,35 @@ export class ComputeService {
 	/**各类总数统计**/
 	public async nodeComputeTotal() {
 		try {
-			const user = await this.userModel.createQueryBuilder().getCount()
-			const cloud = await this.cloudModel.createQueryBuilder().getCount()
-			const article = await this.articleModel.createQueryBuilder().getCount()
-			const minute = await this.minuteModel.createQueryBuilder().getCount()
-			const source = await this.sourceModel.createQueryBuilder().getCount()
+			const user = await this.nodeComputeMonthTotal(this.userModel)
+			const cloud = await this.nodeComputeMonthTotal(this.cloudModel)
+			const article = await this.nodeComputeMonthTotal(this.articleModel)
+			const minute = await this.nodeComputeMonthTotal(this.minuteModel)
+			const source = await this.nodeComputeMonthTotal(this.sourceModel)
 
 			return { user, cloud, article, minute, source }
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**查询各类当月数据和总数**/
+	public async nodeComputeMonthTotal<Entity>(model: Repository<Entity>) {
+		try {
+			const total = await model.createQueryBuilder().getCount()
+			const count = await model
+				.createQueryBuilder()
+				.where(
+					new Brackets(Q => {
+						Q.andWhere('createTime BETWEEN :start AND :end', {
+							start: `${day(new Date().setDate(1)).format('YYYY-MM-DD')} 00:00:00`,
+							end: day().format('YYYY-MM-DD HH:mm:ss')
+						})
+					})
+				)
+				.getCount()
+
+			return { total, count }
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -47,11 +69,11 @@ export class ComputeService {
 
 			const month = Object.keys([...Array(12)])
 				.sort((a: any, b: any) => Number(b) - Number(a))
-				.map(index => {
-					return day()
+				.map(index =>
+					day()
 						.add(-index, 'month')
 						.format('YYYY-MM')
-				})
+				)
 
 			const list: Array<{ month: string; total: string }> = await getManager().query(
 				`SELECT DATE_FORMAT(t.createTime,'%Y-%m') AS month,
