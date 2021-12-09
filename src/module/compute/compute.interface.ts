@@ -3,7 +3,7 @@ import { IsNotEmpty } from 'class-validator'
 import { Type } from 'class-transformer'
 
 export class ComputeParameter {
-	@ApiProperty({ description: '图表类型', enum: [1, 2, 3, 4, 5], example: 1 })
+	@ApiProperty({ description: '图表类型', enum: [1, 2, 3, 4, 5, 6], example: 1 })
 	@IsNotEmpty({ message: '图表类型 必填' })
 	@Type(() => Number)
 	current: number

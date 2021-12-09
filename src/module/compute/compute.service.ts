@@ -61,7 +61,7 @@ export class ComputeService {
 	/**查询各类时间段数据**/
 	public async nodeComputeGroup(props: DTO.NodeComputeGroupParameter) {
 		try {
-			const table = { 1: 'cloud', 2: 'article', 3: 'source', 4: 'minute', 5: 'user' }
+			const table = { 1: 'cloud', 2: 'article', 3: 'source', 4: 'minute', 5: 'user', 6: 'logger' }
 			const currTime = day().format('YYYY-MM-DD HH:mm:ss')
 			const prevTime = day()
 				.add(-1, 'year')
