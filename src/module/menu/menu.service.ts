@@ -85,15 +85,15 @@ export class MenuService {
 	/**动态路由节点**/
 	public async nodeRouter(uid: number) {
 		try {
-			const user = await this.userModel.findOne({ where: { uid } })
+			const user = await this.userModel.findOne({ where: { uid }, relations: ['role'] })
 			return await this.menuModel
 				.createQueryBuilder('menu')
-				// .leftJoinAndSelect('menu.role', 'role')
+				.leftJoinAndSelect('menu.role', 'role')
 				.where(
 					new Brackets(Q => {
 						Q.andWhere('menu.type = :type', { type: 2 })
 						Q.andWhere('menu.status = :status', { status: 1 })
-						// Q.andWhere('role.primary = :primary', { primary: user.primary })
+						Q.andWhere('role.id IN (:id)', { id: user.role.map(k => k.id) })
 					})
 				)
 				.getMany()
@@ -105,15 +105,15 @@ export class MenuService {
 	/**角色菜单**/
 	public async nodeRoleMenus(uid: number) {
 		try {
-			const user = await this.userModel.findOne({ where: { uid } })
+			const user = await this.userModel.findOne({ where: { uid }, relations: ['role'] })
 			const menu = await this.menuModel
 				.createQueryBuilder('menu')
 				.leftJoinAndSelect('menu.parent', 'parent')
-				// .leftJoinAndSelect('menu.role', 'role')
+				.leftJoinAndSelect('menu.role', 'role')
 				.where(
 					new Brackets(Q => {
 						Q.andWhere('menu.status = :status', { status: 1 })
-						// Q.andWhere('role.primary = :primary', { primary: user.primary })
+						Q.andWhere('role.id IN (:id)', { id: user.role.map(k => k.id) })
 					})
 				)
 				.addOrderBy('menu.order', 'DESC')
