@@ -1,10 +1,11 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, Not, Like, Brackets } from 'typeorm'
+import { Repository, In, Not, Like, Brackets, FindOneOptions } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { ArticleEntity } from '@/entity/article.entity'
 import { SourceEntity } from '@/entity/source.entity'
 import { UserEntity } from '@/entity/user.entity'
+import { ArticleCommentEntity } from '@/entity/article.comment.entity'
 import { extractStr } from '@/utils/common'
 import * as DTO from './article.interface'
 
@@ -13,7 +14,8 @@ export class ArticleService {
 	constructor(
 		@InjectRepository(ArticleEntity) private readonly articleModel: Repository<ArticleEntity>,
 		@InjectRepository(SourceEntity) private readonly sourceModel: Repository<SourceEntity>,
-		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>
+		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
+		@InjectRepository(ArticleCommentEntity) private readonly commentModel: Repository<ArticleCommentEntity>
 	) {}
 
 	/**创建文章-授权管理端**/
@@ -50,6 +52,25 @@ export class ArticleService {
 			await this.articleModel.save(newArticle)
 
 			return { message: '创建成功' }
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**验证信息**/
+	public async validator<Entity>(
+		message: string,
+		model: Repository<Entity>,
+		options?: FindOneOptions<Entity>
+	): Promise<Entity> {
+		try {
+			const node = await model.findOne(options)
+			if (!node) {
+				throw new HttpException(`${message}不存在`, HttpStatus.BAD_REQUEST)
+			} else if ((node as any).status === 2) {
+				throw new HttpException(`${message}文章已删除`, HttpStatus.BAD_REQUEST)
+			}
+			return node
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -271,5 +292,11 @@ export class ArticleService {
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
+	}
+
+	/**创建评论**/
+	public async nodeCreateComment() {
+		try {
+		} catch (e) {}
 	}
 }
