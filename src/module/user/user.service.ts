@@ -311,7 +311,6 @@ export class UserService {
 	/**用户列表**/
 	public async nodeUsers(props: DTO.NodeUsersParameter) {
 		try {
-			console.log(props)
 			const [list = [], total = 0] = await this.userModel
 				.createQueryBuilder('user')
 				.leftJoinAndSelect('user.role', 'role')

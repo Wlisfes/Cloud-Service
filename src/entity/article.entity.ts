@@ -2,6 +2,7 @@ import { Entity, Column, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typ
 import { BaseEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
 import { SourceEntity } from '@/entity/source.entity'
+import { ArticleCommentEntity } from '@/entity/article.comment.entity'
 
 @Entity('article')
 export class ArticleEntity extends BaseEntity {
@@ -34,6 +35,13 @@ export class ArticleEntity extends BaseEntity {
 
 	@ManyToOne(type => UserEntity)
 	user: UserEntity
+
+	@OneToMany(
+		type => ArticleCommentEntity,
+		type => type.article,
+		{ cascade: true }
+	)
+	comment: ArticleCommentEntity[]
 
 	@ManyToMany(
 		type => SourceEntity,
