@@ -311,6 +311,7 @@ export class UserService {
 	/**用户列表**/
 	public async nodeUsers(props: DTO.NodeUsersParameter) {
 		try {
+			console.log(props)
 			const [list = [], total = 0] = await this.userModel
 				.createQueryBuilder('user')
 				.leftJoinAndSelect('user.role', 'role')
@@ -318,6 +319,9 @@ export class UserService {
 					new Brackets(Q => {
 						if (!isEmpty(props.status)) {
 							Q.andWhere('user.status = :status', { status: props.status })
+						}
+						if (props.primary) {
+							Q.andWhere('role.primary = :primary', { primary: props.primary })
 						}
 						if (props.keyword) {
 							Q.orWhere('user.account LIKE :account', { account: `%${props.keyword}%` })
