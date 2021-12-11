@@ -24,6 +24,7 @@ import { MinuteModule } from '@/module/minute/minute.module'
 import { PartnerModule } from '@/module/partner/partner.module'
 import { ChunkModule } from '@/module/chunk/chunk.module'
 import { ComputeModule } from '@/module/compute/compute.module'
+import { CommentModule } from '@/module/comment/comment.module'
 
 @Module({
 	imports: [
@@ -94,7 +95,8 @@ import { ComputeModule } from '@/module/compute/compute.module'
 		MinuteModule,
 		PartnerModule,
 		ChunkModule,
-		ComputeModule
+		ComputeModule,
+		CommentModule
 	],
 	providers: [InitService]
 })
