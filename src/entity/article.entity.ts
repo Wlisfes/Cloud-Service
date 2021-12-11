@@ -5,19 +5,19 @@ import { SourceEntity } from '@/entity/source.entity'
 
 @Entity('article')
 export class ArticleEntity extends BaseEntity {
-	@Column({ nullable: false, comment: '文章标题' })
+	@Column({ charset: 'utf8mb4', nullable: false, comment: '文章标题' })
 	title: string
 
 	@Column({ nullable: false, comment: '文章封面' })
 	cover: string
 
-	@Column({ type: 'text', nullable: false, comment: '文章内容' })
+	@Column({ charset: 'utf8mb4', type: 'text', nullable: false, comment: '文章内容' })
 	content: string
 
-	@Column({ type: 'text', nullable: false, default: null, comment: '文章内容 html格式' })
+	@Column({ charset: 'utf8mb4', type: 'text', nullable: false, default: null, comment: '文章内容 html格式' })
 	html: string
 
-	@Column({ nullable: true, default: null, comment: '文章描述' })
+	@Column({ charset: 'utf8mb4', nullable: true, default: null, comment: '文章描述' })
 	description: string
 
 	@Column({ nullable: true, default: null, comment: '跳转链接' })

@@ -10,7 +10,7 @@ export class ModuleActionEntity extends BaseEntity {
 	@Column({ nullable: false, comment: '接口权限名称' })
 	name: string
 
-	@Column({ comment: '接口权限备注', default: null, nullable: true })
+	@Column({ charset: 'utf8mb4', comment: '接口权限备注', default: null, nullable: true })
 	comment: string
 
 	@Column({ nullable: false, default: 1, comment: '状态' })

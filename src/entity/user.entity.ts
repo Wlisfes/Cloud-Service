@@ -16,7 +16,7 @@ export class UserEntity extends BaseEntity {
 	@Column({ comment: '账户', type: 'int', readonly: true })
 	account: number
 
-	@Column({ comment: '昵称', nullable: false })
+	@Column({ charset: 'utf8mb4', comment: '昵称', nullable: false })
 	nickname: string
 
 	@Column({ comment: '邮箱', nullable: true })
@@ -25,7 +25,7 @@ export class UserEntity extends BaseEntity {
 	@Column({ comment: '头像', nullable: true })
 	avatar: string | null
 
-	@Column({ comment: '备注', nullable: true })
+	@Column({ charset: 'utf8mb4', comment: '备注', nullable: true })
 	comment: string | null
 
 	@Column({

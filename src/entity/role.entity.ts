@@ -11,7 +11,7 @@ export class RoleEntity extends BaseEntity {
 	@Column({ comment: '角色名称', nullable: false })
 	name: string
 
-	@Column({ comment: '角色备注', nullable: true })
+	@Column({ charset: 'utf8mb4', comment: '角色备注', nullable: true })
 	comment: string
 
 	@Column({ nullable: false, default: 1, comment: '状态: 0.禁用 1.启用' })

@@ -16,7 +16,7 @@ export class CloudSourceEntity extends BaseEntity {
 	@Column({ nullable: false, default: 0, comment: '排序号' })
 	order: number
 
-	@Column({ comment: '标签备注', nullable: true })
+	@Column({ charset: 'utf8mb4', comment: '标签备注', nullable: true })
 	comment: string
 
 	@ManyToMany(

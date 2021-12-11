@@ -8,10 +8,10 @@ export class CloudEntity extends BaseEntity {
 	@Column({ nullable: false, default: 1, comment: '类型: 1.单集媒体 2.多集媒体' })
 	type: number
 
-	@Column({ nullable: false, comment: '媒体标题' })
+	@Column({ charset: 'utf8mb4', nullable: false, comment: '媒体标题' })
 	title: string
 
-	@Column({ nullable: true, comment: '媒体存在阿里云视频点播的VideoId' })
+	@Column({ charset: 'utf8mb4', nullable: true, comment: '媒体存在阿里云视频点播的VideoId' })
 	key: string
 
 	@Column({ nullable: true, comment: '媒体源存在阿里云视频点播的文件名' })

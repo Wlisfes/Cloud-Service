@@ -10,7 +10,7 @@ export class ModuleEntity extends BaseEntity {
 	@Column({ nullable: false, comment: '模块名称' })
 	name: string
 
-	@Column({ comment: '模块备注', default: null, nullable: true })
+	@Column({ charset: 'utf8mb4', comment: '模块备注', default: null, nullable: true })
 	comment: string
 
 	@Column({ nullable: false, default: 1, comment: '状态' })

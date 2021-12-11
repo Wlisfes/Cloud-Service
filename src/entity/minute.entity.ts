@@ -5,13 +5,13 @@ import { SourceEntity } from '@/entity/source.entity'
 
 @Entity('minute')
 export class MinuteEntity extends BaseEntity {
-	@Column({ nullable: false, comment: '收录标题' })
+	@Column({ charset: 'utf8mb4', nullable: false, comment: '收录标题' })
 	name: string
 
 	@Column({ nullable: false, comment: '封面' })
 	cover: string
 
-	@Column({ nullable: true, default: null, comment: '收录描述' })
+	@Column({ charset: 'utf8mb4', nullable: true, default: null, comment: '收录描述' })
 	description: string
 
 	@Column({ nullable: true, default: null, comment: '跳转链接' })
