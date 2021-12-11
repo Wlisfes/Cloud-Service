@@ -59,15 +59,16 @@ export class CommentService {
 	public async nodeComments(props: DTO.NodeCommentsParameter) {
 		try {
 			const [list = [], total = 0] = await this.commentModel
-				.createQueryBuilder('comment')
+				.createQueryBuilder('t')
 				.where(
 					new Brackets(Q => {
-						Q.andWhere('comment.type = :type', { type: props.type })
-						Q.andWhere('comment.one = :one', { one: props.one })
+						Q.andWhere('t.parent IS :parent', { parent: null })
+						Q.andWhere('t.type = :type', { type: props.type })
+						Q.andWhere('t.one = :one', { one: props.one })
 					})
 				)
-				.leftJoinAndSelect('comment.user', 'user')
-				.leftJoinAndSelect('comment.parent', 'parent')
+				.leftJoinAndSelect('t.user', 'user')
+				.leftJoinAndSelect('t.children', 'children')
 				.getManyAndCount()
 
 			return {

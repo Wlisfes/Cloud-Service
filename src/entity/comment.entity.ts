@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne } from 'typeorm'
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm'
 import { BaseEntity } from '@/entity/common.entity'
 import { UserEntity } from '@/entity/user.entity'
 
@@ -18,6 +18,13 @@ export class CommentEntity extends BaseEntity {
 
 	@ManyToOne(type => CommentEntity)
 	parent: CommentEntity
+
+	@OneToMany(
+		type => CommentEntity,
+		type => type.parent,
+		{ cascade: true }
+	)
+	children: CommentEntity[]
 
 	@ManyToOne(type => UserEntity)
 	user: UserEntity
