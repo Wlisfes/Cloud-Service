@@ -5,7 +5,6 @@ import { isEmpty } from 'class-validator'
 import { ArticleEntity } from '@/entity/article.entity'
 import { SourceEntity } from '@/entity/source.entity'
 import { UserEntity } from '@/entity/user.entity'
-import { ArticleCommentEntity } from '@/entity/article.comment.entity'
 import { extractStr } from '@/utils/common'
 import * as DTO from './article.interface'
 
@@ -14,8 +13,7 @@ export class ArticleService {
 	constructor(
 		@InjectRepository(ArticleEntity) private readonly articleModel: Repository<ArticleEntity>,
 		@InjectRepository(SourceEntity) private readonly sourceModel: Repository<SourceEntity>,
-		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>,
-		@InjectRepository(ArticleCommentEntity) private readonly commentModel: Repository<ArticleCommentEntity>
+		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>
 	) {}
 
 	/**创建文章-授权管理端**/
@@ -292,11 +290,5 @@ export class ArticleService {
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
-	}
-
-	/**创建评论**/
-	public async nodeCreateComment() {
-		try {
-		} catch (e) {}
 	}
 }
