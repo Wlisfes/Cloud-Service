@@ -5,6 +5,7 @@
 	"username": "paker",
 	"password": "77243",
 	"database": "paker",
+	"charset": "utf8mb4",
 	"entities": ["dist/**/*.entity{.ts,.js}"],
 	"synchronize": true,
 	"dateStrings": true
