@@ -251,6 +251,40 @@ export class CloudService {
 		}
 	}
 
+	/**音视频关键字搜索**/
+	public async nodeSearchClouds(props: DTO.NodeCloudsParameter) {
+		try {
+			const [list = [], total = 0] = await this.cloudModel
+				.createQueryBuilder('t')
+				.select(['t.id', 't.title'])
+				.where(
+					new Brackets(Q => {
+						if (!isEmpty(props.status)) {
+							Q.andWhere('t.status = :status', { status: props.status })
+						}
+
+						if (props.title) {
+							Q.andWhere('t.title LIKE :title', { title: `%${props.title}%` })
+							Q.orWhere('t.description LIKE :description', { description: `%${props.title}%` })
+						}
+					})
+				)
+				.orderBy({ 't.id': 'DESC', 't.order': 'DESC' })
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.getManyAndCount()
+
+			return {
+				size: props.size,
+				page: props.page,
+				total,
+				list
+			}
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
 	/**音视频列表-客户端**/
 	public async nodeClientClouds(props: DTO.NodeClientCloudsParameter) {
 		try {

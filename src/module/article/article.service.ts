@@ -226,6 +226,10 @@ export class ArticleService {
 				.select(['t.id', 't.title'])
 				.where(
 					new Brackets(Q => {
+						if (!isEmpty(props.status)) {
+							Q.andWhere('t.status = :status', { status: props.status })
+						}
+
 						if (props.title) {
 							Q.andWhere('t.title LIKE :title', { title: `%${props.title}%` })
 							Q.orWhere('t.description LIKE :description', { description: `%${props.title}%` })

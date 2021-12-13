@@ -67,6 +67,15 @@ export class CloudController {
 		return await this.cloudService.nodeClouds(query, req.user.uid)
 	}
 
+	@ApiOperation({ summary: '音视频关键字搜索-客户端' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCloudsResponse })
+	@Get('client/keyword-node')
+	async nodeSearchClouds(@Query() query: DTO.NodeCloudsParameter) {
+		return await this.cloudService.nodeSearchClouds(query)
+	}
+
 	@ApiOperation({ summary: '音视频列表-客户端' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
