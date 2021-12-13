@@ -22,36 +22,26 @@ export class CloudService {
 	/**创建音视频-授权管理端**/
 	public async nodeCreateCloud(props: DTO.NodeCreateCloudParameter, uid: number) {
 		try {
-			let parent = null
-			let source = []
-
-			if (props.parent) {
-				parent = await this.cloudModel.findOne({
-					where: {
-						id: props.parent,
-						status: Not(2)
-					}
+			const parent = await this.utilsService.validator({
+				message: '父级媒体',
+				empty: true,
+				disable: true,
+				delete: true,
+				model: this.cloudModel,
+				options: { where: { id: props.parent, status: Not(2) } }
+			})
+			const source = await Promise.all(
+				(props.source || []).map(id => {
+					return this.utilsService.validator({
+						message: `标签id ${id}`,
+						empty: true,
+						disable: true,
+						delete: true,
+						model: this.cloudModel,
+						options: { where: { id } }
+					})
 				})
-				if (!parent) {
-					throw new HttpException('父级媒体不存在', HttpStatus.BAD_REQUEST)
-				} else if (parent.status !== 1) {
-					throw new HttpException('父级媒体已禁用', HttpStatus.BAD_REQUEST)
-				}
-			}
-
-			if (props.source?.length > 0) {
-				source = await this.sourceModel.find({ where: { id: In(props.source) } })
-				props.source.forEach(id => {
-					const element = source.find(element => element.id === id)
-					if (!element) {
-						throw new HttpException(`标签id ${id} 不存在`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 0) {
-						throw new HttpException(`标签 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 2) {
-						throw new HttpException(`标签 ${element.name} 已删除`, HttpStatus.BAD_REQUEST)
-					}
-				})
-			}
+			)
 
 			const user = await this.userModel.findOne({ where: { uid } })
 			const newCloud = await this.cloudModel.create({
@@ -80,39 +70,30 @@ export class CloudService {
 	/**修改音视频媒体-授权管理端**/
 	public async nodeUpdateCloud(props: DTO.NodeUpdateCloudParameter) {
 		try {
-			let parent = null
-			const cloud = await this.cloudModel.findOne({ where: { id: props.id }, relations: ['source'] })
-			if (!cloud) {
-				throw new HttpException('音视频媒体不存在', HttpStatus.BAD_REQUEST)
-			}
+			const cloud = await this.utilsService.validator({
+				message: '音视频媒体',
+				empty: true,
+				model: this.cloudModel,
+				options: { where: { id: props.id }, relations: ['source'] }
+			})
 
-			if (props.parent) {
-				parent = await this.cloudModel.findOne({
-					where: [
-						{ id: props.parent, status: 0 },
-						{ id: props.parent, status: 1 }
-					]
-				})
-				if (!parent) {
-					throw new HttpException('父级媒体不存在', HttpStatus.BAD_REQUEST)
-				} else if (parent.status !== 1) {
-					throw new HttpException('父级媒体已禁用', HttpStatus.BAD_REQUEST)
-				}
-			}
+			const parent = await this.utilsService.validator({
+				message: '父级媒体',
+				model: this.cloudModel,
+				options: { where: { id: props.parent } }
+			})
 
-			if (props.source?.length > 0) {
-				const source = await this.sourceModel.find({ where: { id: In(props.source) } })
-				props.source.forEach(id => {
-					const element = source.find(element => element.id === id)
-					if (!element) {
-						throw new HttpException(`标签id ${id} 不存在`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 0) {
-						throw new HttpException(`标签 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 2) {
-						throw new HttpException(`标签 ${element.name} 已删除`, HttpStatus.BAD_REQUEST)
-					}
+			//验证标签
+			await Promise.all(
+				(props.source || []).map(id => {
+					return this.utilsService.validator({
+						message: `标签id ${id}`,
+						empty: true,
+						model: this.sourceModel,
+						options: { where: { id } }
+					})
 				})
-			}
+			)
 
 			//删除已有的标签
 			await this.cloudModel
@@ -150,18 +131,15 @@ export class CloudService {
 	/**切换音视频媒体状态-授权管理端**/
 	public async nodeCloudCutover(props: DTO.NodeCloudCutoverParameter) {
 		try {
-			const cloud = await this.cloudModel.findOne({ where: { id: props.id } })
-			if (!cloud) {
-				throw new HttpException('音视频媒体不存在', HttpStatus.BAD_REQUEST)
-			} else if (cloud.status === 2) {
-				throw new HttpException('音视频媒体已删除', HttpStatus.BAD_REQUEST)
-			}
-			await this.cloudModel.update(
-				{ id: props.id },
-				{
-					status: cloud.status ? 0 : 1
-				}
-			)
+			const cloud = await this.utilsService.validator({
+				message: '音视频媒体',
+				empty: true,
+				delete: true,
+				model: this.cloudModel,
+				options: { where: { id: props.id } }
+			})
+
+			await this.cloudModel.update({ id: props.id }, { status: cloud.status ? 0 : 1 })
 
 			return { message: '修改成功' }
 		} catch (e) {
@@ -172,13 +150,15 @@ export class CloudService {
 	/**音视频信息-授权管理端**/
 	public async nodeCloud(props: DTO.NodeCloudParameter) {
 		try {
-			const cloud = await this.cloudModel.findOne({
-				where: { id: props.id },
-				relations: ['source', 'parent', 'children', 'user']
+			const cloud = await this.utilsService.validator({
+				message: '音视频媒体',
+				empty: true,
+				model: this.cloudModel,
+				options: {
+					where: { id: props.id },
+					relations: ['source', 'parent', 'children', 'user']
+				}
 			})
-			if (!cloud) {
-				throw new HttpException('音视频媒体不存在', HttpStatus.BAD_REQUEST)
-			}
 			return {
 				...cloud,
 				children: cloud.children.sort((a, b) => a.order - b.order)
@@ -191,17 +171,17 @@ export class CloudService {
 	/**音视频信息-客户端**/
 	public async nodeClientCloud(props: DTO.NodeCloudParameter) {
 		try {
-			const cloud = await this.cloudModel.findOne({
-				where: { id: props.id },
-				relations: ['source', 'parent', 'children', 'user']
+			const cloud = await this.utilsService.validator({
+				message: '音视频媒体',
+				empty: true,
+				delete: true,
+				disable: true,
+				model: this.cloudModel,
+				options: {
+					where: { id: props.id },
+					relations: ['source', 'parent', 'children', 'user']
+				}
 			})
-			if (!cloud) {
-				throw new HttpException('音视频媒体不存在', HttpStatus.BAD_REQUEST)
-			} else if (cloud.status === 0) {
-				throw new HttpException('音视频媒体已禁用', HttpStatus.BAD_REQUEST)
-			} else if (cloud.status === 2) {
-				throw new HttpException('音视频媒体已删除', HttpStatus.BAD_REQUEST)
-			}
 
 			//播放量加1
 			await this.cloudModel.update({ id: props.id }, { browse: cloud.browse + 1 })
@@ -342,12 +322,16 @@ export class CloudService {
 	/**删除音视频媒体-授权管理端**/
 	public async nodeDeleteCloud(props: DTO.NodeDeleteCloudParameter) {
 		try {
-			const cloud = await this.cloudModel.findOne({ where: { id: props.id } })
-			if (!cloud) {
-				throw new HttpException('音视频媒体不存在', HttpStatus.BAD_REQUEST)
-			} else if (cloud.status === 2) {
-				throw new HttpException('音视频媒体已删除', HttpStatus.BAD_REQUEST)
-			}
+			const cloud = await this.utilsService.validator({
+				message: '音视频媒体',
+				empty: true,
+				delete: true,
+				model: this.cloudModel,
+				options: {
+					where: { id: props.id },
+					relations: ['source', 'parent', 'children', 'user']
+				}
+			})
 			await this.cloudModel.update({ id: props.id }, { status: 2 })
 
 			return { message: '删除成功' }

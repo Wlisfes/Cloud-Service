@@ -24,16 +24,18 @@ export class ArticleService {
 	public async nodeCreateArticle(props: DTO.NodeCreateArticleParameter, uid: number) {
 		try {
 			//验证标签
-			const useSource = (props.source || []).map(async id => {
-				return await this.utilsService.validator({
-					message: `标签id ${id}`,
-					empty: true,
-					delete: true,
-					disable: true,
-					model: this.sourceModel,
-					options: { where: { id } }
+			const source = await Promise.all(
+				(props.source || []).map(id => {
+					return this.utilsService.validator({
+						message: `标签id ${id}`,
+						empty: true,
+						delete: true,
+						disable: true,
+						model: this.sourceModel,
+						options: { where: { id } }
+					})
 				})
-			})
+			)
 
 			const user = await this.userModel.findOne({ where: { uid } })
 			const Article = await this.articleModel.create({
@@ -45,7 +47,7 @@ export class ArticleService {
 				url: props.url || null,
 				status: isEmpty(props.status) ? 1 : props.status,
 				order: props.order || 0,
-				source: await Promise.all(useSource),
+				source,
 				user
 			})
 			await this.articleModel.save(Article)
@@ -69,8 +71,8 @@ export class ArticleService {
 
 			//验证标签
 			await Promise.all(
-				(props.source || []).map(async id => {
-					return await this.utilsService.validator({
+				(props.source || []).map(id => {
+					return this.utilsService.validator({
 						message: `标签id ${id}`,
 						empty: true,
 						model: this.sourceModel,
