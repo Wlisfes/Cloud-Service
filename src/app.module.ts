@@ -29,6 +29,7 @@ import { PosterEntity } from '@/entity/poster.entity'
 import { PartnerEntity } from '@/entity/partner.entity'
 import { LoggerEntity } from '@/entity/logger.entity'
 import { ChunkEntity } from '@/entity/chunk.entity'
+import { StarEntity } from '@/entity/user.star.entity'
 
 @Module({
 	imports: [
@@ -56,7 +57,8 @@ import { ChunkEntity } from '@/entity/chunk.entity'
 			PosterEntity,
 			PartnerEntity,
 			LoggerEntity,
-			ChunkEntity
+			ChunkEntity,
+			StarEntity
 		]),
 		InitModule
 	],

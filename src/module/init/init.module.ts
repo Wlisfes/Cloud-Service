@@ -25,6 +25,7 @@ import { PartnerModule } from '@/module/partner/partner.module'
 import { ChunkModule } from '@/module/chunk/chunk.module'
 import { ComputeModule } from '@/module/compute/compute.module'
 import { CommentModule } from '@/module/comment/comment.module'
+import { StarModule } from '@/module/star/star.module'
 
 @Module({
 	imports: [
@@ -96,7 +97,8 @@ import { CommentModule } from '@/module/comment/comment.module'
 		PartnerModule,
 		ChunkModule,
 		ComputeModule,
-		CommentModule
+		CommentModule,
+		StarModule
 	],
 	providers: [InitService]
 })
