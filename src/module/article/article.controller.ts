@@ -70,12 +70,14 @@ export class ArticleController {
 	}
 
 	@ApiOperation({ summary: '文章信息-客户端' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true, error: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeArticleResponse })
 	@Get('client/info')
-	async nodeClientArticle(@Query() query: DTO.NodeArticleParameter) {
-		return await this.articleService.nodeClientArticle(query)
+	async nodeClientArticle(@Query() query: DTO.NodeArticleParameter, @Req() req: { user?: { uid: number } }) {
+		return await this.articleService.nodeClientArticle(query, req.user?.uid)
 	}
 
 	@ApiOperation({ summary: '文章关键字搜索-客户端' })
@@ -88,12 +90,14 @@ export class ArticleController {
 	}
 
 	@ApiOperation({ summary: '文章列表-客户端' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true, error: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeArticlesResponse })
 	@Get('client/list-node')
-	async nodeClientArticles(@Query() query: DTO.NodeClientArticlesParameter) {
-		return await this.articleService.nodeClientArticles(query)
+	async nodeClientArticles(@Query() query: DTO.NodeClientArticlesParameter, @Req() req: { user?: { uid: number } }) {
+		return await this.articleService.nodeClientArticles(query, req.user?.uid)
 	}
 
 	@ApiOperation({ summary: '删除文章-授权管理端' })

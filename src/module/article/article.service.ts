@@ -4,6 +4,7 @@ import { Repository, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { UtilsService } from '@/module/utils/utils.service'
 import { CommentService } from '@/module/comment/comment.service'
+import { StarService } from '@/module/star/star.service'
 import { ArticleEntity } from '@/entity/article.entity'
 import { SourceEntity } from '@/entity/source.entity'
 import { UserEntity } from '@/entity/user.entity'
@@ -15,6 +16,7 @@ export class ArticleService {
 	constructor(
 		private readonly utilsService: UtilsService,
 		private readonly commentService: CommentService,
+		private readonly starService: StarService,
 		@InjectRepository(ArticleEntity) private readonly articleModel: Repository<ArticleEntity>,
 		@InjectRepository(SourceEntity) private readonly sourceModel: Repository<SourceEntity>,
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>
@@ -144,7 +146,7 @@ export class ArticleService {
 	}
 
 	/**文章信息-客户端**/
-	public async nodeClientArticle(props: DTO.NodeArticleParameter) {
+	public async nodeClientArticle(props: DTO.NodeArticleParameter, uid?: number) {
 		try {
 			const article = await this.utilsService.validator({
 				message: '文章',
@@ -158,7 +160,10 @@ export class ArticleService {
 			//浏览量加1
 			await this.articleModel.update({ id: props.id }, { browse: article.browse + 1 })
 
-			return article
+			return {
+				...article,
+				star: await this.starService.nodeStarTotal({ one: article.id, type: 1 }, uid)
+			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -196,10 +201,11 @@ export class ArticleService {
 				.take(props.size)
 				.getManyAndCount()
 
-			/**查询顶层评论总数**/
+			/**查询顶层评论总数、收藏总数**/
 			const uesComment = list.map(async item => {
 				return {
 					...item,
+					star: await this.starService.nodeStarTotal({ one: item.id, type: 1 }, uid),
 					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 1 })
 				}
 			})
@@ -250,19 +256,14 @@ export class ArticleService {
 	}
 
 	/**文章列表-客户端**/
-	public async nodeClientArticles(props: DTO.NodeClientArticlesParameter) {
+	public async nodeClientArticles(props: DTO.NodeClientArticlesParameter, uid?: number) {
 		try {
 			const [list = [], total = 0] = await this.articleModel
 				.createQueryBuilder('t')
 				.leftJoinAndSelect('t.source', 'source')
 				.leftJoinAndSelect('t.user', 'user')
 				// .leftJoinAndMapMany('t.star', 't.source', 'star', 'star.name = :name', { name: 'Git' })
-				.loadRelationCountAndMap(
-					't.star',
-					't.source'
-					// 'star', qb =>
-					// qb.andWhere('star.name = :name', { name: 'Git' })
-				)
+				// .loadRelationCountAndMap('t.star','t.source', 'star', qb =>qb.andWhere('star.name = :name', { name: 'Git' }))
 				.where(
 					new Brackets(Q => {
 						Q.andWhere('t.status = :status', { status: 1 })
@@ -282,10 +283,11 @@ export class ArticleService {
 				.take(props.size)
 				.getManyAndCount()
 
-			/**查询顶层评论总数**/
+			/**查询顶层评论总数、收藏总数**/
 			const uesComment = list.map(async item => {
 				return {
 					...item,
+					star: await this.starService.nodeStarTotal({ one: item.id, type: 1 }, uid),
 					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 1 })
 				}
 			})
