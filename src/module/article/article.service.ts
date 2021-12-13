@@ -1,7 +1,9 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, Not, Like, Brackets, FindOneOptions } from 'typeorm'
+import { Repository, In, Brackets, FindOneOptions } from 'typeorm'
 import { isEmpty } from 'class-validator'
+import { UtilsService } from '@/module/utils/utils.service'
+import { CommentService } from '@/module/comment/comment.service'
 import { ArticleEntity } from '@/entity/article.entity'
 import { SourceEntity } from '@/entity/source.entity'
 import { UserEntity } from '@/entity/user.entity'
@@ -11,6 +13,8 @@ import * as DTO from './article.interface'
 @Injectable()
 export class ArticleService {
 	constructor(
+		private readonly utilsService: UtilsService,
+		private readonly commentService: CommentService,
 		@InjectRepository(ArticleEntity) private readonly articleModel: Repository<ArticleEntity>,
 		@InjectRepository(SourceEntity) private readonly sourceModel: Repository<SourceEntity>,
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>
@@ -19,23 +23,20 @@ export class ArticleService {
 	/**创建文章-授权管理端**/
 	public async nodeCreateArticle(props: DTO.NodeCreateArticleParameter, uid: number) {
 		try {
-			let source = []
-			if (props.source?.length > 0) {
-				source = await this.sourceModel.find({ where: { id: In(props.source) } })
-				props.source.forEach(id => {
-					const element = source.find(element => element.id === id)
-					if (!element) {
-						throw new HttpException(`标签id ${id} 不存在`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 0) {
-						throw new HttpException(`标签 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 2) {
-						throw new HttpException(`标签 ${element.name} 已删除`, HttpStatus.BAD_REQUEST)
-					}
+			//验证标签
+			const useSource = (props.source || []).map(async id => {
+				return await this.utilsService.validator({
+					message: `标签id ${id}`,
+					empty: true,
+					delete: true,
+					disable: true,
+					model: this.sourceModel,
+					options: { where: { id } }
 				})
-			}
+			})
 
 			const user = await this.userModel.findOne({ where: { uid } })
-			const newArticle = await this.articleModel.create({
+			const Article = await this.articleModel.create({
 				title: props.title,
 				cover: props.cover,
 				content: props.content,
@@ -44,31 +45,12 @@ export class ArticleService {
 				url: props.url || null,
 				status: isEmpty(props.status) ? 1 : props.status,
 				order: props.order || 0,
-				source,
+				source: await Promise.all(useSource),
 				user
 			})
-			await this.articleModel.save(newArticle)
+			await this.articleModel.save(Article)
 
 			return { message: '创建成功' }
-		} catch (e) {
-			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	/**验证信息**/
-	public async validator<Entity>(
-		message: string,
-		model: Repository<Entity>,
-		options?: FindOneOptions<Entity>
-	): Promise<Entity> {
-		try {
-			const node = await model.findOne(options)
-			if (!node) {
-				throw new HttpException(`${message}不存在`, HttpStatus.BAD_REQUEST)
-			} else if ((node as any).status === 2) {
-				throw new HttpException(`${message}文章已删除`, HttpStatus.BAD_REQUEST)
-			}
-			return node
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -77,24 +59,25 @@ export class ArticleService {
 	/**修改文章-授权管理端**/
 	public async nodeUpdateArticle(props: DTO.NodeUpdateArticleParameter) {
 		try {
-			const article = await this.articleModel.findOne({ where: { id: props.id }, relations: ['source'] })
-			if (!article) {
-				throw new HttpException('文章不存在', HttpStatus.BAD_REQUEST)
-			}
+			//验证文章
+			const article = await this.utilsService.validator({
+				message: '文章',
+				empty: true,
+				model: this.articleModel,
+				options: { where: { id: props.id }, relations: ['source'] }
+			})
 
-			if (props.source?.length > 0) {
-				const source = await this.sourceModel.find({ where: { id: In(props.source) } })
-				props.source.forEach(id => {
-					const element = source.find(element => element.id === id)
-					if (!element) {
-						throw new HttpException(`标签id ${id} 不存在`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 0) {
-						throw new HttpException(`标签 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 2) {
-						throw new HttpException(`标签 ${element.name} 已删除`, HttpStatus.BAD_REQUEST)
-					}
+			//验证标签
+			await Promise.all(
+				(props.source || []).map(async id => {
+					return await this.utilsService.validator({
+						message: `标签id ${id}`,
+						empty: true,
+						model: this.sourceModel,
+						options: { where: { id } }
+					})
 				})
-			}
+			)
 
 			//删除已有的标签
 			await this.articleModel
@@ -129,18 +112,14 @@ export class ArticleService {
 	/**切换文章状态-授权管理端**/
 	public async nodeArticleCutover(props: DTO.NodeArticleCutoverParameter) {
 		try {
-			const article = await this.articleModel.findOne({ where: { id: props.id } })
-			if (!article) {
-				throw new HttpException('文章不存在', HttpStatus.BAD_REQUEST)
-			} else if (article.status === 2) {
-				throw new HttpException('文章已删除', HttpStatus.BAD_REQUEST)
-			}
-			await this.articleModel.update(
-				{ id: props.id },
-				{
-					status: article.status ? 0 : 1
-				}
-			)
+			const article = await this.utilsService.validator({
+				message: '文章',
+				empty: true,
+				delete: true,
+				model: this.articleModel,
+				options: { where: { id: props.id } }
+			})
+			await this.articleModel.update({ id: props.id }, { status: article.status ? 0 : 1 })
 
 			return { message: '修改成功' }
 		} catch (e) {
@@ -151,14 +130,12 @@ export class ArticleService {
 	/**文章信息-授权管理端**/
 	public async nodeArticle(props: DTO.NodeArticleParameter) {
 		try {
-			const article = await this.articleModel.findOne({
-				where: { id: props.id },
-				relations: ['source', 'user']
+			return await this.utilsService.validator({
+				message: '文章',
+				empty: true,
+				model: this.articleModel,
+				options: { where: { id: props.id }, relations: ['source', 'user'] }
 			})
-			if (!article) {
-				throw new HttpException('文章不存在', HttpStatus.BAD_REQUEST)
-			}
-			return article
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -167,17 +144,14 @@ export class ArticleService {
 	/**文章信息-客户端**/
 	public async nodeClientArticle(props: DTO.NodeArticleParameter) {
 		try {
-			const article = await this.articleModel.findOne({
-				where: { id: props.id },
-				relations: ['source', 'user']
+			const article = await this.utilsService.validator({
+				message: '文章',
+				empty: true,
+				delete: true,
+				disable: true,
+				model: this.articleModel,
+				options: { where: { id: props.id }, relations: ['source', 'user'] }
 			})
-			if (!article) {
-				throw new HttpException('文章不存在', HttpStatus.BAD_REQUEST)
-			} else if (article.status === 0) {
-				throw new HttpException('文章已禁用', HttpStatus.BAD_REQUEST)
-			} else if (article.status === 2) {
-				throw new HttpException('文章已删除', HttpStatus.BAD_REQUEST)
-			}
 
 			//浏览量加1
 			await this.articleModel.update({ id: props.id }, { browse: article.browse + 1 })
@@ -220,11 +194,24 @@ export class ArticleService {
 				.take(props.size)
 				.getManyAndCount()
 
+			/**查询前3条评论**/
+			const uesComment = list.map(async item => {
+				return {
+					...item,
+					reply: await this.commentService.nodeComments({
+						page: 1,
+						size: 3,
+						one: item.id,
+						type: 1
+					})
+				}
+			})
+
 			return {
 				size: props.size,
 				page: props.page,
 				total,
-				list
+				list: await Promise.all(uesComment)
 			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
@@ -264,11 +251,24 @@ export class ArticleService {
 				.take(props.size)
 				.getManyAndCount()
 
+			/**查询前3条评论**/
+			const uesComment = list.map(async item => {
+				return {
+					...item,
+					reply: await this.commentService.nodeComments({
+						page: 1,
+						size: 3,
+						one: item.id,
+						type: 1
+					})
+				}
+			})
+
 			return {
 				size: props.size,
 				page: props.page,
 				total,
-				list
+				list: await Promise.all(uesComment)
 			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
@@ -278,12 +278,13 @@ export class ArticleService {
 	/**删除文章-授权管理端**/
 	public async nodeDeleteArticle(props: DTO.NodeDeleteArticleParameter) {
 		try {
-			const article = await this.articleModel.findOne({ where: { id: props.id } })
-			if (!article) {
-				throw new HttpException('文章不存在', HttpStatus.BAD_REQUEST)
-			} else if (article.status === 2) {
-				throw new HttpException('文章已删除', HttpStatus.BAD_REQUEST)
-			}
+			await this.utilsService.validator({
+				message: '文章',
+				empty: true,
+				delete: true,
+				model: this.articleModel,
+				options: { where: { id: props.id } }
+			})
 			await this.articleModel.update({ id: props.id }, { status: 2 })
 
 			return { message: '删除成功' }

@@ -60,6 +60,7 @@ export class CommentService {
 		try {
 			const [list = [], total = 0] = await this.commentModel
 				.createQueryBuilder('t')
+				.leftJoinAndSelect('t.user', 'user')
 				.where(
 					new Brackets(Q => {
 						Q.andWhere('t.parent IS :parent', { parent: null })
@@ -67,15 +68,63 @@ export class CommentService {
 						Q.andWhere('t.one = :one', { one: props.one })
 					})
 				)
-				.leftJoinAndSelect('t.user', 'user')
-				.leftJoinAndSelect('t.children', 'children')
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
 				.getManyAndCount()
+
+			const comment = list.map(async item => {
+				return {
+					...item,
+					reply: await this.nodeRecurComment({
+						parent: item.id,
+						one: props.one,
+						type: props.type
+					})
+				}
+			})
 
 			return {
 				size: props.size,
 				page: props.page,
 				total,
-				list
+				list: await Promise.all(comment)
+			}
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**递归查询前3条子评论**/
+	public async nodeRecurComment(props: { parent: number; type: number; one: number }) {
+		try {
+			const [list = [], total = 0] = await this.commentModel
+				.createQueryBuilder('t')
+				.leftJoinAndSelect('t.user', 'user')
+				.leftJoinAndSelect('t.parent', 'parent')
+				.where(
+					new Brackets(Q => {
+						Q.andWhere('parent.id = :id', { id: props.parent })
+						Q.andWhere('t.type = :type', { type: props.type })
+						Q.andWhere('t.one = :one', { one: props.one })
+					})
+				)
+				.skip(0)
+				.take(3)
+				.getManyAndCount()
+
+			const comment = list.map(async item => {
+				return {
+					...item,
+					reply: await this.nodeRecurComment({
+						parent: item.id,
+						one: props.one,
+						type: props.type
+					})
+				}
+			})
+			return {
+				list: await Promise.all(comment),
+				total
 			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
