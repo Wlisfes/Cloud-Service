@@ -4,6 +4,7 @@ import { Repository, In, Not, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { UtilsService } from '@/module/utils/utils.service'
 import { CommentService } from '@/module/comment/comment.service'
+import { StarService } from '@/module/star/star.service'
 import { CloudEntity } from '@/entity/cloud.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
 import { UserEntity } from '@/entity/user.entity'
@@ -14,6 +15,7 @@ export class CloudService {
 	constructor(
 		private readonly utilsService: UtilsService,
 		private readonly commentService: CommentService,
+		private readonly starService: StarService,
 		@InjectRepository(CloudEntity) private readonly cloudModel: Repository<CloudEntity>,
 		@InjectRepository(CloudSourceEntity) private readonly sourceModel: Repository<CloudSourceEntity>,
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>
@@ -169,7 +171,7 @@ export class CloudService {
 	}
 
 	/**音视频信息-客户端**/
-	public async nodeClientCloud(props: DTO.NodeCloudParameter) {
+	public async nodeClientCloud(props: DTO.NodeCloudParameter, uid?: number) {
 		try {
 			const cloud = await this.utilsService.validator({
 				message: '音视频媒体',
@@ -188,7 +190,8 @@ export class CloudService {
 
 			return {
 				...cloud,
-				children: cloud.children.sort((a, b) => a.order - b.order)
+				children: cloud.children.sort((a, b) => a.order - b.order),
+				star: await this.starService.nodeStarTotal({ one: cloud.id, type: 2 }, uid)
 			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
@@ -225,10 +228,11 @@ export class CloudService {
 				.take(props.size)
 				.getManyAndCount()
 
-			/**查询顶层评论总数**/
+			/**查询顶层评论总数、收藏总数**/
 			const uesComment = list.map(async item => {
 				return {
 					...item,
+					star: await this.starService.nodeStarTotal({ one: item.id, type: 2 }, uid),
 					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 2 })
 				}
 			})
@@ -279,7 +283,7 @@ export class CloudService {
 	}
 
 	/**音视频列表-客户端**/
-	public async nodeClientClouds(props: DTO.NodeClientCloudsParameter) {
+	public async nodeClientClouds(props: DTO.NodeClientCloudsParameter, uid?: number) {
 		try {
 			const [list = [], total = 0] = await this.cloudModel
 				.createQueryBuilder('cloud')
@@ -300,10 +304,11 @@ export class CloudService {
 				.take(props.size)
 				.getManyAndCount()
 
-			/**查询顶层评论总数**/
+			/**查询顶层评论总数、收藏总数**/
 			const uesComment = list.map(async item => {
 				return {
 					...item,
+					star: await this.starService.nodeStarTotal({ one: item.id, type: 2 }, uid),
 					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 2 })
 				}
 			})

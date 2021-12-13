@@ -77,21 +77,25 @@ export class CloudController {
 	}
 
 	@ApiOperation({ summary: '音视频列表-客户端' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true, error: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeClientCloudsResponse })
 	@Get('client/list-node')
-	async nodeClientClouds(@Query() query: DTO.NodeClientCloudsParameter) {
-		return await this.cloudService.nodeClientClouds(query)
+	async nodeClientClouds(@Query() query: DTO.NodeClientCloudsParameter, @Req() req: { user?: { uid: number } }) {
+		return await this.cloudService.nodeClientClouds(query, req.user?.uid)
 	}
 
 	@ApiOperation({ summary: '音视频信息-客户端' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true, error: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCloudResponse })
 	@Get('client/info')
-	async nodeClientCloud(@Query() query: DTO.NodeCloudParameter) {
-		return await this.cloudService.nodeClientCloud(query)
+	async nodeClientCloud(@Query() query: DTO.NodeCloudParameter, @Req() req: { user?: { uid: number } }) {
+		return await this.cloudService.nodeClientCloud(query, req.user?.uid)
 	}
 
 	@ApiOperation({ summary: '删除音视频媒体-授权管理端' })
