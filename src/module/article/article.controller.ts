@@ -78,6 +78,15 @@ export class ArticleController {
 		return await this.articleService.nodeClientArticle(query)
 	}
 
+	@ApiOperation({ summary: '文章关键字搜索-客户端' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeArticlesResponse })
+	@Get('client/keyword-node')
+	async nodeSearchArticles(@Query() query: DTO.NodeArticlesParameter) {
+		return await this.articleService.nodeSearchArticles(query)
+	}
+
 	@ApiOperation({ summary: '文章列表-客户端' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')

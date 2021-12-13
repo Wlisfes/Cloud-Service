@@ -218,27 +218,57 @@ export class ArticleService {
 		}
 	}
 
+	/**文章关键字搜索**/
+	public async nodeSearchArticles(props: DTO.NodeArticlesParameter) {
+		try {
+			const [list = [], total = 0] = await this.articleModel
+				.createQueryBuilder('t')
+				.select(['t.id', 't.title'])
+				.where(
+					new Brackets(Q => {
+						if (props.title) {
+							Q.andWhere('t.title LIKE :title', { title: `%${props.title}%` })
+							Q.orWhere('t.description LIKE :description', { description: `%${props.title}%` })
+						}
+					})
+				)
+				.orderBy({ 't.id': 'DESC', 't.order': 'DESC' })
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.getManyAndCount()
+
+			return {
+				size: props.size,
+				page: props.page,
+				total,
+				list
+			}
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
 	/**文章列表-客户端**/
 	public async nodeClientArticles(props: DTO.NodeClientArticlesParameter) {
 		try {
 			const [list = [], total = 0] = await this.articleModel
-				.createQueryBuilder('article')
-				.leftJoinAndSelect('article.source', 'source')
-				.leftJoinAndSelect('article.user', 'user')
-				// .leftJoinAndMapMany('article.star', 'article.source', 'star', 'star.name = :name', { name: 'Git' })
+				.createQueryBuilder('t')
+				.leftJoinAndSelect('t.source', 'source')
+				.leftJoinAndSelect('t.user', 'user')
+				// .leftJoinAndMapMany('t.star', 't.source', 'star', 'star.name = :name', { name: 'Git' })
 				.loadRelationCountAndMap(
-					'article.star',
-					'article.source'
+					't.star',
+					't.source'
 					// 'star', qb =>
 					// qb.andWhere('star.name = :name', { name: 'Git' })
 				)
 				.where(
 					new Brackets(Q => {
-						Q.andWhere('article.status = :status', { status: 1 })
+						Q.andWhere('t.status = :status', { status: 1 })
 
 						if (props.title) {
-							Q.andWhere('article.title LIKE :title', { title: `%${props.title}%` })
-							Q.orWhere('article.description LIKE :description', { description: `%${props.title}%` })
+							Q.andWhere('t.title LIKE :title', { title: `%${props.title}%` })
+							Q.orWhere('t.description LIKE :description', { description: `%${props.title}%` })
 						}
 
 						if (props.source) {
@@ -246,7 +276,7 @@ export class ArticleService {
 						}
 					})
 				)
-				.orderBy({ 'article.id': 'DESC' })
+				.orderBy({ 't.id': 'DESC' })
 				.skip((props.page - 1) * props.size)
 				.take(props.size)
 				.getManyAndCount()
