@@ -1,6 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, Brackets } from 'typeorm'
+import { isEmpty } from 'class-validator'
 import { UtilsService } from '@/module/utils/utils.service'
 import { UserEntity } from '@/entity/user.entity'
 import { CommentEntity } from '@/entity/comment.entity'
@@ -56,14 +57,19 @@ export class CommentService {
 	}
 
 	/**评论列表**/
-	public async nodeComments(props: DTO.NodeCommentsParameter) {
+	public async nodeComments(props: DTO.NodeCommentsParameter, parent?: number | null) {
 		try {
 			const [list = [], total = 0] = await this.commentModel
 				.createQueryBuilder('t')
 				.leftJoinAndSelect('t.user', 'user')
+				.leftJoinAndSelect('t.parent', 'parent')
 				.where(
 					new Brackets(Q => {
-						Q.andWhere('t.parent IS :parent', { parent: null })
+						if (isEmpty(parent)) {
+							Q.andWhere('t.parent IS :parent', { parent: null })
+						} else {
+							Q.andWhere('parent.id = :id', { id: parent })
+						}
 						Q.andWhere('t.type = :type', { type: props.type })
 						Q.andWhere('t.one = :one', { one: props.one })
 					})
@@ -72,14 +78,11 @@ export class CommentService {
 				.take(props.size)
 				.getManyAndCount()
 
-			const comment = list.map(async item => {
+			/**递归查询前3条子评论**/
+			const useRecurComment = list.map(async item => {
 				return {
 					...item,
-					reply: await this.nodeRecurComment({
-						parent: item.id,
-						one: props.one,
-						type: props.type
-					})
+					reply: await this.nodeComments({ page: 1, size: 3, one: props.one, type: props.type }, item.id)
 				}
 			})
 
@@ -87,45 +90,29 @@ export class CommentService {
 				size: props.size,
 				page: props.page,
 				total,
-				list: await Promise.all(comment)
+				list: await Promise.all(useRecurComment)
 			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
 	}
 
-	/**递归查询前3条子评论**/
-	public async nodeRecurComment(props: { parent: number; type: number; one: number }) {
+	/**获取某个项目的顶层评论数**/
+	public async nodeCommentTotal(props: { one: number; type: number; status?: number }) {
 		try {
-			const [list = [], total = 0] = await this.commentModel
+			return await this.commentModel
 				.createQueryBuilder('t')
-				.leftJoinAndSelect('t.user', 'user')
-				.leftJoinAndSelect('t.parent', 'parent')
 				.where(
 					new Brackets(Q => {
-						Q.andWhere('parent.id = :id', { id: props.parent })
+						if (!isEmpty(props.status)) {
+							Q.andWhere('t.status = :status', { status: props.status })
+						}
+						Q.andWhere('t.parent IS :parent', { parent: null })
 						Q.andWhere('t.type = :type', { type: props.type })
 						Q.andWhere('t.one = :one', { one: props.one })
 					})
 				)
-				.skip(0)
-				.take(3)
-				.getManyAndCount()
-
-			const comment = list.map(async item => {
-				return {
-					...item,
-					reply: await this.nodeRecurComment({
-						parent: item.id,
-						one: props.one,
-						type: props.type
-					})
-				}
-			})
-			return {
-				list: await Promise.all(comment),
-				total
-			}
+				.getCount()
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}

@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, Brackets, FindOneOptions } from 'typeorm'
+import { Repository, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { UtilsService } from '@/module/utils/utils.service'
 import { CommentService } from '@/module/comment/comment.service'
@@ -194,16 +194,11 @@ export class ArticleService {
 				.take(props.size)
 				.getManyAndCount()
 
-			/**查询前3条评论**/
+			/**查询顶层评论总数**/
 			const uesComment = list.map(async item => {
 				return {
 					...item,
-					reply: await this.commentService.nodeComments({
-						page: 1,
-						size: 3,
-						one: item.id,
-						type: 1
-					})
+					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 1 })
 				}
 			})
 
@@ -285,16 +280,11 @@ export class ArticleService {
 				.take(props.size)
 				.getManyAndCount()
 
-			/**查询前3条评论**/
+			/**查询顶层评论总数**/
 			const uesComment = list.map(async item => {
 				return {
 					...item,
-					reply: await this.commentService.nodeComments({
-						page: 1,
-						size: 3,
-						one: item.id,
-						type: 1
-					})
+					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 1 })
 				}
 			})
 

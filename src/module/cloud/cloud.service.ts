@@ -1,7 +1,9 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, Not, Like, Brackets } from 'typeorm'
+import { Repository, In, Not, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
+import { UtilsService } from '@/module/utils/utils.service'
+import { CommentService } from '@/module/comment/comment.service'
 import { CloudEntity } from '@/entity/cloud.entity'
 import { CloudSourceEntity } from '@/entity/cloud.source.entity'
 import { UserEntity } from '@/entity/user.entity'
@@ -10,6 +12,8 @@ import * as DTO from './cloud.interface'
 @Injectable()
 export class CloudService {
 	constructor(
+		private readonly utilsService: UtilsService,
+		private readonly commentService: CommentService,
 		@InjectRepository(CloudEntity) private readonly cloudModel: Repository<CloudEntity>,
 		@InjectRepository(CloudSourceEntity) private readonly sourceModel: Repository<CloudSourceEntity>,
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>
@@ -240,11 +244,20 @@ export class CloudService {
 				.skip((props.page - 1) * props.size)
 				.take(props.size)
 				.getManyAndCount()
+
+			/**查询顶层评论总数**/
+			const uesComment = list.map(async item => {
+				return {
+					...item,
+					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 2 })
+				}
+			})
+
 			return {
 				size: props.size,
 				page: props.page,
 				total,
-				list
+				list: await Promise.all(uesComment)
 			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
@@ -307,11 +320,19 @@ export class CloudService {
 				.take(props.size)
 				.getManyAndCount()
 
+			/**查询顶层评论总数**/
+			const uesComment = list.map(async item => {
+				return {
+					...item,
+					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 2 })
+				}
+			})
+
 			return {
 				size: props.size,
 				page: props.page,
 				total,
-				list
+				list: await Promise.all(uesComment)
 			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
