@@ -1,7 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, Not, Like, Brackets } from 'typeorm'
+import { Repository, In, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
+import { UtilsService } from '@/module/utils/utils.service'
 import { MinuteEntity } from '@/entity/minute.entity'
 import { UserEntity } from '@/entity/user.entity'
 import { SourceEntity } from '@/entity/source.entity'
@@ -10,6 +11,7 @@ import * as DTO from './minute.interface'
 @Injectable()
 export class MinuteService {
 	constructor(
+		private readonly utilsService: UtilsService,
 		@InjectRepository(MinuteEntity) private readonly minuteModel: Repository<MinuteEntity>,
 		@InjectRepository(SourceEntity) private readonly sourceModel: Repository<SourceEntity>,
 		@InjectRepository(UserEntity) private readonly userModel: Repository<UserEntity>
@@ -18,20 +20,19 @@ export class MinuteService {
 	/**创建收录-授权管理端**/
 	public async nodeCreateMinute(props: DTO.NodeCreateMinuteParameter, uid: number) {
 		try {
-			let source = []
-			if (props.source?.length > 0) {
-				source = await this.sourceModel.find({ where: { id: In(props.source) } })
-				props.source.forEach(id => {
-					const element = source.find(element => element.id === id)
-					if (!element) {
-						throw new HttpException(`标签id ${id} 不存在`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 0) {
-						throw new HttpException(`标签 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 2) {
-						throw new HttpException(`标签 ${element.name} 已删除`, HttpStatus.BAD_REQUEST)
-					}
+			//验证标签
+			const source = await Promise.all(
+				(props.source || []).map(id => {
+					return this.utilsService.validator({
+						message: `标签id ${id}`,
+						empty: true,
+						delete: true,
+						disable: true,
+						model: this.sourceModel,
+						options: { where: { id } }
+					})
 				})
-			}
+			)
 
 			const user = await this.userModel.findOne({ where: { uid } })
 			const newMinute = await this.minuteModel.create({
@@ -57,24 +58,25 @@ export class MinuteService {
 	/**修改收录-授权管理端**/
 	public async nodeUpdateMinute(props: DTO.NodeUpdateMinuteParameter, uid: number) {
 		try {
-			const minute = await this.minuteModel.findOne({ where: { id: props.id }, relations: ['source'] })
-			if (!minute) {
-				throw new HttpException('收录不存在', HttpStatus.BAD_REQUEST)
-			}
+			//验证收录
+			const minute = await this.utilsService.validator({
+				message: '收录',
+				empty: true,
+				model: this.minuteModel,
+				options: { where: { id: props.id }, relations: ['source'] }
+			})
 
-			if (props.source?.length > 0) {
-				const source = await this.sourceModel.find({ where: { id: In(props.source) } })
-				props.source.forEach(id => {
-					const element = source.find(element => element.id === id)
-					if (!element) {
-						throw new HttpException(`标签id ${id} 不存在`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 0) {
-						throw new HttpException(`标签 ${element.name} 已禁用`, HttpStatus.BAD_REQUEST)
-					} else if (element?.status === 2) {
-						throw new HttpException(`标签 ${element.name} 已删除`, HttpStatus.BAD_REQUEST)
-					}
+			//验证标签
+			await Promise.all(
+				(props.source || []).map(id => {
+					return this.utilsService.validator({
+						message: `标签id ${id}`,
+						empty: true,
+						model: this.sourceModel,
+						options: { where: { id } }
+					})
 				})
-			}
+			)
 
 			//删除已有的标签
 			await this.minuteModel
@@ -109,12 +111,13 @@ export class MinuteService {
 	/**切换收录状态-授权管理端**/
 	public async nodeMinuteCutover(props: DTO.NodeMinuteCutoverParameter) {
 		try {
-			const minute = await this.minuteModel.findOne({ where: { id: props.id } })
-			if (!minute) {
-				throw new HttpException('收录不存在', HttpStatus.BAD_REQUEST)
-			} else if (minute.status === 2) {
-				throw new HttpException('收录已删除', HttpStatus.BAD_REQUEST)
-			}
+			const minute = await this.utilsService.validator({
+				message: '收录',
+				empty: true,
+				delete: true,
+				model: this.minuteModel,
+				options: { where: { id: props.id } }
+			})
 			await this.minuteModel.update(
 				{ id: props.id },
 				{
@@ -131,14 +134,12 @@ export class MinuteService {
 	/**收录信息-授权管理端**/
 	public async nodeMinute(props: DTO.NodeMinuteParameter) {
 		try {
-			const minute = await this.minuteModel.findOne({
-				where: { id: props.id },
-				relations: ['source', 'user']
+			return await this.utilsService.validator({
+				message: '收录',
+				empty: true,
+				model: this.minuteModel,
+				options: { where: { id: props.id }, relations: ['source', 'user'] }
 			})
-			if (!minute) {
-				throw new HttpException('收录不存在', HttpStatus.BAD_REQUEST)
-			}
-			return minute
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -147,19 +148,14 @@ export class MinuteService {
 	/**收录信息-客户端**/
 	public async nodeClientMinute(props: DTO.NodeMinuteParameter) {
 		try {
-			const minute = await this.minuteModel.findOne({
-				where: { id: props.id },
-				relations: ['source', 'user']
+			return await this.utilsService.validator({
+				message: '收录',
+				empty: true,
+				disable: true,
+				delete: true,
+				model: this.minuteModel,
+				options: { where: { id: props.id }, relations: ['source', 'user'] }
 			})
-			if (!minute) {
-				throw new HttpException('收录不存在', HttpStatus.BAD_REQUEST)
-			} else if (minute.status === 0) {
-				throw new HttpException('收录已禁用', HttpStatus.BAD_REQUEST)
-			} else if (minute.status === 2) {
-				throw new HttpException('收录已删除', HttpStatus.BAD_REQUEST)
-			}
-
-			return minute
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
@@ -248,12 +244,13 @@ export class MinuteService {
 	/**删除收录-授权管理端**/
 	public async nodeDeleteMinute(props: DTO.NodeDeleteMinuteParameter) {
 		try {
-			const minute = await this.minuteModel.findOne({ where: { id: props.id } })
-			if (!minute) {
-				throw new HttpException('收录不存在', HttpStatus.BAD_REQUEST)
-			} else if (minute.status === 2) {
-				throw new HttpException('收录已删除', HttpStatus.BAD_REQUEST)
-			}
+			const minute = await this.utilsService.validator({
+				message: '收录',
+				empty: true,
+				delete: true,
+				model: this.minuteModel,
+				options: { where: { id: props.id } }
+			})
 			await this.minuteModel.update({ id: props.id }, { status: 2 })
 
 			return { message: '删除成功' }
