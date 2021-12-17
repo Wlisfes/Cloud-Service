@@ -39,7 +39,7 @@ export class AppService {
 				const role = await this.roleModel.find()
 				const newUser = await this.userModel.create({
 					account: 88888888,
-					nickname: '妖雨纯',
+					nickname: '超级管理员',
 					password: '123456',
 					role
 				})
