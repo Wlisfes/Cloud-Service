@@ -7,6 +7,9 @@ export class CommentEntity extends BaseEntity {
 	@Column({ nullable: false, comment: '评论类型ID' })
 	one: number
 
+	@Column({ nullable: true, default: null, comment: '顶层评论ID' })
+	super: number
+
 	@Column({ nullable: false, comment: '评论类型 1.文章 2.媒体' })
 	type: number
 

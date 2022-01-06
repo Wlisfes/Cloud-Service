@@ -13,6 +13,9 @@ export class CommentResponse {
 	@ApiProperty({ description: '评论类型ID', example: 1 })
 	one: number
 
+	@ApiProperty({ description: '顶层评论ID' })
+	super: number
+
 	@ApiPropertyOptional({ description: '状态: 0.禁用 1.启用 2.删除', enum: [0, 1, 2], example: 1 })
 	status: number
 
@@ -39,6 +42,11 @@ export class CommentParameter {
 	@IsNotEmpty({ message: '评论类型 必填' })
 	@Type(type => Number)
 	one: number
+
+	@ApiPropertyOptional({ description: '顶层评论ID' })
+	@IsOptional({}, { string: true, number: true })
+	@Type(type => Number)
+	super: number
 
 	@ApiProperty({ description: '评论类型', enum: [1, 2], example: 1 })
 	@IsNotEmpty({ message: '评论类型 必填' })
@@ -74,7 +82,10 @@ export class CommentParameter {
  *
  * 创建评论-Parameter
  *************************************************************************************************/
-export class NodeCreateCommentParameter extends PickType(CommentParameter, ['type', 'one', 'comment', 'parent']) {}
+export class NodeCreateCommentParameter extends IntersectionType(
+	PickType(CommentParameter, ['type', 'one', 'comment']),
+	PickType(CommentParameter, ['parent', 'super'])
+) {}
 /**创建评论-Response**/
 export class NodeCreateCommentResponse {
 	@ApiProperty({ description: 'message', example: '创建成功' })
@@ -98,7 +109,7 @@ export class NodeCommentCutoverResponse {
  *
  * 评论列表Parameter
  *************************************************************************************************/
-export class NodeCommentsParameter extends PickType(CommentParameter, ['one', 'type', 'page', 'size']) {}
+export class NodeCommentsParameter extends PickType(CommentParameter, ['one', 'type', 'super', 'page', 'size']) {}
 /**评论列表Response**/
 export class NodeCommentsResponse extends PickType(CommentResponse, ['page', 'size', 'total']) {
 	@ApiProperty({ description: '评论列表', type: [CommentResponse], example: [] })

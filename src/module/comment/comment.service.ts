@@ -30,6 +30,7 @@ export class CommentService {
 				comment: props.comment,
 				type: props.type,
 				one: props.one,
+				super: props.super || null,
 				parent,
 				user
 			})
@@ -57,7 +58,7 @@ export class CommentService {
 	}
 
 	/**评论列表**/
-	public async nodeComments(props: DTO.NodeCommentsParameter, parent?: number | null) {
+	public async nodeComments(props: DTO.NodeCommentsParameter) {
 		try {
 			const [list = [], total = 0] = await this.commentModel
 				.createQueryBuilder('t')
@@ -65,11 +66,7 @@ export class CommentService {
 				.leftJoinAndSelect('t.parent', 'parent')
 				.where(
 					new Brackets(Q => {
-						if (isEmpty(parent)) {
-							Q.andWhere('t.parent IS :parent', { parent: null })
-						} else {
-							Q.andWhere('parent.id = :id', { id: parent })
-						}
+						Q.andWhere('t.parent IS :parent', { parent: null })
 						Q.andWhere('t.type = :type', { type: props.type })
 						Q.andWhere('t.one = :one', { one: props.one })
 					})
@@ -82,7 +79,13 @@ export class CommentService {
 			const useRecurComment = list.map(async item => {
 				return {
 					...item,
-					reply: await this.nodeComments({ page: 1, size: 3, one: props.one, type: props.type }, item.id)
+					reply: await this.nodeChildComments({
+						page: 1,
+						size: 3,
+						one: props.one,
+						type: props.type,
+						super: item.id
+					})
 				}
 			})
 
@@ -91,6 +94,35 @@ export class CommentService {
 				page: props.page,
 				total,
 				list: await Promise.all(useRecurComment)
+			}
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**评论子列表**/
+	public async nodeChildComments(props: DTO.NodeCommentsParameter) {
+		try {
+			const [list = [], total = 0] = await this.commentModel
+				.createQueryBuilder('t')
+				.leftJoinAndSelect('t.user', 'user')
+				.leftJoinAndSelect('t.parent', 'parent')
+				.where(
+					new Brackets(Q => {
+						Q.andWhere('t.super = :super', { super: props.super })
+						Q.andWhere('t.type = :type', { type: props.type })
+						Q.andWhere('t.one = :one', { one: props.one })
+					})
+				)
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.orderBy({ 't.createTime': 'DESC' })
+				.getManyAndCount()
+			return {
+				size: props.size,
+				page: props.page,
+				total,
+				list
 			}
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
