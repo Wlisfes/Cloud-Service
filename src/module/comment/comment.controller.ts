@@ -38,8 +38,17 @@ export class CommentController {
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCommentsResponse })
 	@Get('list-node')
-	async nodeClouds(@Query() query: DTO.NodeCommentsParameter) {
+	async nodeComments(@Query() query: DTO.NodeCommentsParameter) {
 		return await this.commentService.nodeComments(query)
+	}
+
+	@ApiOperation({ summary: '子评论列表' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCommentsResponse })
+	@Get('child/list-node')
+	async nodeChildComments(@Query() query: DTO.NodeCommentsParameter) {
+		return await this.commentService.nodeChildComments(query)
 	}
 
 	@ApiOperation({ summary: '删除评论' })

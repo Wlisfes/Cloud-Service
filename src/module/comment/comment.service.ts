@@ -73,6 +73,7 @@ export class CommentService {
 				)
 				.skip((props.page - 1) * props.size)
 				.take(props.size)
+				.orderBy({ 't.createTime': 'DESC' })
 				.getManyAndCount()
 
 			/**递归查询前3条子评论**/
