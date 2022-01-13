@@ -26,7 +26,6 @@ export class CloudService {
 		try {
 			const parent = await this.utilsService.validator({
 				message: '父级媒体',
-				empty: true,
 				disable: true,
 				delete: true,
 				model: this.cloudModel,
