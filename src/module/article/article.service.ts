@@ -206,7 +206,7 @@ export class ArticleService {
 				return {
 					...item,
 					star: await this.starService.nodeStarTotal({ one: item.id, type: 1 }, uid),
-					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 1 })
+					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 1, status: 1 })
 				}
 			})
 
@@ -288,7 +288,7 @@ export class ArticleService {
 				return {
 					...item,
 					star: await this.starService.nodeStarTotal({ one: item.id, type: 1 }, uid),
-					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 1 })
+					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 1, status: 1 })
 				}
 			})
 

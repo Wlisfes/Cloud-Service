@@ -232,7 +232,7 @@ export class CloudService {
 				return {
 					...item,
 					star: await this.starService.nodeStarTotal({ one: item.id, type: 2 }, uid),
-					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 2 })
+					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 2, status: 1 })
 				}
 			})
 
@@ -308,7 +308,7 @@ export class CloudService {
 				return {
 					...item,
 					star: await this.starService.nodeStarTotal({ one: item.id, type: 2 }, uid),
-					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 2 })
+					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 2, status: 1 })
 				}
 			})
 

@@ -132,7 +132,7 @@ export class CommentService {
 		}
 	}
 
-	/**获取某个项目的顶层评论数**/
+	/**获取某个项目的总评论数**/
 	public async nodeCommentTotal(props: { one: number; type: number; status?: number }) {
 		try {
 			return await this.commentModel
@@ -142,7 +142,7 @@ export class CommentService {
 						if (!isEmpty(props.status)) {
 							Q.andWhere('t.status = :status', { status: props.status })
 						}
-						Q.andWhere('t.parent IS :parent', { parent: null })
+						// Q.andWhere('t.parent IS :parent', { parent: null })
 						Q.andWhere('t.type = :type', { type: props.type })
 						Q.andWhere('t.one = :one', { one: props.one })
 					})
