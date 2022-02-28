@@ -31,6 +31,7 @@ export class BannerService {
 						}))
 					})
 				)
+				.toPromise()
 		} catch (e) {
 			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
