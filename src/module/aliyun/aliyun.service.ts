@@ -86,9 +86,9 @@ export class AliyunService {
 	}
 
 	/**获取播放凭证**/
-	async createPlayAuth(prosp: DTO.CreatePlayAuth): Promise<DTO.AliyunCreatePlayAuthResponse> {
+	async createPlayAuth(props: DTO.CreatePlayAuth): Promise<DTO.AliyunCreatePlayAuthResponse> {
 		try {
-			const response: any = await this.client.request('GetVideoPlayAuth', { ...prosp }, {})
+			const response: any = await this.client.request('GetVideoPlayAuth', { ...props }, {})
 			if (response?.VideoMeta?.VideoId) {
 				const { PlayAuth, RequestId, VideoMeta } = response
 				return {
@@ -106,7 +106,12 @@ export class AliyunService {
 	/**获取URL鉴权**/
 	async createPlayURLAuth(props: DTO.CreatePlayURLAuth) {
 		try {
-			console.log(props)
+			const response = await this.client.request(
+				'GetMezzanineInfo',
+				{ VideoId: props.VideoId, AuthTimeout: 86400 },
+				{}
+			)
+			return response
 		} catch (e) {
 			throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
 		}
