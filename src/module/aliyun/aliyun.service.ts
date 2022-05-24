@@ -103,6 +103,15 @@ export class AliyunService {
 		}
 	}
 
+	/**获取URL鉴权**/
+	async createPlayURLAuth(props: DTO.CreatePlayURLAuth) {
+		try {
+			console.log(props)
+		} catch (e) {
+			throw new HttpException(e.data.Message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
 	/**获取播放信息**/
 	async createPlayInfo(prosp: DTO.CreatePlayInfo) {
 		try {

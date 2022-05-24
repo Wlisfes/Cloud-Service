@@ -60,6 +60,15 @@ export class AliyunController {
 		return await this.aliyunService.createPlayAuth(props)
 	}
 
+	@ApiOperation({ summary: '获取URL鉴权' })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.AliyunCreatePlayURLAuthResponse })
+	@Get('play-url-auth')
+	async createPlayURLAuth(@Query() props: DTO.CreatePlayURLAuth) {
+		return await this.aliyunService.createPlayURLAuth(props)
+	}
+
 	@ApiOperation({ summary: '获取播放信息' })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
@@ -70,8 +79,8 @@ export class AliyunController {
 	}
 
 	@ApiOperation({ summary: '创建Oss-STS授权' })
-	// @ApiBearerAuth(APP_AUTH_TOKEN)
-	// @AuthToken({ login: true })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeOssStsResponse })
