@@ -103,12 +103,12 @@ export class AliyunService {
 		}
 	}
 
-	/**获取URL鉴权**/
-	async createPlayURLAuth(props: DTO.CreatePlayURLAuth) {
+	/**获取源文件信息**/
+	async createOriginFile(props: DTO.CreateOriginFile) {
 		try {
 			const response = await this.client.request(
 				'GetMezzanineInfo',
-				{ VideoId: props.VideoId, AuthTimeout: 86400 },
+				{ VideoId: props.VideoId, AuthTimeout: props.AuthTimeout },
 				{}
 			)
 			return response

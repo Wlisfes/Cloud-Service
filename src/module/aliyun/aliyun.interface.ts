@@ -223,10 +223,10 @@ export class AliyunCreatePlayAuthResponse extends PickType(AliyunInterface, ['Re
 	props: VideoMeta
 }
 
-/**获取URL鉴权--Parameter**/
-export class CreatePlayURLAuth extends PickType(AliyunParameter, ['VideoId', 'AuthInfoTimeout']) {}
-/**获取URL鉴权--Response**/
-export class AliyunCreatePlayURLAuthResponse extends PickType(AliyunInterface, ['RequestId', 'PlayAuth']) {
+/**获取源文件信息--Parameter**/
+export class CreateOriginFile extends PickType(AliyunParameter, ['VideoId', 'AuthTimeout']) {}
+/**获取源文件信息--Response**/
+export class AliyunCreateOriginFileResponse extends PickType(AliyunInterface, ['RequestId', 'PlayAuth']) {
 	@ApiProperty({ description: '视频Meta信息', type: VideoMeta })
 	props: VideoMeta
 }
