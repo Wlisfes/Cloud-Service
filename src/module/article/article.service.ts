@@ -174,6 +174,18 @@ export class ArticleService {
 		try {
 			const [list = [], total = 0] = await this.articleModel
 				.createQueryBuilder('article')
+				.select([
+					'article.id',
+					'article.title',
+					'article.description',
+					'article.cover',
+					'article.browse',
+					'article.createTime',
+					'article.updateTime',
+					'article.order',
+					'article.status',
+					'article.url'
+				])
 				.leftJoinAndSelect('article.source', 'source')
 				.leftJoinAndSelect('article.user', 'user')
 				.where(
@@ -260,6 +272,18 @@ export class ArticleService {
 		try {
 			const [list = [], total = 0] = await this.articleModel
 				.createQueryBuilder('t')
+				.select([
+					't.id',
+					't.title',
+					't.description',
+					't.cover',
+					't.browse',
+					't.createTime',
+					't.updateTime',
+					't.order',
+					't.status',
+					't.url'
+				])
 				.leftJoinAndSelect('t.source', 'source')
 				.leftJoinAndSelect('t.user', 'user')
 				// .leftJoinAndMapMany('t.star', 't.source', 'star', 'star.name = :name', { name: 'Git' })
