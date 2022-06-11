@@ -35,7 +35,7 @@ export class UserService {
 			color: true,
 			noise: 4,
 			width: 100,
-			height: 32,
+			height: 40,
 			inverse: true,
 			charPreset: '1234567890',
 			background: '#cc9966'
