@@ -56,15 +56,26 @@ export class CloudController {
 		return await this.cloudService.nodeCloud(query)
 	}
 
-	@ApiOperation({ summary: '音视频列表-授权管理端' })
+	@ApiOperation({ summary: '短片列表-授权管理端' })
 	@ApiBearerAuth(APP_AUTH_TOKEN)
 	@AuthToken({ login: true })
 	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
 	@ApiProduces('application/json', 'application/xml')
 	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCloudsResponse })
-	@Get('list-node')
-	async nodeClouds(@Query() query: DTO.NodeCloudsParameter, @Req() req: { user: { uid: number } }) {
-		return await this.cloudService.nodeClouds(query, req.user.uid)
+	@Get('media')
+	async nodeCloudMedia(@Query() query: DTO.NodeCloudsParameter, @Req() req: { user: { uid: number } }) {
+		return await this.cloudService.nodeCloudMedia(query, req.user.uid)
+	}
+
+	@ApiOperation({ summary: '番剧列表-授权管理端' })
+	@ApiBearerAuth(APP_AUTH_TOKEN)
+	@AuthToken({ login: true })
+	@ApiConsumes('application/x-www-form-urlencoded', 'application/json')
+	@ApiProduces('application/json', 'application/xml')
+	@ApiResponse({ status: 200, description: 'OK', type: () => DTO.NodeCloudsResponse })
+	@Get('dinner')
+	async nodeCloudDinner(@Query() query: DTO.NodeCloudsParameter, @Req() req: { user: { uid: number } }) {
+		return await this.cloudService.nodeCloudDinner(query, req.user.uid)
 	}
 
 	@ApiOperation({ summary: '音视频关键字搜索-客户端' })

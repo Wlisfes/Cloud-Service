@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, Not, Brackets } from 'typeorm'
+import { Repository, In, Not, IsNull, Brackets } from 'typeorm'
 import { isEmpty } from 'class-validator'
 import { UtilsService } from '@/module/utils/utils.service'
 import { CommentService } from '@/module/comment/comment.service'
@@ -197,8 +197,58 @@ export class CloudService {
 		}
 	}
 
-	/**音视频列表-授权管理端**/
-	public async nodeClouds(props: DTO.NodeCloudsParameter, uid: number) {
+	/**短片列表-授权管理端**/
+	public async nodeCloudMedia(props: DTO.NodeCloudsParameter, uid: number) {
+		try {
+			const [list = [], total = 0] = await this.cloudModel
+				.createQueryBuilder('cloud')
+				.leftJoinAndSelect('cloud.user', 'user')
+				.leftJoinAndSelect('cloud.parent', 'parent')
+				.where(
+					new Brackets(Q => {
+						Q.where('user.uid = :uid', { uid })
+						Q.andWhere('cloud.type = :type', { type: 1 })
+						Q.andWhere('cloud.parent IS NULL')
+
+						if (isEmpty(props.status)) {
+							Q.andWhere('cloud.status != :status', { status: 2 })
+						} else {
+							Q.andWhere('cloud.status = :status', { status: props.status })
+						}
+
+						if (props.title) {
+							Q.andWhere('cloud.title LIKE :title', { title: `%${props.title}%` })
+							Q.orWhere('cloud.description LIKE :description', { description: `%${props.title}%` })
+						}
+					})
+				)
+				.orderBy({ 'cloud.id': 'DESC' })
+				.skip((props.page - 1) * props.size)
+				.take(props.size)
+				.getManyAndCount()
+
+			/**查询顶层评论总数、收藏总数**/
+			const uesComment = list.map(async item => {
+				return {
+					...item,
+					star: await this.starService.nodeStarTotal({ one: item.id, type: 2 }, uid),
+					comment: await this.commentService.nodeCommentTotal({ one: item.id, type: 2, status: 1 })
+				}
+			})
+
+			return {
+				size: props.size,
+				page: props.page,
+				total,
+				list: await Promise.all(uesComment)
+			}
+		} catch (e) {
+			throw new HttpException(e.message || e.toString(), HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	/**番剧列表-授权管理端**/
+	public async nodeCloudDinner(props: DTO.NodeCloudsParameter, uid: number) {
 		try {
 			const [list = [], total = 0] = await this.cloudModel
 				.createQueryBuilder('cloud')
@@ -206,9 +256,7 @@ export class CloudService {
 				.where(
 					new Brackets(Q => {
 						Q.where('user.uid = :uid', { uid })
-						if (!isEmpty(props.type)) {
-							Q.andWhere('cloud.type = :type', { type: props.type })
-						}
+						Q.andWhere('cloud.type = :type', { type: 2 })
 
 						if (isEmpty(props.status)) {
 							Q.andWhere('cloud.status != :status', { status: 2 })

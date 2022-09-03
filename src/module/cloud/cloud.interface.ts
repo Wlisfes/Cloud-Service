@@ -197,11 +197,6 @@ export class NodeCloudResponse extends IntersectionType(
  * 音视频列表-授权管理端Parameter
  *************************************************************************************************/
 export class NodeCloudsParameter extends PickType(CloudParameter, ['page', 'size', 'status']) {
-	@ApiPropertyOptional({ description: '媒体类型: 1.单集媒体 2.多集媒体', enum: [1, 2], example: 1 })
-	@IsOptional({}, { string: true, number: true })
-	@Type(type => Number)
-	type: number
-
 	@ApiPropertyOptional({ description: '媒体标题' })
 	@IsOptional({}, { string: true, number: true })
 	title: string
