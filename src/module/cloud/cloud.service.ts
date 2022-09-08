@@ -204,6 +204,7 @@ export class CloudService {
 				.createQueryBuilder('cloud')
 				.leftJoinAndSelect('cloud.user', 'user')
 				.leftJoinAndSelect('cloud.parent', 'parent')
+				.leftJoinAndSelect('cloud.source', 'source')
 				.where(
 					new Brackets(Q => {
 						Q.where('user.uid = :uid', { uid })
@@ -253,6 +254,7 @@ export class CloudService {
 			const [list = [], total = 0] = await this.cloudModel
 				.createQueryBuilder('cloud')
 				.leftJoinAndSelect('cloud.user', 'user')
+				.leftJoinAndSelect('cloud.source', 'source')
 				.where(
 					new Brackets(Q => {
 						Q.where('user.uid = :uid', { uid })
